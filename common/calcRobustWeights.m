@@ -1,0 +1,22 @@
+function wRob = calcRobustWeights(res, jac)
+% wRob = calcRobustWeight(res)
+% calculates biquared robust weights from fit residuals and jacobian according
+% DuMouchel and O'Brien in
+% Computing and Graphics in Statisitics
+% (Buja, A., Tukey, P.A., eds.)
+% Springer New York (1991)
+% p41-48
+K = 4.685;
+mad = median(abs(res));
+robVar = mad/0.6745;
+% compute leverage adjustment from the jacobian ('design matrix');
+% matrix inverse calculated via qr algorithm (see matlab documentation)
+[Q,R] = qr(jac,0);
+E = jac/R;
+h = min(.9999, sum(E.*E,2));
+adjFactor = 1 ./ sqrt(1-h);
+  
+wResAdjusted = adjFactor.*res/(K*robVar);
+wRob = zeros(size(res));
+iNonZero = find(abs(wResAdjusted) < 1);
+wRob(iNonZero) = (1-wResAdjusted(iNonZero).^2).^2;

@@ -1,0 +1,24 @@
+function fid = SetIniPars(iniName, iniPars);
+fid = fopen(iniName, 'wt');
+if (fid == -1)
+    return;
+end
+clNames = fieldnames(iniPars);
+for i=1:length(clNames)
+    fieldstr = char(clNames(i));
+    par = iniPars.(fieldstr)
+    fprintf(fid, '%s',fieldstr);
+    if (~isstr(par))
+         % Use the adaptive formatting of the
+          % MATLAB num2str function
+        
+      for n =1:length(par)
+  
+          
+    else
+        fprintf(fid, '>%s', par);
+    end
+    fprintf(fid, '\n');
+end
+fclose(fid);
+        
