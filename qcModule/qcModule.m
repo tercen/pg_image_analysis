@@ -19,14 +19,9 @@ if isempty(v);
     return
 end
 
-iPoint = findstr(vFile,'.');
-vFileOut = [vFile(1:iPoint-1),'_qcout.v'];
-
 eCode = 1;
 if isequal(iniPars.qcMethod, 'Kinase')
-    [vOut, eCode] = qcKinase(v, settingsFile,1);
-    
-  vWrite(vFileOut, vOut);
+    [vOut, eCode] = qcKinase(v, settingsFile);
 else
     fprintf(MSGOUT, 'Unknown QC method: %s',iniPars.qcMethod);
     eCode = 0;
