@@ -1,4 +1,6 @@
 function imgCollectResults(sBatchFile, sRootDir, sMode, sInstrument)
+% compile
+% mcc -m -d [dest dir] imgCollectResults
 % messages from msgCollectResults will be written to fid = MSGOUT
 % 1: standard out
 global MSGOUT;

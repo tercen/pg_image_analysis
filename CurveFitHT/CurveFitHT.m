@@ -1,4 +1,6 @@
 function varargout = CurveFitHT(varargin)
+% compile
+% mcc -m -d [dest dir] CurveFitHT CurveFitHT_pragma
 % RdW2004, PamGene International, CurveFitHT vs1.0 
 % CURVEFITHT M-file for CurveFitHT.fig
 %      CURVEFITHT, by itself, creates a new CURVEFITHT or raises the existing

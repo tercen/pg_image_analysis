@@ -1,4 +1,6 @@
 function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile, sBatchFile)
+% compile:
+% mcc -m -d C:\PamSoft\DataAnalysis\img\bin imgSetupBatch ppFun5
 %function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile,sBatchFile)
 global MSGOUT
 MSGOUT = 1;
