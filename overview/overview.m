@@ -315,10 +315,10 @@ if cbVal == 1
                 x = str2num(char(clData(j, iX))) + 1 - ymin;
                 y = str2num(char(clData(j, iY))) + 1 - xmin;
                 hold on
-                h = plot(x, y, 'yo');
+                h = plot(x, y, 'y.');
                 dDiam = char(clData(j, iDiam));
                 dDiam = str2num(dDiam);
-                set(h, 'LineWidth', 0.3, 'MarkerSize', dDiam/1.7);
+                set(h, 'LineWidth', 0.3);
          
             end
            

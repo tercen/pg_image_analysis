@@ -19,6 +19,7 @@ if nargin < 3
 else
     IniPars.instrument = 'PS96';
     IniPars.dataMode = 'kinetics';
+    IniPars.mExpMaxModeSig  = 3000;
     [IniPars, fid] = getparsfromfile(sConfigurationFile, IniPars);
     sInstrument = IniPars.instrument;
     sMode = IniPars.dataMode;
@@ -96,25 +97,42 @@ if (fid ~= -1)
                 fprintf(MSGOUT, 'Problem creating directories in: %s\n', sRootDir);
             end
         elseif isequal(sMode, 'endpoint') 
-            % when the batchmode is 'endpoint', the only action is to copy
-            % the resultfile with checked naming to a quantified results
-            % directory.
+            % MultiExp Data Collection
+            
+            
             if mkdir(sRootDir, '_Quantified Results')
-                dest = [sRootDir, '\_Quantified Results'];
-                for nRes=1:length(ResultList)
-                    fName =    [ResultList(nRes).chipID, '_', ...
-                                ResultList(nRes).sampleID, '_', ...
-                                ResultList(nRes).arrayID,'_',...
-                                ResultList(nRes).filter,'_',...
-                                ResultList(nRes).integrationTime,'_',...
-                                ResultList(nRes).pumpCycle,'.txt'];
-                    fPath = [dest, '\', fName];
-                     
-                    if ~copyfile(ResultList(nRes).resultFile, fPath);
-                        fprintf(MSGOUT, 'Could not copy results to %s\n', fPath);
+                % go trough the result list and find the results of images
+                % from the same array with different exposures.
+                sDstDir = [sRootDir, '\_Quantified Results'];
+                uniqueChips = vGetUniqueID(ResultList, 'chipID');
+                [clChips{1:length(ResultList)}] = deal(ResultList.chipID);
+                iDone = 0;
+                for iChip = 1:length(uniqueChips)
+                    iMatch = strmatch(uniqueChips{iChip}, clChips);
+                    currentChipList = ResultList(iMatch);
+                    uniqueWells = vGetUniqueID(currentChipList, 'arrayID');
+                    [clWells{1:length(currentChipList)}] = deal(currentChipList.arrayID);
+                    for iWell = 1:length(uniqueWells)
+                        iMatch = strmatch(uniqueWells{iWell}, clWells);
+                        currentWellList = currentChipList(iMatch);
+                        uniqueFilter = vGetUniqueID(currentWellList, 'filter');
+                        [clFilter{1:length(currentWellList)}] = deal(currentWellList.filter);
+                        for iFilter = 1:length(uniqueFilter)
+                            iMatch = strmatch(uniqueFilter{iFilter}, clFilter);
+                            MultExpList = currentWellList(iMatch);
+
+
+                            % finally the list of multiple exposure
+                            % images from current ChipWellFilter:
+                         
+                            multExpIntegration(MultExpList, sDstDir, IniPars.mExpMaxModeSig, sInstrument);
+                            iDone = iDone + length(MultExpList);
+                            fprintf(MSGOUT, 'done %d/%d\n', iDone, length(ResultList));
+                            
+                        end
                     end
-                    fprintf(MSGOUT, 'done: %d/%d\n', nRes, length(ResultList))                                 
                 end
+                          
             else
                 fprintf(MSGOUT, 'Problem creating directories in: %s', sDataRoot);
                 exitCode = 0;
@@ -187,12 +205,12 @@ for  i=1:length(imageList)
             ResultList(nListed).integrationTime = char(integrationTime);
             ResultList(nListed).pumpCycle = char(pumpCycle);
             if isempty(chipID)
-                ResultList(nListed).chipID = 'XXXX';
+                ResultList(nListed).chipID = '0000';
             else
               ResultList(nListed).chipID      = char(chipID);
             end
             if isempty(sampleID)
-                ResultList(nListed).sampleID = 'XXXX';
+                ResultList(nListed).sampleID = '0000';
             else
                 ResultList(nListed).sampleID     = char(sampleID);
             end
@@ -304,3 +322,88 @@ if isequal(sMode, 'kinetics')
         result = 0;
     end
 end   
+
+function multExpIntegration(MultExpList, dstDir, maxModeSignal, sInstrument)
+nExp = length(MultExpList);
+
+clMeas{1} = 'Gene ID';
+clMeas{2} ='Row';
+clMeas{3} = 'Column';
+clMeas{4} = 'Signal Mean';
+clMeas{5} = 'Background Mean';
+clMeas{6} = 'Signal Median';
+clMeas{7} = 'Background Median';
+clMeas{8} = 'Signal Mode';
+clMeas{9} = 'Background Mode';
+
+vRes = [];
+for i =1:nExp
+    strFile = MultExpList(i).resultFile;
+    v = vFromImgResults(strFile, clMeas);
+        strT = MultExpList(i).integrationTime;
+    exposureTime = str2num(strT(2:length(strT)));
+    
+    for j = 1:length(v)
+        % combine Gene ID with array position
+        v(j).Gene_ID = [v(j).Gene_ID,'_(',num2str(v(j).Row),':',num2str(v(j).Column),')'];
+        v(j).exposureTime = exposureTime;
+    end
+    v = rmfield(v, clMeas(2:3));
+    vRes = [vRes, v];
+end
+clUniqueID  = vGetUniqueID(vRes, 'Gene_ID');
+[clIDList{1:length(vRes)}] = deal(vRes.Gene_ID);
+
+iSet = 0;
+for i =1:length(clUniqueID)
+    % for each Gene_ID find the highest exposure time < maxModeSignal 
+    iSet = iSet + 1;
+    iMatch = strmatch(clUniqueID{i}, clIDList);
+    [clExpTime{1:length(iMatch)}] = deal(vRes(iMatch).exposureTime);
+    expTime = cell2mat(clExpTime);
+    [clModeSig{1:length(iMatch)}] = deal(vRes(iMatch).Signal_Mode);
+    modeSig = cell2Mat(clModeSig);
+    [expTime, iSort] = sort(expTime);
+    modeSig = modeSig(iSort);
+    iIn = find(modeSig <= maxModeSignal);
+    if isempty(iIn)
+        Saturation(iSet) = 1;
+        iIn = 1;
+    else
+        Saturation(iSet) = 0;
+        iIn = iIn(length(iIn));
+    end
+    % store the result in vExp;
+    vExp(iSet) = vRes(iMatch(iIn));
+end
+
+for iSet = 1:length(vExp)
+    % scale with exposure time / add background subtraction / stauration
+    % flag0
+    
+    vExp(iSet).Signal_Mean          = vExp(iSet).Signal_Mean/vExp(iSet).exposureTime;
+    vExp(iSet).Background_Mean      = vExp(iSet).Background_Mean/vExp(iSet).exposureTime;
+    vExp(iSet).Background_Median    = vExp(iSet).Background_Median/vExp(iSet).exposureTime;
+    vExp(iSet).Signal_Median        = vExp(iSet).Signal_Median/vExp(iSet).exposureTime;
+    vExp(iSet).Signal_Mode          = vExp(iSet).Signal_Mode/vExp(iSet).exposureTime;
+    vExp(iSet).Background_Mode      = vExp(iSet).Background_Mode/vExp(iSet).exposureTime;
+    vExp(iSet).SigmBg_Mean          = vExp(iSet).Signal_Mean - vExp(iSet).Background_Mean;
+    vExp(iSet).SigmBg_Median        = vExp(iSet).Signal_Median - vExp(iSet).Background_Median;
+    vExp(iSet).SigmBg_Mode          = vExp(iSet).Signal_Mode - vExp(iSet).Background_Mode;
+    vExp(iSet).Saturation           = Saturation(iSet);
+end
+
+
+% save to disk.
+fName = [MultExpList(1).chipID,'_',MultExpList(1).sampleID,'_',MultExpList(1).arrayID,'_',MultExpList(1).filter,'.v'];
+
+clHdr{1}                        = fName;
+clHdr{2}                        = ['Created from data from a',num2str(length(MultExpList)),' image exposure time series'];
+clHdr{3}                        = ['All Signal and Background values have been scaled to vaue/ms.'];
+vGen.Date                       = date;
+vGen.chipID                     = MultExpList(1).chipID;
+vGen.arrayID                    = MultExpList(1).arrayID;
+vGen.sampleID                   = MultExpList(1).sampleID;
+vGen.maxSignal_Mode             = maxModeSignal;
+vGen.Instrument                 = sInstrument;
+vWrite([dstDir,'\',fName], vExp, vGen, clHdr);

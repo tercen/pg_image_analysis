@@ -285,9 +285,7 @@ for i=1:length(T)
 end
 
 function sName = multiExpGridImagePath(fEntry)
-iSlash = findstr(fEntry.fPath, '\');
-iSlash = iSlash(length(iSlash));
-sPath = fEntry.fPath(1:iSlash-1);
+sPath = fEntry.fPath;
 sName = [sPath,'\GridImage', fEntry.C,fEntry.W,fEntry.S,'.tif'];
 
        

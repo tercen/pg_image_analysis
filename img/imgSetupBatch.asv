@@ -1,4 +1,6 @@
 function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile, sBatchFile)
+% compile:
+% mcc -m -d C:\PamSoft\DataAnalysis\img\bin imgSetupBatch ppFun5
 %function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile,sBatchFile)
 global MSGOUT
 MSGOUT = 1;
@@ -11,6 +13,8 @@ IniPars.imgConfiguration = '';
 IniPars.searchFilter = '*.tif';
 IniPars.ppFunctionDefFile = '';
 IniPars.ppUseName = 'none';
+IniPars.satLevel = 3900;
+
 
 [IniPars, fid] = getparsfromfile(sConfigurationFile, IniPars);
 
@@ -58,12 +62,13 @@ if (fid ~= -1)
                 fprintf(MSGOUT, 'Preprocessing %d/%d\n',iDir, length(uniqueDirList));
                 % in every directory, identify the last image (in cycles)
                 iFiles = strmatch(uniqueDirList(iDir), clAllDir);
-                
+                clCurDir = {};
 				[clCurDir{1:length(iFiles)}] = deal(ImageList(iFiles).fName);
-                [clLast, clNotRec] = imgGetLastFileFromList(clCurDir, IniPars.instrument);
+                [clPath{1:length(iFiles)}] = deal(ImageList(iFiles).fPath);
+                [clLast, clNotRec] = imgGetLastFileFromList(clCurDir,clPath, IniPars.instrument);
                 if ~isempty(clNotRec)
                     for iNr = 1:length(clNotRec)
-                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', char(clNotRec(iNr)));
+                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', char(clNotRec{iNr}));
                     end
                 end
                 if ~isempty(clLast)
@@ -74,12 +79,16 @@ if (fid ~= -1)
                         Ilast = imread(strIlast);
                     catch
                         fprintf(MSGOUT, 'Could not open: %s\n', strIlast);
+                        Ilast = [];
+                        exitCode = 0;
                     end
                     % preprocessing
-                    if ~isequal(IniPars.ppUseName, 'none');
-                        Ilast = feval(PPF(iPPF).ppFunction, Ilast, ppParVals);
+                    if ~isempty(Ilast)
+                        if ~isequal(IniPars.ppUseName, 'none');
+                            Ilast = feval(PPF(iPPF).ppFunction, Ilast, ppParVals);
+                        end
+                        imwrite(Ilast, [char(uniqueDirList(iDir)),'\',ppFixedName], 'Compression', 'none');
                     end
-                    imwrite(Ilast, [char(uniqueDirList(iDir)),'\',ppFixedName], 'Compression', 'none');
                 end
             end
             [nFiles, msg] = imgMakeBatchFileEx(ppFixedName, sBatchFile, ImageList, IniPars.imgConfiguration, sTemplateFile);
@@ -123,7 +132,92 @@ if (fid ~= -1)
                 exitCode = 0;
             end
 
+        elseif isequal(IniPars.batchMode, 'MultExp')
+            % create gridimage based on multiple exposure times.
+            % we'll make a combined image from the highest and lowest
+            % exposure time for each well, preprocess and save as the grid
+            % image.
+            
+            nFound = 0;
+            ListAll = ImageList;
+            
+            for i = 1:length(ListAll)
+                % Add CSWFTP  attributes to image list
+                [arrayID, filter, expTime, pump, chip, sample] = imgReadWFTP(ListAll(i).fName,[], IniPars.instrument);
+                % only keep th eones with naming recognized
+                if ~(isempty(pump)|isempty(arrayID)|isempty(expTime)|isempty(filter))
+                    nFound = nFound + 1;
+                    ImageList(nFound).C = char(chip);
+                    ImageList(nFound).S = char(sample);
+                    ImageList(nFound).W = char(arrayID);
+                    ImageList(nFound).F = char(filter);
+                    ImageList(nFound).T = char(expTime);
+                    ImageList(nFound).P = char(pump);
+                else
+                     fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', ImageList(i).fName);
+                end
 
+           end
+            
+            % get the unique entry list for C (chip) attribute 
+            uniqueChip = vGetUniqueID(ImageList, 'C');
+            % the C attribute may not be defined in which case the above will
+            % return uniqueChip = {''}, we can procedd as if it where
+            % defined.
+            % loop over the chip ID's
+            iDone = 0;
+            for iChip = 1:length(uniqueChip)
+                
+                [chipList{1:length(ImageList)}] = deal(ImageList.C);
+                % find the current match
+                iChipMatch = strmatch(uniqueChip{iChip}, chipList);
+                chipImageList = ImageList(iChipMatch);
+                
+                % get the unique wells belonging to the current chip
+                uniqueWell = vGetUniqueID(chipImageList, 'W');
+                % loop over the wells
+                for iWell = 1:length(uniqueWell)
+                    iDone = iDone + 1;
+                    fprintf(MSGOUT, 'preprocessing %d/%d(-)\n', iDone, 4*length(uniqueChip));
+                    [wellList{1:length(chipImageList)}] = deal(chipImageList.W);
+                    iWellMatch = strmatch(uniqueWell{iWell}, wellList);
+                    wellImageList = chipImageList(iWellMatch);
+                    % from the current well, get a list of
+                    % exposure times used.
+                    uniqueExp = vGetUniqueID(wellImageList, 'T');
+                    %Finally we have a list of images from the same
+                    % well with multiple exposure times. From these
+                    % create the gridimage
+                    Icomb = combineExposures(wellImageList, IniPars.satLevel);
+                    
+                    % save at appropriate location = 1levelup
+                    giPath = multiExpGridImagePath(wellImageList(1));
+                    
+                  
+                    try
+                        imwrite(Icomb, giPath, 'compression', 'none');
+                    catch
+                        fprintf(MSGOUT, 'Warning: Could not create the grid image for: %s\n', [sPath, '\',sName]);
+                    end
+                end
+                
+            end
+            
+            % add grid image entry to all entries in the imagelist
+            
+            sGridImage = 'giPath';
+            for i = 1:length(ImageList)
+                ImageList(i).(sGridImage) = multiExpGridImagePath(ImageList(1));
+            end
+            
+            [nFiles, msg] = imgMakeBatchFileEx(sGridImage, sBatchFile, ImageList, IniPars.imgConfiguration, sTemplateFile);
+            if isempty(msg)
+                fprintf(MSGOUT, 'Created batchfile: %s, for %d images.\n', sBatchFile, nFiles);
+            else
+                fprintf(MSGOUT, 'Could not create batchfile because: %s\n', msg);
+                exitCode = 0;
+            end  
+                      
         else
             fprintf(MSGOUT, 'Unknown batch setup mode: %s\n', IniPars.batchMode);
             exitCode = 0;
@@ -138,4 +232,65 @@ else
     fprintf(MSGOUT, 'Could not open setup configuration file: %s\n', sConfigurationFile);
     exitCode = 0;
 end
+fprintf(MSGOUT, 'Exit Code = %d\n', exitCode);
+
+
+%--------------------------- Sub functions ------------------------
+function Ic = combineExposures(fList, satLevel)
+% Creates a combined exposure image from the images in the list.
+
+uniqueExp = vGetUniqueID(fList, 'T');
+for i =1:length(uniqueExp)
+    str = uniqueExp{i};
+    T(i) = str2num(str(2:length(str)));
+end
+[T, iSort] = sort(T);
+
+%start at the lowest exposure time
+[clList{1:length(fList)}] = deal(fList.T);
+for i=1:length(T)
+   iMatch = strmatch(uniqueExp(iSort(i)), clList);
+   
+   % if more than one image with the same exposure,
+   % select the one with the highest pumpcycle.
+   CurrentList = fList(iMatch);
+   [pList{1:length(CurrentList)}] = deal(CurrentList.P);
+   for j = 1:length(CurrentList)
+        str = pList{j};
+        P(j) = str2num(str(2:length(str)));
+   end
+   [mxP, mxIndex] = max(P);
+   iMatch = iMatch(mxIndex);
+   % cater for the remote possibility that there are duplicate pumpcycles.
+   iMatch = iMatch(length(iMatch));
+   
+   
+   % load the next image
+   I = imread([fList(iMatch).fPath, '\',fList(iMatch).fName]);
+   if i==1
+       %First (low exposure image)
+       %determine to 16 bit scaling factor
+       scaleFac = double(2^16/max(max(I)));
+       Ic = immultiply(I, scaleFac);
+   else
+       % Next images
+       % scale accordingg to exposure time relative to the first image)
+       
+       I = immultiply(I, scaleFac* T(1)/T(i));
+       scSatLevel = satLevel * scaleFac * T(1)/T(i);
+       Ic(I<scSatLevel) = I(I<scSatLevel);
+   end
+end
+
+function sName = multiExpGridImagePath(fEntry)
+iSlash = findstr(fEntry.fPath, '\');
+iSlash = iSlash(length(iSlash));
+sPath = fEntry.fPath(1:iSlash-1);
+sName = ['GridImage', fEntry.C,fEntry.W,fEntry.S,'.tif'];
+
+       
+       
+       
+       
+
 
