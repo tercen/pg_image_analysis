@@ -1,4 +1,4 @@
-function bFile = createBatchFile(batchID)
+function createBatchFile(batchID)
 global pathImageResults;
 global pathTemplate;
 global pathConfiguration;
@@ -11,6 +11,7 @@ global ppLargeDisk;
 global ppDiameter;
 global ppBlurr;
 global log;
+global batchFile
 
 if nargin == 0
     batchID = '';
@@ -18,16 +19,18 @@ end
 
 try
     b = imgBatch();
-    b = set(b, 'batchID', batchID, 'log', 0);
+    b = set(b, 'batchID', batchID);
     
-     
-    % check if the optional globals have been set otherwise refer to imgBatch object dfts.
+   % check if the optional globals have been set otherwise refer to imgBatch object dfts.
     if isempty(imageFilter)
         imageFilter = get(b, 'imageFilter');
     end
     
     if isempty(log)
-        log = get(b, 'log');
+        log = 0;
+    elseif ischar(log)
+            fid = fopen(log, 'wt');
+            set(b, 'log', fid);
     end
     
     if isempty(lPreprocess)
@@ -70,7 +73,7 @@ try
         'ppObj'              , p, ...
         'log'                , log);
 
-    bFile = batchCreate(b);
+    batchFile = batchCreate(b);
 catch
     % error handling ????
     errmsg = lasterr;
