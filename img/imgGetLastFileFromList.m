@@ -1,4 +1,4 @@
-function [clLastName, clNotRec, clFirstName] = imgGetLastFileFromList(clList, pathList, sInstrument)
+function [clLastName, clNotRec] = imgGetLastFileFromList(clList, pathList, sInstrument)
 clLastName = [];
 clNotRec = [];
 nNotRec = 0;
@@ -18,7 +18,5 @@ end
 
 if (nRec > 0)
     [Pmax, iMax] = max(P);
-    [Pmin, iMin] = min(P);
     clLastName = clList(index(iMax));
-    clFirstName = clList(index(iMin));
 end
