@@ -1,7 +1,7 @@
 % RefTest
 clear all
 close all
-v = vLoad('D:\temp\data\SO-0183C3-on StandardKinase-run 15-26-09 19-Oct-2004-ImageResults\_CurveFit Results\rik.v');
+v = vLoad('D:\temp\data\040818-M040630A-MW-C6 Q-results\F1\T20\Median\todat.v');
 disp('Select Normalizers ...');
 clRefID = vPick(v, 'ID');
 maps   = vArrange96(v, 'ID', clRefID, 'EndLevel');
@@ -12,7 +12,7 @@ for i=1:s3
     mMaps(:,:,i) = maps(:,:,i)/mean(refcols(:,i));
 end
 refcols = reshape(mMaps, s1*s2*s3, 1);
-iOut = findOutliersRW(refcols, 4.1, 0.001);
+iOut = findOutliersRW(refcols, 3, 0.01);
 
 figure(1)
 subplot(2,1,1)
