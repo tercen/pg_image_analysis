@@ -1,9 +1,8 @@
 /*
  * MATLAB Compiler: 4.0 (R14)
- * Date: Wed Aug 11 17:53:20 2004
+ * Date: Wed Aug 25 15:03:47 2004
  * Arguments: "-B" "macro_default" "-m" "-W" "main" "-T" "link:exe" "-d"
- * "C:\PamSoft\DataAnalysis\CurveFitHT\Bin" "CurveFitHT" "cfExpAss" "cfViniP2"
- * "cfViniLin" "cfExpAssBnd" "cfExpDec" 
+ * "C:\PamSoft\DataAnalysis\CurveFitHT\Bin" "CurveFitHT" "CurveFitHT_pragma" 
  */
 
 #include <stdio.h>
