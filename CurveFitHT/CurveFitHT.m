@@ -25,7 +25,7 @@ function varargout = CurveFitHT(varargin)
 
 % Edit the above text to modify the response to help CurveFitHT
 
-% Last Modified by GUIDE v2.5 10-Aug-2004 12:54:47
+% Last Modified by GUIDE v2.5 01-Apr-2005 11:25:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -90,14 +90,17 @@ iniPars.FitDisplay = 'off';
 iniPars.DftMaxFunEvals = 200;
 iniPars.DftMethod = 'Normal';
 iniPars.sInstrument = 'Detect';
-iniPars.sQcSettingsFile   = 'dftKinaseQc.ini';
-% iniPars.dftQcSpecMinimalR         = 0.7;
-% iniPars.dftQcSpecMinimalVini      = 0;
-% iniPars.dftQcSpecMinimalEndLevel  = 0;
+iniPars.strRefID    = '290-100';
+iniPars.qcSpecMinLocalT          =   -2.5;
+iniPars.qcSpecMaxLocalT          =   3.5;
+iniPars.qcSpecMaxLocalCV           = 0.25 ;
+iniPars.qcSpecMaxXw                 = 100;
 iniPars.resHistNumOfBins = 10;
 iniPars.dftFileFilter = '*mBg.dat';
 iniPars.dftSetupFile = 'cfAutorun.cset'; % setup file is used for autorun
 iniPars.saveLocationSetupFile = 'C:\';
+
+
 handles.iniName = 'CurveFitHT.ini';
 [iniPars, inifID] = getparsfromfile(handles.iniName, iniPars);
 
@@ -125,7 +128,7 @@ end
 
 handles.hPlot = [];
 handles.stModels = stModels;
-handles.versionStr  = 'CurveFitHT v1.7';
+handles.versionStr  = 'CurveFitHT v1.71';
 
 cfFitOpts.offsetX   = 0;
 cfFitOpts.offsetY   = 0;
@@ -135,10 +138,11 @@ cfFitOpts.FitDisplay = iniPars.FitDisplay;
 cfFitOpts.strMethod = iniPars.DftMethod;
 handles.cfFitOpts = cfFitOpts;
 
-%QcSpec.minimalR2 = iniPars.dftQcSpecMinimalR;
-%QcSpec.minimalEndLevel = iniPars.dftQcSpecMinimalEndLevel;
-%QcSpec.minimalVini  = iniPars.dftQcSpecMinimalVini;
-%handles.QcSpec = QcSpec;
+QcSpec.minLocalT    = iniPars.qcSpecMinLocalT;
+QcSpec.maxLocalT    = iniPars.qcSpecMaxLocalT;
+QcSpec.maxLocalCV   = iniPars.qcSpecMaxLocalCV;
+QcSpec.maxXw        = iniPars.qcSpecMaxXw;
+handles.QcSpec = QcSpec;
 
 if isequal(cfFitOpts.strMethod, 'Normal')
     set(findobj('Tag', 'rbFast'), 'Value' , 1);
@@ -610,12 +614,13 @@ else
 end
 
 % import settings from GUI
-[cSet, cfOpts] = cfGetSettings(handles, setupFileName);
-% note that th structures cSet and cfOPts, together with handles.QcSpec
+[cSet, cfOpts, dummy, QcSpec] = cfGetSettings(handles, setupFileName);
+% note that th structures cSet and cfOPts, together with QcSpec
 % define the fit settings.
 
 % loop trough the datasets
-   allPoints = [];
+allPoints = [];
+allRelRes = [];
 for i = 1:handles.nData;
     handles.dataset = i;
     handles = SetData(handles, 1);
@@ -628,8 +633,9 @@ for i = 1:handles.nData;
     if handles.bConsistent
         [x,y] = cfGetCurrentData(handles);
         title(handles.dataname, 'Interpreter', 'none');
-        [v, fit, handles.absRes, handles.relRes, points] = vMakeFit(x,y,cSet, cfOpts, handles.dataname, handles.iniPars.sInstrument);
-        allPoints = [allPoints; points];
+        [v, fit, handles.absRes, handles.relRes] = vMakeFit(x,y,cSet, cfOpts, handles.dataname, handles.iniPars.sInstrument);
+        [sRes1, sRes2] = size(handles.relRes);
+        allRelRes = [allRelRes, handles.relRes(:,2:sRes2)];
         if v(1).Index1 ~= -1
             vAll = [vAll,v];
         else
@@ -668,16 +674,40 @@ for i = 1:handles.nData;
     end
 end
 
+
+
+
 if get(hFitAllButton, 'UserData') ~= -1
+    % now recalculate the wChiSqr based on all residuals
+    
+    
+    
     clLog{length(clLog)+1} = cellstr('logEnd');
     vGen = vGeneral(handles, cSet, cfOpts);
+    
+    bDoQC = get(findobj('Tag', 'miDoQc'), 'Checked');
+    if (bDoQC)
+        [vAll, vGenEntries, strRefID]= cfGlobalQC(vAll, handles.iniPars.strRefID);
+        handles.iniPars.strRefID = strRefID;
+        if ~isempty(vGenEntries)
+            clNames = fieldnames(vGenEntries);
+            for n = 1:length(clNames)
+                vGen.(clNames{n}) = vGenEntries.(clNames{n});
+            end
+        end
+        
+        vAll = vAddQcFlags(vAll, QcSpec);
+    end
+        
+    
+    
     fid = vWrite(vFileName, vAll, vGen, clLog);
     if (fid == -1)
         uiwait(msgbox(['Failed to save results to: ',vFileName], 'CurveFitHT Error !', 'modal'));
     else
         uiwait(msgbox(['Results saved to: ', vFileName],'Finished Fitting !','modal'));
     end
-    save 'allPoints.txt' allPoints -ascii
+ 
 end
 set(h, 'Tag', 'axData');
 set(hFitAllButton, 'String', 'Fit All', 'ForegroundColor',  handles.stdBlue, 'UserData', 0, 'Enable', 'on');
@@ -732,7 +762,7 @@ data = handles.data;
 Xdata = data(:,1);
 Ydata = data(:,handles.SelectedData);
 
-function [v, fit, absRes, relRes, allPoints] = vMakeFit(x,y,Settings, cfOpts, dataname, sInstrument)
+function [v, fit, absRes, relRes] = vMakeFit(x,y,Settings, cfOpts, dataname, sInstrument)
 
 pName = Settings.Model.Parameter;
 nData = size(y); nData = nData(2);
@@ -742,25 +772,22 @@ xDerivative = x(Settings.vDerivative);
 vDerivative = find(xUsed == xDerivative);
 
 
-allPoints = [];
+
 for i = 1:nData
     yUsed = y(vUsed,i);
-    errorModel = (0.022 * yUsed + 74);
-    w = 1./errorModel;
+    
     
     [p(:,i), ExitFlag, wOut] = cfFit(xUsed-cfOpts.offsetX,yUsed - cfOpts.offsetY,[], Settings.Model.FunctionName, cfOpts);
     [fit(:,i),j, V] = feval(Settings.Model.FunctionName, xUsed - cfOpts.offsetX, [], p(:,i));
+    
     absRes(:,i) = (yUsed - fit(:,i));
+    
+    warning('off','MATLAB:divideByZero')
+    relRes(:,i) =  absRes(:,i)./yUsed;
+    warning('on','MATLAB:divideByZero')
     aChiSqr     = sum(absRes(:,i).^2);
-    %wChiSqr = sum( wOut.*(absRes(:,i).^2)  )/1000;
-    
-    warning('off', 'MATLAB:dividebyzero');
-    relRes(:,i) = (yUsed - fit(:,i))./yUsed;
-    wChiSqr = sum( wOut.*(relRes(:,i).^2));
-    warning('on', 'MATLAB:dividebyzero');
-    
-        
-        % make results vector for this fit
+
+    % make results vector for this fit
     v(i).ID = Settings.clCurrentID(i);
     v(i).QcFlag = '';
     [r,c] = fname2rc(dataname,sInstrument);
@@ -771,7 +798,7 @@ for i = 1:nData
         v(i).Index1 = -1;
         v(i).Index2 = -1;
     end
-        
+         
     for nPar = 1:length(p(:,i))
         strfld = char(pName(nPar));
         v(i).(strfld) = p(nPar,i);
@@ -782,18 +809,28 @@ for i = 1:nData
         v(i).Vini = [];
     end
     
-   
-    v(i).EndLevel   =  mean(y(Settings.vEndLevel,i) );       
-    v(i).R2         =  CalcR(fit(:,i), yUsed);
-    v(i).aChiSqr    =  aChiSqr;
-    v(i).DOF        = length(yUsed) - length(p(:,i));
-    v(i).QcFlag     =  0;
+    iOut = isnan(relRes(:,i)) | isinf(relRes(:,i));
     
-    points(:,1) = yUsed;
-    points(:,2) = fit(:,i);
-    points(:,3) = ones(size(yUsed)) * v(i).R2;
-    allPoints = [allPoints; points];
+   
+    v(i).EndLevel       =  mean(y(Settings.vEndLevel,i) );       
+    v(i).R2             =  CalcR(fit(:,i), yUsed);
+    v(i).aChiSqr        =  aChiSqr/length(yUsed);
+    v(i).rChiSqr        =  sum(relRes(~iOut,i).^2);
+%     v(i).sChiSqr        =  sum( (relRes(~iOut,i)/std(relRes(~iOut,i))).^2);;
+    v(i).t              = median(absRes)/std(absRes);
+    v(i).sSig           =   std(yUsed - median(yUsed));
+%     v(i).pRuns          =  runsTest(absRes(:,i));
+%     v(i).N              =  length(yUsed);
+    v(i).QcFlag         =  0;
+              
+    
 end
+
+
+
+
+  
+
 relRes = [xUsed, relRes];
 absRes = [xUsed, absRes];
 
@@ -803,10 +840,16 @@ hPlot = plot(x(Settings.vUseX),fit );
 % plot Vini tangent if appropriate
 if  ~isempty(v.Vini)
     xDerivative = x(Settings.vDerivative);
-    vDerivative = find(x(Settings.vUseX) == xDerivative); 
-    vx = [x(Settings.vDerivative),x(Settings.vDerivative+2)];
-    dx  = x(Settings.vDerivative+2) - x(Settings.vDerivative);
-    vy = [fit(vDerivative),fit(vDerivative) + v.Vini*dx];     
+    vDerivative = find(x(Settings.vUseX) == xDerivative);
+    xPlot = x;
+    if vDerivative+2 > length(xPlot)
+        dX = xPlot(end) - xPlot(end-1);
+        last = xPlot(end);
+        xPlot = [xPlot;last+dX;last+2*dX];
+    end
+    vx = [xPlot(Settings.vDerivative),xPlot(Settings.vDerivative+2)];
+    dx  = xPlot(Settings.vDerivative+2) - xPlot(Settings.vDerivative);
+    vy = [fit(vDerivative),fit(vDerivative) + v.Vini*dx];
     plot(vx, vy, 'm');
 end
 % plot measured end level
@@ -819,7 +862,7 @@ eLy = v.EndLevel * ones(size(eLx));
 plot(eLx, eLy, 'k');
 
 function vG     = vGeneral(handles, settings, cfopts)
-vG.generalID     = 'plateID';
+vG.generalID     = handles.iniPars.DataDir;
 vG.Date         = date;
 vG.Generated_By = handles.versionStr;
 vG.FitModel     = settings.Model.FunctionName;
@@ -967,7 +1010,20 @@ if isequal(cVal, 'on')
 elseif isequal(cVal, 'off')
     set(hObject, 'Checked', 'on')
 end
-    
+
+% --------------------------------------------------------------------
+function miDoQc_Callback(hObject, eventdata, handles)
+% hObject    handle to miDoQc (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+cVal = get(hObject, 'Checked');
+if isequal(cVal, 'on')
+    set(hObject, 'Checked', 'off')
+elseif isequal(cVal, 'off')
+    set(hObject, 'Checked', 'on')
+end
+
+
 function miPrefAdvanced_Callback(hObject, eventdata, handles)
 
 
@@ -1069,27 +1125,26 @@ if ischar(fName)
     if isempty(iPoint)
         fName = [fName,fExt];
     end
-    [Settings, Options] = cfGetSettings(handles);
+    [Settings, Options, dataFilter, QcSpec] = cfGetSettings(handles);
     Settings.SelectedData   = handles.SelectedData;
     Settings.SelectedID     = handles.SelectedID;
-    dataFilter = handles.dataFilter;
     handles.iniPars.saveLocationSetupFile = fPath;
     try
-        save([fPath, '\', fName], 'Settings', 'Options','dataFilter','-mat');
+        save([fPath, '\', fName], 'Settings', 'Options','dataFilter', 'QcSpec','-mat');
     catch
         errordlg(['Could not create settings file: ', [fPath,'\',fName]], 'CurveFitHT Error');
     end
 end
 guidata(hObject, handles);
 
-function [Settings, Options, dataFilter] = cfGetSettings(handles, fSetup)
+function [Settings, Options, dataFilter, QcSpec] = cfGetSettings(handles, fSetup)
 % This gets the fit Settings, Options and QC specs from
 % 1. The GUI, if fSetup is not specified
 % 2. The settings file fSetup if specified.
 
 if nargin == 1 | isempty(fSetup)
     % read settings from the GUI
-    %QcSpec = handles.QcSpec;
+    QcSpec = handles.QcSpec;
     stModels = handles.stModels;
     vModel      = get(findobj('Tag', 'puModel'), 'Value');
     Settings.Model      = stModels(vModel);
@@ -1100,14 +1155,16 @@ if nargin == 1 | isempty(fSetup)
     Settings.clCurrentID = clSpotID(handles.SelectedID);
     Settings.Instrument = handles.Instrument;
     Options = handles.cfFitOpts;
+    dataFilter= handles.dataFilter;
 else
     % load settings from file.
     try
         Setup = load(fSetup, '-mat');
         Settings    = Setup.Settings;
         Options     = Setup.Options;
-        %QcSpec      = Setup.QcSpec;
+        QcSpec      = Setup.QcSpec;
         dataFilter  = Setup.dataFilter;
+            
     catch
         Settings = [];
         Options =  [];
@@ -1117,10 +1174,10 @@ else
 end
 
 function handles = cfAutoRun(handles, dataDir, vFileName, setupFileName)
-[S, O,dataFilter] = cfGetSettings([], setupFileName);
+[S, O,dataFilter, Q] = cfGetSettings([], setupFileName);
 if ~isempty(dataFilter)
     if ~isempty(dataDir)
-        %handles.QcSpec = Q;
+        handles.QcSpec = Q;
         handles.cfFitOpts = O;
 		handles.iniPars.DataDir = dataDir;
         handles.dataFilter = dataFilter;
@@ -1147,3 +1204,48 @@ if ~isempty(dataFilter)
 else
     uiwait(errordlg(['Could Not Autorun With: ',setupFileName ], 'CurveFitHT Error!'));
 end
+
+function v = vAddQcFlags(v, Specs);
+
+flFlag          = bin2dec('00000001');
+flBadWell       = bin2dec('00000010');
+flLocalT        = bin2dec('00000100');
+flLocalCV       = bin2dec('00001000');
+flXw            = bin2dec('00010000');
+
+
+
+for i=1:length(v)
+    bFlag = 0;
+    bBadWell = 0;
+    
+    if (v(i).localT < Specs.minLocalT) | (v(i).localT > Specs.maxLocalT)
+        v(i).QcFlag = flLocalT;
+        bFlag = 1;
+        bBadWell = 1;
+    end
+    if v(i).localCV > Specs.maxLocalCV
+        v(i).QcFlag = flLocalCV;
+        bFlag = 1;
+        bBadWell = 1;
+    end
+    if (v(i).aChiSqr / v(i).sSig) > Specs.maxXw
+        v(i).QcFlag = flXw;
+        bFlag = 1;
+    end
+    if bFlag
+        v(i).QcFlag = v(i).QcFlag + flFlag;
+    end
+    if bBadWell
+        v(i).QcFlag = v(i).QcFlag + flBadWell;
+    end
+end
+
+        
+
+
+
+
+
+
+

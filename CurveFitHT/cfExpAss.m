@@ -32,7 +32,7 @@ if nargin == 2
     
     p0(3) = 1.3/(X(xi));
     varargout{1} = p0';
-    varargout{2} = [-1e8;-1e8;0];
+    varargout{2} = [-1e8;-1e8;1e-7];
     varargout{3} = [1e8; 1e8; 1e8];
     return;
 end
