@@ -27,4 +27,5 @@ end
 p.maxIterations = 100;
 p.TolX = 1e-2;
 p.TolMode = 'Relative';
+p.errorMethod = 'ASE';
 p = class(p, 'pgFit');

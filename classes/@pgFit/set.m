@@ -36,9 +36,9 @@ for i=1:2:length(pArgin)
         else
             error([p.model, ' expects exactly ', num2str(nPars), ' parameters.']);
         end
-    end
     
-    if isequal(pName, 'lbPars')
+    
+    elseif isequal(pName, 'lbPars')
         
         if length(pVal == length(fDef.clParameter))
             p.lbPars = pVal;
@@ -92,11 +92,20 @@ for i=1:2:length(pArgin)
     
     elseif isequal(pName, 'robTune')
         p.robTune = pVal;
-   
+    
+    elseif isequal(pName, 'errorMethod')
+        if isequal(pVal, 'ASE')
+            p.errorMethod = pVal;
+        else
+            error(['Invalid value for errorMethod property'])
+        end
+    
+    
     else
         error(['invalid property: ', pName])
     end
-
+    
+   
     
 end
 

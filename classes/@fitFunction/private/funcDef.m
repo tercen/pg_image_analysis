@@ -13,7 +13,7 @@ Func(1).strFitFunctionName      = 'cfIC50s';
 %#function cfIC50s
 Func(1).strIniFunctionName      = 'ifIC50s';
 %#function ifIC50s
-Func(1).jacFlag                 = 0;
+Func(1).jacFlag                 = 1;
 
 % IC50 with offset
 Func(2).strModelName            = 'IC50 offset';
@@ -25,8 +25,10 @@ Func(2).clParameter{3}          = 'IC50';
 
 Func(2).strFitFunctionName      = 'cfIC50offset';
 Func(2).strIniFunctionName      = 'ifIC50offset';
-Func(2).jacFlag                 = 0;
+Func(2).jacFlag                 = 1;
 
+%#function cfIC50offset
+%#function ifIC50offset
 % Exp Ass Ris
 Func(3).strModelName            = 'Exp Associated';
 Func(3).strModelDescription     = 'Exponential associated rise';
@@ -38,10 +40,12 @@ Func(3).clParameter{3}          = 'k';
 Func(3).strFitFunctionName      = 'cfExpAss';
 Func(3).strIniFunctionName      = 'ifExpAss';
 Func(3).jacFlag                 = 1;
+%#function cfExpAss;
+%#function ifExpAss;
 
 % logIC50, variable slope, offset
-Func(4).strModelName            = 'logIC50';
-Func(4).strModelDescription     = 'logIC50, variable slope, offset, assumes log10 x-axis';
+Func(4).strModelName            = 'logIC50_1';
+Func(4).strModelDescription     = 'logIC50, Ymax to Y0, variable slope';
 
 Func(4).clParameter{1}          = 'Y0';
 Func(4).clParameter{2}          = 'Ymax';
@@ -50,6 +54,47 @@ Func(4).clParameter{4}          = 'hs';
 
 Func(4).strFitFunctionName      = 'cfLogIC50';
 Func(4).strIniFunctionName      = 'ifLogIC50';
-Func(4).jacFlag                 = 0;
+Func(4).jacFlag                 = 1;
+%#function cfLogIC50
+%#function ifLogIC50
+
+%
+Func(5).strModelName            = 'logIC50_2';
+Func(5).strModelDescription     = 'logIC50, Ymax to 0, variable slope';
+
+Func(5).clParameter{1}          = 'Ymax';
+Func(5).clParameter{2}          = 'logIC50';
+Func(5).clParameter{3}          = 'hs';
+
+Func(5).strFitFunctionName      = 'cfLogIC50_2';
+Func(5).strIniFunctionName      = 'ifLogIC50_2';
+Func(5).jacFlag                 = 1;
+%#function cfLogIC50_2
+%#function ifLogIC50_2
+
+%
+Func(6).strModelName            = 'logIC50_3';
+Func(6).strModelDescription     = 'logIC50, Ymax to Y0, fixed slope';
+
+Func(6).clParameter{1}          = 'Y0';
+Func(6).clParameter{2}          = 'Ymax';
+Func(6).clParameter{3}          = 'logIC50';
+
+Func(6).strFitFunctionName      = 'cfLogIC50_3';
+Func(6).strIniFunctionName       = 'ifLogIC50_3';
+%#function cfLogIC50_3
+%#function ifLogIC50_3
+
+%
+Func(7).strModelName           = 'logIC50_4';
+Func(7).strModelDescription    = 'logIC50, Ymax to 0, fixed slope';
+
+Func(7).clParameter{1}         = 'Ymax';
+Func(7).clParameter{2}         = 'logIC50';
+
+Func(7).strFitFunctionName      = 'cfLogIC50_4';
+Func(7).strIniFunctionName      = 'ifLogIC50_4';
+
+
 
 

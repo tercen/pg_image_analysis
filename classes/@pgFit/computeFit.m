@@ -1,4 +1,4 @@
-function [pRes, wRes] = computeFit(pgfit, X, Y, W)
+function [pRes, pStdError, wRes] = computeFit(pgfit, X, Y, W)
 
 % check size and shape of input
 if nargin < 4
@@ -58,10 +58,11 @@ for i=1:sy2
             nIter = 0;
             while(1)
                 nIter = nIter + 1;
-                [pOut, ChiSqr, Res, ExitFlag] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
-
+                [pOut, ChiSqr, Res, ExitFlag, dummy, dummy, jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
+              
                 if bRelative
-                    p0 = min(abs(p0), 1e-10);
+                    iZero = p0 == 0;
+                    p0(iZero) = 1e-10;
                     eps = abs((p0-pOut)./p0);
                 else
                     eps = abs(p0-pOut);
@@ -74,7 +75,7 @@ for i=1:sy2
                 end
             end
             pRes(:,i) = pOut;
-            wRes(:,i) = W;
+            wRes(:,i) = W(:,i);
 
         case 'Robust'
             options = optimset('Jacobian', pgfit.jacobian,'Display', 'none' ,'MaxFunEvals', 5, 'TolX', 1e-8);
@@ -83,7 +84,7 @@ for i=1:sy2
             % first iteration before reweight
             [pOut, ChiSqr, Res, ExitFlag,dummy1,dummy2,jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
             fit = getCurve(pgfit.modelObj, X, pOut);
-            wRob = calcRobustWeights((Y(:,i)-fit), jac, pgfit.robTune);
+            wRob = calcRobustWeights((Y(:,i)-fit), full(jac), pgfit.robTune);
             wIn = W(:,i).*wRob;
             
             while(1)
@@ -95,7 +96,8 @@ for i=1:sy2
                 wIn = W(:,i).*wRob;
                 
                 if bRelative
-                    p0 = min(abs(p0), 1e-10);
+                    iZero = p0 == 0;
+                    p0(iZero) = 1e-10;
                     eps = abs((p0-pOut)./p0);
                 else
                     eps = abs(p0-pOut);
@@ -118,4 +120,13 @@ for i=1:sy2
             [pRes(:,i), wRes(:,i)] = computeFit(cppgFit, X, Y(:,i), W(:,i));
 
     end %<switch>
+    jac = full(jac);
+    fit = getCurve(pgfit.modelObj, X, pRes(:,i));
+
+    switch pgfit.errorMethod
+        case 'ASE'
+            pStdError(:,i) = fitAse(fit - Y(:,i), jac);
+    end
+    
 end %<i loop>
+

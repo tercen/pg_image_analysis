@@ -12,7 +12,8 @@ bJac = logical(bJac);
 for i=1:sp2
     strFunction = f.strFitFunctionName;
     if bJac
-        [y(:,i), J(:,:,i)]  = feval(strFunction, x, p(:,i));
+        [y(:,i), j]  = feval(strFunction, x, p(:,i));
+        J(:,:,i) = j;
     else
         y(:,i) = feval(strFunction,x, p(:,i));
     end

@@ -128,7 +128,7 @@ end
 
 handles.hPlot = [];
 handles.stModels = stModels;
-handles.versionStr  = 'CurveFitHT v1.72';
+handles.versionStr  = 'CurveFitHT v1.73';
 
 cfFitOpts.offsetX   = 0;
 cfFitOpts.offsetY   = 0;
@@ -686,7 +686,7 @@ if get(hFitAllButton, 'UserData') ~= -1
     vGen = vGeneral(handles, cSet, cfOpts);
     
     bDoQC = get(findobj('Tag', 'miDoQc'), 'Checked');
-    if (bDoQC)
+    if isequal(bDoQC, 'on')
         [vAll, vGenEntries, strRefID]= cfGlobalQC(vAll, handles.iniPars.strRefID);
         handles.iniPars.strRefID = strRefID;
         if ~isempty(vGenEntries)
@@ -694,9 +694,10 @@ if get(hFitAllButton, 'UserData') ~= -1
             for n = 1:length(clNames)
                 vGen.(clNames{n}) = vGenEntries.(clNames{n});
             end
+            vAll = vAddQcFlags(vAll, QcSpec);
         end
         
-        vAll = vAddQcFlags(vAll, QcSpec);
+        
     end
         
     

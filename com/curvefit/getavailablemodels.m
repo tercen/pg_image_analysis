@@ -3,6 +3,7 @@ global model
 global xScale
 global fitMode
 global robTune
+global errorMode
 global parInitialGuess
 global parLowerBounds
 global parUpperBounds
