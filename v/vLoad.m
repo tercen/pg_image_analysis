@@ -8,6 +8,7 @@ function v = vLoad(fname);
 [fid, message] = fopen(fname, 'rt');
 if (fid == -1)
     disp(message);
+    v = [];
     return;
 end
 line = '';
@@ -23,9 +24,12 @@ hdr = strread(line,'%s','delimiter','\t');
 
 
 i = 0;
-while (line ~= -1)
+while (line ~= -1) 
     i = i+1;
     line = fgetl(fid);
+    if isequal(line, 'vEnd')
+        break;
+    end
     if (line ~= -1)
         templ(i,:) = strread(line,'%s','delimiter','\t');
         for j = 1:length(templ(i,:))

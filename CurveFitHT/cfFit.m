@@ -27,9 +27,9 @@ switch cfFitOpts.strMethod
             nIter = nIter + 1;          
             [fit, jac]  =  feval(cfModelFunc, X, [], p0);
             wRob = calcRobustWeights(Y-fit, jac);
-            wIn = W.*wRob;        
+            W = W.*wRob;        
             % re-iterate using robust weights
-            [pOut, ChiSqr, Res, ExitFlag] = lsqnonlin(@cfGenFit, p0, pLower, pUpper,options, X, Y, wIn, cfModelFunc);
+            [pOut, ChiSqr, Res, ExitFlag] = lsqnonlin(@cfGenFit, p0, pLower, pUpper,options, X, Y, W, cfModelFunc);
             eps = abs((p0-pOut)./p0);
             if eps <= cfFitOpts.TolX | nIter >= cfFitOpts.MaxFunEvals
                 break;
