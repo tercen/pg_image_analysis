@@ -34,69 +34,103 @@ if (fid ~= -1)
     if (nImages > 0)
         ResultList = makeResultList(imageList, sInstrument);
 
-        % set up directory structure for saving results.
-        uniqueFilters = vGetUniqueID(ResultList, 'filter');
-        uniqueIntegrationTime = vGetUniqueID(ResultList, 'integrationTime');
-        uniqueArrayID = vGetUniqueID(ResultList, 'arrayID');
-        dcSucces = 1;
-        if ~mkdir(sRootDir, '_Quantified Results'), dcSucces = 0; end
-        sDataRoot = [sRootDir, '_Quantified Results\'];
-        for iFilters = length(uniqueFilters)
-            if ~mkdir(sDataRoot, char(uniqueFilters(iFilters))), dcSucces = 0; end
-            for iTimes = 1:length(uniqueIntegrationTime)
-                if mkDir([sDataRoot, char(uniqueFilters(iFilters))], char(uniqueIntegrationTime(iTimes)))
-                    if ~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Mean');
-                        dcSucces = 0;
-                    elseif ~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Median');
-                        dcSucces = 0;
-                    elseif~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Mode');
-                        dcSucces = 0;
-                    end
-                else
-                    dcSucces = 0;
-                end
-            end
-        end
-        if dcSucces
-            nDone = 0;
-            %For every filter, integration time and well produce kinetics
-            [clFilterList{1:length(ResultList)}] = deal(ResultList.filter);
-            fprintf(MSGOUT, 'Collecting results ...\n');
-            for iFilters = 1:length(uniqueFilters)
-                iCurrentFilter = strmatch(uniqueFilters{iFilters}, clFilterList);
-                % select all entries with current filter
-                [clTimeList{1:length(iCurrentFilter)}] = deal(ResultList(iCurrentFilter).integrationTime);
+        if isequal(sMode, 'kinetics')
+            % produce kinetic *.dat files
+            % set up directory structure for saving results.
+            uniqueFilters = vGetUniqueID(ResultList, 'filter');
+            uniqueIntegrationTime = vGetUniqueID(ResultList, 'integrationTime');
+            uniqueArrayID = vGetUniqueID(ResultList, 'arrayID');
+            dcSucces = 1;
+            if ~mkdir(sRootDir, '_Quantified Results'), dcSucces = 0; end
+            sDataRoot = [sRootDir, '_Quantified Results\'];
+            for iFilters = length(uniqueFilters)
+                if ~mkdir(sDataRoot, char(uniqueFilters(iFilters))), dcSucces = 0; end
                 for iTimes = 1:length(uniqueIntegrationTime)
-                    iCurrentTime = strmatch(uniqueIntegrationTime{iTimes}, clTimeList);
-                    [clArrayList{1:length(iCurrentTime)}] = deal(ResultList(iCurrentTime).arrayID);
-                    %select all entries with current time
-                    for iArrays = 1:length(uniqueArrayID)
-                        iCurrentArray = strmatch(uniqueArrayID{iArrays},clArrayList);
-                        [Data, SpotID] = imgIntegrate(ResultList(iCurrentArray), sMode);
-                        nDone = nDone + length(iCurrentArray);
-                        fprintf(MSGOUT, 'done: %d/%d\n', nDone, length(ResultList) );
-                        ci = iCurrentArray(1);
-                        fRoot = [ResultList(ci).arrayID,'_',ResultList(ci).filter,'_',ResultList(ci).integrationTime];
-                        if isempty(Data) 
-                            fprintf(MSGOUT, 'Skipped data because files were inconsistent,\n Data from: %s.\n', fRoot) 
-                        else
-                            sCurrentDataDir = [sDataRoot,ResultList(ci).filter,'\',ResultList(ci).integrationTime];
-                            if ~WriteData(sCurrentDataDir, fRoot, Data, SpotID, sMode)
-                                fprintf(MSGOUT, 'Could not open a data file for writing for:\n %s, %s\n', sCurrentDataDir, ResultList(ci).arrayID); 
-                            end
-                       end
-                        
+                    if mkDir([sDataRoot, char(uniqueFilters(iFilters))], char(uniqueIntegrationTime(iTimes)))
+                        if ~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Mean');
+                            dcSucces = 0;
+                        elseif ~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Median');
+                            dcSucces = 0;
+                        elseif~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Mode');
+                            dcSucces = 0;
+                        end
+                    else
+                        dcSucces = 0;
                     end
                 end
             end
+            if dcSucces
+                nDone = 0;
+                %For every filter, integration time and well produce kinetics
+                [clFilterList{1:length(ResultList)}] = deal(ResultList.filter);
+                fprintf(MSGOUT, 'Collecting results ...\n');
+                for iFilters = 1:length(uniqueFilters)
+                    iCurrentFilter = strmatch(uniqueFilters{iFilters}, clFilterList);
+                    % select all entries with current filter
+                    [clTimeList{1:length(iCurrentFilter)}] = deal(ResultList(iCurrentFilter).integrationTime);
+                    for iTimes = 1:length(uniqueIntegrationTime)
+                        iCurrentTime = strmatch(uniqueIntegrationTime{iTimes}, clTimeList);
+                        [clArrayList{1:length(iCurrentTime)}] = deal(ResultList(iCurrentTime).arrayID);
+                        %select all entries with current time
+                        for iArrays = 1:length(uniqueArrayID)
+                            iCurrentArray = strmatch(uniqueArrayID{iArrays},clArrayList);
+                            [Data, SpotID] = imgIntegrate(ResultList(iCurrentArray), sMode);
+                            nDone = nDone + length(iCurrentArray);
+                            fprintf(MSGOUT, 'done: %d/%d\n', nDone, length(ResultList) );
+                            ci = iCurrentArray(1);
+                            fRoot = [ResultList(ci).arrayID,'_',ResultList(ci).filter,'_',ResultList(ci).integrationTime];
+                            if isempty(Data)
+                                fprintf(MSGOUT, 'Skipped data because files were inconsistent,\n Data from: %s.\n', fRoot)
+                            else
+                                sCurrentDataDir = [sDataRoot,ResultList(ci).filter,'\',ResultList(ci).integrationTime];
+                                if ~WriteData(sCurrentDataDir, fRoot, Data, SpotID, sMode)
+                                    fprintf(MSGOUT, 'Could not open a data file for writing for:\n %s, %s\n', sCurrentDataDir, ResultList(ci).arrayID);
+                                end
+                            end
+
+                        end
+                    end
+                end
+            else
+                exitCode = 0;
+                fprintf(MSGOUT, 'Problem creating directories in: %s\n', sRootDir);
+            end
+        elseif isequal(sMode, 'endpoint') 
+            % when the batchmode is 'endpoint', the only action is to copy
+            % the resultfile with checked naming to a quantified results
+            % directory.
+            if mkdir(sRootDir, '_Quantified Results')
+                dest = [sRootDir, '\_Quantified Results'];
+                for nRes=1:length(ResultList)
+                    fName =    [ResultList(nRes).chipID, '_', ...
+                                ResultList(nRes).sampleID, '_', ...
+                                ResultList(nRes).arrayID,'_',...
+                                ResultList(nRes).filter,'_',...
+                                ResultList(nRes).integrationTime,'_',...
+                                ResultList(nRes).pumpCycle,'.txt'];
+                    fPath = [dest, '\', fName];
+                     
+                    if ~copyfile(ResultList(nRes).resultFile, fPath);
+                        fprintf(MSGOUT, 'Could not copy results to %s\n', fPath);
+                    end
+                    fprintf(MSGOUT, 'done: %d/%d\n', nRes, length(ResultList))                                 
+                end
+            else
+                fprintf(MSGOUT, 'Problem creating directories in: %s', sDataRoot);
+                exitCode = 0;
+            end
+            
         else
+            fprintf(MSGOUT, 'Unknown mode: %s in %s\n', sMode, sConfigurationFile);
             exitCode = 0;
-            fprintf(MSGOUT, 'Problem creating directories in: %s\n', sRootDir);
         end
+        
     else
         fprintf(MSGOUT, 'No Images found in: %s\n', sBatchFile);
         exitCode = 0;
     end
+
+
 else
     % batch file could not be opened
     fprintf(MSGOUT, '%s\n',msg)
@@ -143,15 +177,25 @@ for  i=1:length(imageList)
         pathName = resultFile(1:iSlash-1);
         % now pick appart the string to get Filter, IntegrationTime, Well,
         % Pumpcycle
-        [arrayID, filter, integrationTime, pumpCycle] = ...
+        [arrayID, filter, integrationTime, pumpCycle, chipID, sampleID] = ...
             imgReadWFTP(baseName,pathName, sInstrument);
-        if ~isempty(arrayID)
+        if ~isempty(arrayID) & ~isempty(filter) & ~isempty(pumpCycle) & ~isempty(integrationTime)
             nListed = nListed + 1;
             ResultList(nListed).resultFile = resultFile;
             ResultList(nListed).arrayID = char(arrayID);
             ResultList(nListed).filter = char(filter);
             ResultList(nListed).integrationTime = char(integrationTime);
             ResultList(nListed).pumpCycle = char(pumpCycle);
+            if isempty(chipID)
+                ResultList(nListed).chipID = 'XXXX';
+            else
+              ResultList(nListed).chipID      = char(chipID);
+            end
+            if isempty(sampleID)
+                ResultList(nListed).sampleID = 'XXXX';
+            else
+                ResultList(nListed).sampleID     = char(sampleID);
+            end
         else
             fprintf(MSGOUT, 'Skipped data file because the naming format was not recognized: \n%s\n', char(imageList(i)));
         end
@@ -162,11 +206,11 @@ for  i=1:length(imageList)
 end    
         
 function [Data, SpotID] = imgIntegrate(stResultList, sMode);
-    Data = struct( 'meanSig'   , [],   'meanBg'    , [], 'meanSigmBg'  , []    , ...
+    if isequal(sMode, 'kinetics')
+         Data = struct( 'meanSig'   , [],   'meanBg'    , [], 'meanSigmBg'  , []    , ...
         'medianSig' , [],   'medianBg'  , [], 'medianSigmBg', []    , ...
         'modeSig'   , [],   'modeBg'    , [], 'modeSigmBg'  , []    , 'x', []);
-
-    if isequal(sMode, 'kinetics')
+        
         [clHdr, nSpots] = imgScanFile(stResultList(1).resultFile);
         nCols = length(clHdr);
         iMeanSig    =strmatch('Signal Mean', clHdr, 'exact');

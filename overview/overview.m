@@ -197,7 +197,7 @@ for i=1:length(fFound);
     iDash = iDash(length(iDash));
     iCol = str2num(fFound(i).fName(iDash-2:iDash-1));
     iRow = str2num(fFound(i).fName(iDash+1:iDash+2));
-    if ~(isempty(iRow) | isempty(iCol) | iRow > 11 | iRow < 0 | iCol < 0 |iCol > 7)
+    if ~(isempty(iRow) | isempty(iCol) | iRow > 7 | iRow < 0 | iCol < 0 |iCol > 11)
         nMatch = nMatch + 1;
         fList(nMatch).imagePath = [fFound(i).fPath, '\', fFound(i).fName];
         fList(nMatch).mwCol     = iCol + 1;
@@ -283,7 +283,9 @@ I = imread(imgPath);
 I = I(xmin:xmax, ymin:ymax);
 figure(hFigure);
 lName = length(imgPath);
-set(hFigure, 'MenuBar', 'none', 'name', ['...',imgPath(lName-50:lName)]);
+iniName = max(1, lName-50);
+
+set(hFigure, 'MenuBar', 'none', 'name', ['...',imgPath(iniName:lName)]);
 set(hFigure, 'Position', [450, 200, 500, 400])
 if isequal(instrument, 'production')
     sI = size(I);

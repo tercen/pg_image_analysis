@@ -1,6 +1,6 @@
 %fd10test
-sData = 'D:\temp\data\041110 FD10-2ref290expRW';
-sSettings = 'FD10DftKinetics.ini';
+sData = 'D:\temp\data\epTest\epTest-ImageResults';
+sSettings = 'FD10mEndPoint.ini';
 sTemplate = 'D:\temp\data\041110 FD10-2ref290expRW\reftpl.tpl';
 sBatch = [sData,'\ImageneBatch.bch'];
 imgSetupBatch(sData, sSettings, sTemplate, sBatch);
@@ -8,4 +8,4 @@ curDir = pwd;
 cd('C:\Imagene')
 eval(['!Imagene5 -batch "',sBatch,'"']);
 cd(curDir)
-imgCollectResults(sBatch,sData, sSettings);
+imgCollectResults(sBatch,'D:\Temp\data\epTest', sSettings);

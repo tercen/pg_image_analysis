@@ -1,13 +1,14 @@
-function v = vLoad(fname);
+function [v,msg] = vLoad(fname);
 % function v = vLoad(fname);
 % will load the  file <fname> into structure v
 % v will have m entries were m is the number of measurements
 % each entry consists of n fields, where n is the number of headers in <filename> 
 % to see a list of fields in v, use fieldnames(v)
 
+msg = [];
 [fid, message] = fopen(fname, 'rt');
 if (fid == -1)
-    disp(message);
+    msg = message;
     v = [];
     return;
 end
