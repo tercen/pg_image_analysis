@@ -24,7 +24,7 @@ function varargout = overview(varargin)
 
 % Edit the above text to modify the response to help overview
 
-% Last Modified by GUIDE v2.5 01-Dec-2004 13:57:32
+% Last Modified by GUIDE v2.5 06-Dec-2004 09:51:35
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -59,8 +59,21 @@ IniPars.initialDir = 'C:\';
 IniPars.resReduction = 2;
 IniPars.showOverviews = 1;
 IniPars.pixOffset = 3;
+IniPars.evolveFilter = 'W*.tif';
+IniPars.pimoptsFilter = '*.tif';
 IniPars.filter = 'W*.tif*';
+IniPars.instrument = 'PS96';
+IniPars.mxScale = 0.1;
 IniPars = getparsfromfile('overview.ini', IniPars);
+
+if isequal(IniPars.instrument, 'PS96')
+    IniPars.filter = IniPars.evolveFilter;
+    set(handles.cbGrid, 'Enable', 'on');
+elseif isequal(IniPars.instrument, 'production')
+    set(handles.cbGrid, 'Enable', 'off');
+    IniPars.filter = IniPars.pimoptsFilter;
+end
+
 
 
 set(findobj('Tag', 'axImage'), 'visible', 'off');
@@ -69,6 +82,7 @@ set(findobj('Tag', 'pbNext'), 'enable', 'off');
 set(findobj('Tag', 'pbPrevious'), 'enable', 'off');
 set(findobj('Tag', 'pbAoi'), 'Enable', 'off');
 set(findobj('Tag', 'pbGo'), 'Enable', 'off');
+set(findobj('Tag', 'lbCycles'), 'Enable', 'off');
 
 handles.output = hObject;
 handles.IniPars = IniPars;
@@ -113,44 +127,97 @@ if ischar(dDir)
     set(findobj('Tag','txStatus'),'String', 'Searching Data ...'); 
     drawnow;
     handles.IniPars.initialDir = dDir;
-    d = dir(dDir);
-    iImageResults = 0;
-    for i=1:length(d)
-        if (d(i).isdir)
-            iMatch = findstr(d(i).name, 'ImageResults');
-            if ~isempty(iMatch)
-                iImageResults = i;
-            end
-        end
-    end
-
-    if iImageResults ~= 0
-        srchDir     =   [dDir, '\', d(iImageResults).name];
-        srchList   =   filehound2(srchDir, handles.IniPars.filter);  
-        fList = sortData(srchList);
-        nFound = length(fList);
-        set(findobj('Tag', 'txStatus'), 'String', ['Found: ',num2str(nFound), ' Images in: ',srchDir]);
-        drawnow
-        clUniquePumpCycles = vGetUniqueID(fList, 'strPumpCycle');
-        clUniquePumCycles = sort(clUniquePumpCycles);
-        info = imfinfo(fList(1).imagePath);
     
+    if isequal(handles.IniPars.instrument, 'PS96')
+        fList = setDataPS96(dDir, handles.IniPars.filter);
+    elseif isequal(handles.IniPars.instrument, 'production');
+        fList = setDataPimOpts(dDir, handles.IniPars.filter);     
+        % cyclematch is nou use here so set it for all indices in the list:
+        handles.cycleMatch      = [1:length(fList)];
+        handles.iCycleMatch     = 1;
+    
+    else
+        uiwait(errordlg(['Undefined instrument: ',handles.IniPars.instrument]));
+    end  
+        
+    if ~isempty(fList)
+        info = imfinfo(fList(1).imagePath);
         handles.iMinY    = 1;
         handles.iMinX    = 1;
         handles.iMaxY    = info.Width;
-        handles.iMaxX       = info.Height;
-        set(findobj('Tag', 'lbCycles'), 'String', clUniquePumpCycles, 'Value', length(clUniquePumpCycles));
-        handles.fList = fList;
+        handles.iMaxX    = info.Height;
+        handles.fList    = fList;
     else
-        errordlg('No ImageResults found!', '');
+        uiwait(errordlg(['No ',handles.IniPars.instrument,' data found in: ',dDir]));
     end
-    
-
-    set(hObject, 'Enable', 'on');
-    set(gcf, 'Pointer', 'Arrow');
-    guidata(hObject, handles);
 end
 
+set(hObject, 'Enable', 'on');
+set(gcf, 'Pointer', 'Arrow');
+guidata(hObject, handles);
+
+
+function fList = setDataPS96(dDir, filter)
+ 
+d = dir(dDir);
+iImageResults = 0;
+for i=1:length(d)
+    if (d(i).isdir)
+        iMatch = findstr(d(i).name, 'ImageResults');
+        if ~isempty(iMatch)
+            iImageResults = i;
+        end
+    end
+end
+
+if iImageResults ~= 0
+    srchDir     =   [dDir, '\', d(iImageResults).name];
+    srchList   =   filehound2(srchDir, filter);
+    fList = sortData(srchList);
+    nFound = length(fList);
+    set(findobj('Tag', 'txStatus'), 'String', ['Found: ',num2str(nFound), ' Images in: ',srchDir]);
+    drawnow
+    clUniquePumpCycles = vGetUniqueID(fList, 'strPumpCycle');
+    clUniquePumCycles = sort(clUniquePumpCycles);
+
+    set(findobj('Tag', 'lbCycles'), 'String', clUniquePumpCycles, 'Value', length(clUniquePumpCycles), 'Enable', 'on');
+
+else
+    fList = [];
+    uiwait(errordlg('No ImageResults found!', ''));
+end
+    
+function fList = setDataPimOpts(dDir, filter)
+fFound = filehound2(dDir, filter, 0);
+nMatch = 0;
+fList = [];
+for i=1:length(fFound);
+
+    iDash = findstr(fFound(i).fName, '_');
+    iDash = iDash(length(iDash));
+    iCol = str2num(fFound(i).fName(iDash-2:iDash-1));
+    iRow = str2num(fFound(i).fName(iDash+1:iDash+2));
+    if ~(isempty(iRow) | isempty(iCol) | iRow > 11 | iRow < 0 | iCol < 0 |iCol > 7)
+        nMatch = nMatch + 1;
+        fList(nMatch).imagePath = [fFound(i).fPath, '\', fFound(i).fName];
+        fList(nMatch).mwCol     = iCol + 1;
+        fList(nMatch).mwRow     = iRow + 1;
+        fList(nMatch).strArray = fFound(i).fName(iDash-2:iDash+2);
+    end
+end
+nFound = length(fList);
+set(findobj('Tag', 'txStatus'),'String', ['Found ',num2str(nFound), ' Images in: ', dDir]);
+if nFound
+    set(findobj('Tag', 'pbNext'), 'enable', 'on');
+    set(findobj('Tag','pbPrevious'), 'enable', 'on');
+    set(findobj('Tag','pbAoi'), 'enable', 'on');
+    set(findobj('Tag','pbGo'), 'enable', 'on');
+else
+    set(findobj('Tag', 'pbNext'), 'enable', 'off');
+    set(findobj('Tag','pbPrevious'), 'enable', 'off');
+    set(findobj('Tag','pbAoi'), 'enable', 'off');
+    set(findobj('Tag','pbGo'), 'enable', 'off');
+end
 
 function sortedList = sortData(srchList);
 
@@ -190,8 +257,11 @@ hiVal = max(val);
 iMatch = strmatch(clPump{hiVal}, pumpList);
 
 cFig = gcf;
+
+warning('off', 'Images:initSize:adjustingMag');
 imgReadAndDisplay(handles.imFig, handles.fList(iMatch(handles.iCycleMatch)).imagePath, handles.iMinY, handles.iMaxY ...
-                    , handles.iMinX, handles.iMaxX);
+                    , handles.iMinX, handles.iMaxX, handles.IniPars.instrument);
+warning('on', 'Images:initSize:adjustingMag');               
 figure(cFig);
 handles.cycleMatch = iMatch;
 
@@ -203,18 +273,61 @@ set(handles.pbGo, 'enable', 'on');
 guidata(hObject, handles);
 
 
-function imgReadAndDisplay(hFigure, imgPath, ymin, ymax, xmin, xmax);
+function imgReadAndDisplay(hFigure, imgPath, ymin, ymax, xmin, xmax, instrument, mxScale);
+
+if nargin == 7
+    mxScale = 0.1;
+end
 
 I = imread(imgPath);
+I = I(xmin:xmax, ymin:ymax);
 figure(hFigure);
 lName = length(imgPath);
 set(hFigure, 'MenuBar', 'none', 'name', ['...',imgPath(lName-50:lName)]);
 set(hFigure, 'Position', [450, 200, 500, 400])
-hIm =  imshow(I(xmin:xmax, ymin:ymax), [], 'initialmagnification', 'fit');
+if isequal(instrument, 'production')
+    sI = size(I);
+    %se = strel('disk', 6); 
+    I = I(1:2:sI(1), 1:2:sI(2));
+    I = imadjust(I , [0 mxScale],[0 1]);
+    %I = rangefilt(I, getnhood(se));
+    %I = histeq(I);     
+    I = imcomplement(I);
+end
 
+hIm =  imshow(I, [], 'initialmagnification', 'fit');
 
-
-
+cbVal = get(findobj('Tag', 'cbGrid'), 'Value');
+if cbVal == 1
+    rsPath = fnReplaceExtension(imgPath, 'txt');
+    if exist(rsPath, 'file')
+        
+        try
+            [clHdrs, nSpots] = imgScanFile(rsPath);
+            nCols = length(clHdrs);
+            clData = imgReadFile(rsPath, nSpots, nCols);
+            iX = strmatch('CM-X', clHdrs);
+            iY = strmatch('CM-Y', clHdrs);
+            iDiam = strmatch('Diameter', clHdrs);
+            for j =1 :nSpots
+                x = str2num(char(clData(j, iX))) + 1 - ymin;
+                y = str2num(char(clData(j, iY))) + 1 - xmin;
+                hold on
+                h = plot(x, y, 'yo');
+                dDiam = char(clData(j, iDiam));
+                dDiam = str2num(dDiam);
+                set(h, 'LineWidth', 0.3, 'MarkerSize', dDiam/1.7);
+         
+            end
+           
+            
+       catch
+            set(findobj('Tag', 'txStatus'), 'String', 'trouble reading grid ...');
+       end
+        
+    end
+end
+hold off
 
 % --- Executes during object creation, after setting all properties.
 function lbCycles_CreateFcn(hObject, eventdata, handles)
@@ -241,7 +354,7 @@ if handles.iCycleMatch < 1
 end
 cFig = gcf;
 imgReadAndDisplay(handles.imFig, handles.fList(handles.cycleMatch(handles.iCycleMatch)).imagePath, handles.iMinY, handles.iMaxY ...
-                    , handles.iMinX, handles.iMaxX);
+                    , handles.iMinX, handles.iMaxX, handles.IniPars.instrument,handles.IniPars.mxScale);
 figure(cFig);
 guidata(hObject, handles);
 
@@ -252,11 +365,11 @@ function pbNext_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 handles.iCycleMatch = handles.iCycleMatch + 1;
 if handles.iCycleMatch > length(handles.cycleMatch)
-    handles.iCycleMatch = 1
+    handles.iCycleMatch = 1;
 end
 cFig = gcf;
 imgReadAndDisplay(handles.imFig, handles.fList(handles.cycleMatch(handles.iCycleMatch)).imagePath, handles.iMinY, handles.iMaxY ...
-                    , handles.iMinX, handles.iMaxX);
+                    , handles.iMinX, handles.iMaxX, handles.IniPars.instrument, handles.IniPars.mxScale);
 figure(cFig);
 guidata(hObject, handles);
 
@@ -274,23 +387,18 @@ nCurImage = handles.cycleMatch(handles.iCycleMatch);
 figure(handles.imFig);
 set(gcf, 'Name', 'Set Aoi');
 I = imread(handles.fList(nCurImage).imagePath);
+warning('off', 'Images:initSize:adjustingMag');
 [iX, iY,gv] = impixel(I, []);
+warning('on', 'Images:initSize:adjustingMag');
 handles.iMinY = iX(1);
 handles.iMaxY = iX(length(iX));
 handles.iMinX = iY(1);
 handles.iMaxX = iY(length(iY));
 
 imgReadAndDisplay(handles.imFig, handles.fList(nCurImage).imagePath, handles.iMinY, handles.iMaxY ...
-                    , handles.iMinX, handles.iMaxX);
+                    , handles.iMinX, handles.iMaxX, handles.IniPars.instrument);
 figure(cFig);
 guidata(hObject, handles);
-
-% --- Executes on button press in pushbutton7.
-function pushbutton7_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton7 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
 
 % --- Executes on button press in pbGo.
 function pbGo_Callback(hObject, eventdata, handles)
@@ -299,27 +407,45 @@ function pbGo_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 fList = handles.fList;
-pCycles     = get(handles.lbCycles, 'String');
-val         = get(handles.lbCycles, 'Value');
-pCycles = pCycles(val);
-nOverviews  = length(pCycles);
+
+if isequal(handles.IniPars.instrument, 'PS96');
+       pCycles     = get(handles.lbCycles, 'String');
+        val         = get(handles.lbCycles, 'Value');
+        pCycles = pCycles(val);
+        nOverviews  = length(pCycles);
+        [pList{1:nImages}] = deal(fList.strPumpCycle);
+elseif isequal(handles.IniPars.instrument, 'production');
+        nOverviews = 1;
+end
+
 set(handles.txStatus, 'String', ['Creating ',num2str(nOverviews),' overview(s) ...']);
 curFig = gcf;
 set(gcf, 'Pointer', 'Watch');
 drawnow;
 
 nImages = length(handles.fList);
-[pList{1:nImages}] = deal(fList.strPumpCycle);
+
 res = handles.IniPars.resReduction;
 
 mkDir(handles.IniPars.initialDir, '_Overviews');
 ovDir = [handles.IniPars.initialDir, '\_Overviews'];
 for i=1:nOverviews
-    iMatch = strmatch(pCycles{nOverviews - i + 1}, pList);
+    if isequal(handles.IniPars.instrument, 'PS96');
+          iMatch = strmatch(pCycles{nOverviews - i + 1}, pList);
+    elseif isequal(handles.IniPars.instrument, 'production');
+          iMatch = [1:length(fList)];
+    end
+    
+    
     for j=1:length(iMatch)
         
         I = imread(fList(iMatch(j)).imagePath);
         I = I(handles.iMinX:res:handles.iMaxX, handles.iMinY:res:handles.iMaxY);
+        if isequal(handles.IniPars.instrument, 'production');
+            I = imadjust(I, [0 handles.IniPars.mxScale], [0 1]);
+            I = imcomplement(I);
+        end
+        
         sI = size(I);
         iRow = 1 + (fList(iMatch(j)).mwRow - 1) * (sI(1)+handles.IniPars.pixOffset);
         iCol = 1 + (fList(iMatch(j)).mwCol - 1) * (sI(2)+handles.IniPars.pixOffset);
@@ -338,7 +464,13 @@ for i=1:nOverviews
 
     figure;
     imshow(overviewImage, [], 'initialmagnification', 'fit');
-    ovName = ['overview',pCycles{nOverviews-i+1},'.jpg'];
+    
+    if isequal(handles.IniPars.instrument, 'PS96')
+        ovName = ['overview',pCycles{nOverviews-i+1},'.jpg'];
+    elseif isequal(handles.IniPars.instrument, 'production')
+        ovName = ['overview.jpg'];
+    end
+        
     set(gcf, 'Name',ovName)
     imwrite(overviewImage, [ovDir,'\',ovName]);
     drawnow;
@@ -352,8 +484,6 @@ set(gcf, 'Pointer', 'Arrow');
 drawnow;
     
     
-
-
 % --- Executes on button press in pbCancel.
 function pbCancel_Callback(hObject, eventdata, handles)
 % hObject    handle to pbCancel (see GCBO)
@@ -362,5 +492,16 @@ function pbCancel_Callback(hObject, eventdata, handles)
 overviewClose(hObject, eventdata, handles);
 
 
+
+
+
+
+% --- Executes on button press in cbGrid.
+function cbGrid_Callback(hObject, eventdata, handles)
+% hObject    handle to cbGrid (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of cbGrid
 
 
