@@ -1,0 +1,18 @@
+From v1.6 on:
+CurveFitHT [no args] invokes the CurveFitHT GUI, renders control to the user
+
+Command line arguments
+data dataDir: dataDir the path to the directory with the data to be fitted,
+              this should be <run directory>\_Quantified Results\F*\T*\Median
+              (If this argument is omitted, the user will be prompted for it)  
+
+vfile vfilepath: complete path for the output vfile 
+                 Should be something like:
+                <run directory>\_CurveFit Results\<run ID>_ fitresults.v
+                The directory were the v-file is to be created should already exist!
+                (If this argument is omitted, the user will be prompted for it).
+
+setup setupfilename: complete path to setup file defining curvefit settings.
+                If this argument is omitted it defaults to {app}\cfAutorun.fset
+                A setup file can be created using the CurveFitHT gui, setup a curvefit ans
+                File:Save Setup
