@@ -321,12 +321,14 @@ if (get(findobj('Tag','cbAutoFit'),'Value'))
     pbCurrent_Callback(hObject, [], handles)
 end
 
-function handles = SetData(handles, bGraph)
+function handles = SetData(handles, bFitAll)
 persistent oldHdr
 % previous hdr line is kept between calls to check for consistency
 
+% if bFitAll = 1, SetData is called form the FitAll function
+% this affects the way data inconsistency is handled in SetData
 if nargin == 1
-    bGraph = 1;
+    bFitAll = 0;
 end
 
 fdata = handles.fdata;
@@ -350,10 +352,13 @@ else
     handles.bConsistent = 1;
 end
 
-handles.data = data;
-oldHdr = hdr;
-x = data(:,1);   
-if ~handles.bConsistent
+if handles.bConsistent
+    handles.data = data;
+    oldHdr = hdr;
+    x = data(:,1);   
+end
+
+if ~handles.bConsistent & ~bFitAll
     % data inconsistent reset.
   
     cHdr = strread(hdr, '%s', 'delimiter','\t');
@@ -368,12 +373,11 @@ if ~handles.bConsistent
     set(findobj('Tag','pbPrevious'), 'Enable','on');
     set(findobj('Tag', 'lbdata'), 'Value', 1);
     set(findobj('Tag', 'lbData'), 'String', cHdr, 'Value', 1); 
-    
 end
 
 y = data(:,handles.SelectedData);
 handles.dataname = fdata(handles.dataset).name;
-if (bGraph)
+if ~bFitAll
     axes(findobj('Tag', 'axData'));
     h = gca;
     hold off
@@ -612,7 +616,7 @@ if isequal(cUpdate, 'on');
     bUpdate = 1;
 else
     bUpdate = 0;
-end    
+end
 
 % import settings from GUI
 [cSet, cfOpts, QcSettings] = cfGetSettings(handles, setupFileName);
@@ -622,52 +626,53 @@ end
 % loop trough the datasets
 for i = 1:handles.nData;
     handles.dataset = i;
-    handles = SetData(handles, 0);
-    
+    handles = SetData(handles, 1);
+
     h = gca;
     axes(h);
-    set(h, 'Tag', 'axData'); 
-   
-    if ~handles.bConsistent
-        uiwait(msgbox(['The data set in: ', handles.iniPars.DataDir, ' is inconsistent. Fitting is aborted'], 'CurveFitHT Error', 'error'));  
-        set(hFitAllButton, 'UserData', -1);
-        break;
-    end 
-    [x,y] = cfGetCurrentData(handles); 
-    title(handles.dataname, 'Interpreter', 'none');
-    [v, fit, handles.absRes, handles.relRes] = vMakeFit(x,y,cSet, cfOpts, QcSettings, handles.dataname, handles.iniPars.sInstrument);  
-    
-    if v(1).Index1 ~= -1
-        vAll = [vAll,v];
-    else
-        % handles.dataname was not recognized.
-        lStr = ['Skipped: ',handles.dataname,': indices could not be assigned.'];
-        clLog{length(clLog)+1} = cellstr(lStr);
-    end     
-   
-    if(bUpdate)
-        hold off
-        plot(x, y,'.')
+    set(h, 'Tag', 'axData');
+
+    if handles.bConsistent
+        [x,y] = cfGetCurrentData(handles);
         title(handles.dataname, 'Interpreter', 'none');
-        hold on
-        nCol = size(y); nCol = nCol(2);
-        for j=1:nCol
-            hPlot(j) = cfPlotFit(x, fit(:,j), v(j), cSet);
+        [v, fit, handles.absRes, handles.relRes] = vMakeFit(x,y,cSet, cfOpts, QcSettings, handles.dataname, handles.iniPars.sInstrument);
+
+        if v(1).Index1 ~= -1
+            vAll = [vAll,v];
+        else
+            % handles.dataname was not recognized.
+            lStr = ['Skipped: ',handles.dataname,': indices could not be assigned.'];
+            clLog{length(clLog)+1} = cellstr(lStr);
         end
-        handles.hPlot = hPlot;
-        vl = vList(v, ' : ');
-        cListVal = get(findobj('Tag', 'lbFitParameters'), 'Value');
-        if cListVal > length(vl), cListVal = 1; end;
-            
-        set(findobj('Tag', 'lbFitParameters'), 'String',char(vl), 'Value', cListVal);        
-        drawnow    
-    end
 
-    % check if cancel pressed
-    if get(hFitAllButton, 'UserData') == -1
-        break
-    end
+        if(bUpdate)
+            hold off
+            plot(x, y,'.')
+            title(handles.dataname, 'Interpreter', 'none');
+            hold on
+            nCol = size(y); nCol = nCol(2);
+            for j=1:nCol
+                hPlot(j) = cfPlotFit(x, fit(:,j), v(j), cSet);
+            end
+            handles.hPlot = hPlot;
+            vl = vList(v, ' : ');
+            cListVal = get(findobj('Tag', 'lbFitParameters'), 'Value');
+            if cListVal > length(vl), cListVal = 1; end;
 
+            set(findobj('Tag', 'lbFitParameters'), 'String',char(vl), 'Value', cListVal);
+            drawnow
+        end
+
+        % check if cancel pressed
+        if get(hFitAllButton, 'UserData') == -1
+            break
+        end
+    else
+            % if ~handles.bConsistent, the current datafile was found to be
+            % inconsistent: skip and add to log in v-file
+            lStr = ['Skipped: ',handles.dataname,': data file is inconsistent'];
+            clLog(length(clLog)+1) = cellstr(lStr);
+    end
 end
 
 if get(hFitAllButton, 'UserData') ~= -1
