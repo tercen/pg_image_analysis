@@ -2,9 +2,14 @@ function [nImages, msg] = imgMakeBatchFileEx(sGridFile, fBatchFile,FileList, fSe
 % nImages = imgMakeBatchFileEx(sMode, fBatchFile, FileList, fSettings, fTemplate, <nChannel>, <pChannelName>)  
 % sMode: gridding mode
 %       'All'        gridding on every image
-%       If anyother sGridFile is taken as the fixed name of the image to grid on (cfi
-%       (PreProcessed.tif) / should be present in every directory.
-%       FileList as created by FileHound2
+%       if not 'All' there are two possibilities:
+%       1)  (sGridFile) refers to a field of the input structure FileList.
+%           In this case FileList(:).(sGridFile) should reference the full
+%           path of the image that should be used for gridding
+%       2)  (sGridFile) is not a field of the input structure FileList
+%           In this case sGridFile is assumed to refer to a fixed name GridImage present
+%            in every image directory.
+            
 
 if (nargin < 6)
     nChannel = 0;
@@ -48,17 +53,24 @@ if isequal(sGridFile, 'All')
         fprintf(fid, '<AdjustSpots>true</AdjustSpots>\n');
         fprintf(fid, '</Entry>\n');
     end
+    
+elseif ~isfield(FileList, sGridFile)
+   
 
-else
     DirList = vGetUniqueID(FileList, 'fPath');
     [clPaths{1:length(FileList)}] = deal(FileList.fPath);
     for n = 1:length(DirList)
+      
+        sGridImage = [FileList(n).fPath, '\', sGridFile];
+        
+        
+        
         iCurDir = strmatch(DirList(n), clPaths);
 
         % Image to put the grid on
         nImages = nImages + 1;
         fprintf(fid, '<Entry>\n');
-        fprintf(fid, '<Image>%s</Image>\n',[FileList(iCurDir(1)).fPath,'\',sGridFile] );
+        fprintf(fid, '<Image>%s</Image>\n',sGridImage );
         fprintf(fid, '<Template>%s</Template>\n',fTemplate);
         fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
         fprintf(fid, '<Destination>%s</Destination>\n', FileList(iCurDir(1)).fPath);
@@ -79,13 +91,57 @@ else
             fprintf(fid, '<Destination>%s</Destination>\n', FileList(iCurDir(m)).fPath);
             fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
             fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
-            fprintf(fid, '<SubstituteGridImage>%s</SubstituteGridImage>\n',[FileList(iCurDir(m)).fPath,'\',sGridFile]);
+            fprintf(fid, '<SubstituteGridImage>%s</SubstituteGridImage>\n',sGridImage);
             fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>\n');
             fprintf(fid, '<AdjustGrid>false</AdjustGrid>\n');
             fprintf(fid, '<AdjustSpots>true</AdjustSpots>\n');
             fprintf(fid, '</Entry>\n');
         end
     end
+    
+elseif isfield(FileList, sGridFile)
+    clUniqueGridFiles = vGetUniqueID(FileList, sGridFile);
+    
+    for i=1:length(clUniqueGridFiles)
+        strFile = clUniqueGridFiles{i};
+        
+        iSlash = findstr(strFile, '\');
+        iSlash = iSlash(length(iSlash));
+        dstPath = strFile(1:iSlash-1);
+
+        nImages = nImages + 1;
+        fprintf(fid, '<Entry>\n');
+        fprintf(fid, '<Image>%s</Image>\n',strFile );
+        fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+        fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+        fprintf(fid, '<Destination>%s</Destination>\n', dstPath);
+        fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+        fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
+        fprintf(fid, '<SubstituteGridImage>null</SubstituteGridImage>\n');
+        fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>\n');
+        fprintf(fid, '<AdjustGrid>true</AdjustGrid>\n');
+        fprintf(fid, '<AdjustSpots>true</AdjustSpots>\n');
+        fprintf(fid, '</Entry>\n');    
+    
+    end
+    
+    
+    for i=1:length(FileList)
+            nImages = nImages + 1;
+            fprintf(fid, '<Entry>\n');
+            fprintf(fid, '<Image>%s</Image>\n',[FileList(i).fPath,'\',FileList(i).fName] );
+            fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+            fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+            fprintf(fid, '<Destination>%s</Destination>\n', FileList(i).fPath);
+            fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+            fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
+            fprintf(fid, '<SubstituteGridImage>%s</SubstituteGridImage>\n',FileList(i).(sGridFile));
+            fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>\n');
+            fprintf(fid, '<AdjustGrid>false</AdjustGrid>\n');
+            fprintf(fid, '<AdjustSpots>true</AdjustSpots>\n');
+            fprintf(fid, '</Entry>\n');
+    end
+    
 end
 %write footer
 fprintf(fid, '</Batch>\n');

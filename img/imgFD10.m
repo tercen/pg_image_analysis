@@ -1,7 +1,7 @@
 %fd10test
-sData = 'D:\temp\data\epTest\epTest-ImageResults';
+sData = 'D:\temp\FD10RenamingProject\experimentYing\experimentYing-ImageResults';
 sSettings = 'FD10mEndPoint.ini';
-sTemplate = 'D:\temp\data\041110 FD10-2ref290expRW\reftpl.tpl';
+sTemplate = 'G:\DataAnalysis\Bin\FD10GeTest.tpl';
 sBatch = [sData,'\ImageneBatch.bch'];
 imgSetupBatch(sData, sSettings, sTemplate, sBatch);
 curDir = pwd;

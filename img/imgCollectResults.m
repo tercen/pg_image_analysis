@@ -18,10 +18,10 @@ if nargin < 3
     sMode = 'kinetics';
 else
     IniPars.instrument = 'PS96';
-    IniPars.mode = 'kinetics';
+    IniPars.dataMode = 'kinetics';
     [IniPars, fid] = getparsfromfile(sConfigurationFile, IniPars);
     sInstrument = IniPars.instrument;
-    sMode = IniPars.mode;
+    sMode = IniPars.dataMode;
 end
 
 [fid, msg] = fopen(sBatchFile, 'rt');
