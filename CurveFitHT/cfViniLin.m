@@ -1,5 +1,5 @@
 function varargout = cfViniLin(X, Y, p)
-% Y = p0 + p1*X 
+% Y = p0 + p1*X;
 % This function integrates functions for:
 % estimating initial guess for fit
 % defining default bounds on parameters
