@@ -1,4 +1,4 @@
-function imgCollectResults(sBatchFile, sRootDir, sMode, sConfigurationFile)
+function imgCollectResults(sBatchFile, sRootDir, sConfigurationFile)
 % compile
 % mcc -m -d [dest dir] imgCollectResults
 % messages from msgCollectResults will be written to fid = MSGOUT
@@ -11,16 +11,17 @@ if ~isequal(sRootDir(length(sRootDir)), '\')
     sRootDir = [sRootDir, '\'];
 end
 
-if nargin < 3
-    sMode = 'kinetics';
-end
 
-if nargin < 4
+
+if nargin < 3
     sInstrument = 'PS96';
+    sMode = 'kinetics';
 else
     IniPars.instrument = 'PS96';
+    IniPars.mode = 'kinetics';
     [IniPars, fid] = getparsfromfile(sConfigurationFile, IniPars);
     sInstrument = IniPars.instrument;
+    sMode = IniPars.mode;
 end
 
 [fid, msg] = fopen(sBatchFile, 'rt');
@@ -42,7 +43,7 @@ if (fid ~= -1)
         sDataRoot = [sRootDir, '_Quantified Results\'];
         for iFilters = length(uniqueFilters)
             if ~mkdir(sDataRoot, char(uniqueFilters(iFilters))), dcSucces = 0; end
-            for iTimes = length(uniqueIntegrationTime)
+            for iTimes = 1:length(uniqueIntegrationTime)
                 if mkDir([sDataRoot, char(uniqueFilters(iFilters))], char(uniqueIntegrationTime(iTimes)))
                     if ~mkdir([sDataRoot, char(uniqueFilters(iFilters)), '\',char(uniqueIntegrationTime(iTimes))], 'Mean');
                         dcSucces = 0;
@@ -139,10 +140,11 @@ for  i=1:length(imageList)
         iPeriod = findstr('.', resultFile); iPeriod = iPeriod(length(iPeriod));
         iSlash =  findstr('\', resultFile); iSlash = iSlash(length(iSlash));
         baseName = resultFile(iSlash + 1: iPeriod-1);
+        pathName = resultFile(1:iSlash-1);
         % now pick appart the string to get Filter, IntegrationTime, Well,
         % Pumpcycle
         [arrayID, filter, integrationTime, pumpCycle] = ...
-            imgReadWFTP(baseName, sInstrument);
+            imgReadWFTP(baseName,pathName, sInstrument);
         if ~isempty(arrayID)
             nListed = nListed + 1;
             ResultList(nListed).resultFile = resultFile;
