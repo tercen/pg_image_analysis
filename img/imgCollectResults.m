@@ -1,4 +1,4 @@
-function imgCollectResults(sBatchFile, sRootDir, sMode, sInstrument)
+function imgCollectResults(sBatchFile, sRootDir, sMode, sConfigurationFile)
 % compile
 % mcc -m -d [dest dir] imgCollectResults
 % messages from msgCollectResults will be written to fid = MSGOUT
@@ -14,8 +14,13 @@ end
 if nargin < 3
     sMode = 'kinetics';
 end
+
 if nargin < 4
     sInstrument = 'PS96';
+else
+    IniPars.instrument = 'PS96';
+    [IniPars, fid] = getparsfromfile(sConfigurationFile, IniPars);
+    sInstrument = IniPars.instrument;
 end
 
 [fid, msg] = fopen(sBatchFile, 'rt');

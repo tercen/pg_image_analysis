@@ -62,10 +62,11 @@ if (fid ~= -1)
                 iFiles = strmatch(uniqueDirList(iDir), clAllDir);
                 clCurDir = {};
 				[clCurDir{1:length(iFiles)}] = deal(ImageList(iFiles).fName);
-                [clLast, clNotRec] = imgGetLastFileFromList(clCurDir, IniPars.instrument);
+                [clPath{1:length(iFiles)}] = deal(ImageList(iFiles).fPath);
+                [clLast, clNotRec] = imgGetLastFileFromList(clCurDir,clPath, IniPars.instrument);
                 if ~isempty(clNotRec)
                     for iNr = 1:length(clNotRec)
-                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', char(clNotRec(iNr)));
+                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', char(clNotRec{iNr}));
                     end
                 end
                 if ~isempty(clLast)

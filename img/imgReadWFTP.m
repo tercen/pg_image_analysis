@@ -1,4 +1,4 @@
-    function [arrayID, filter, integrationTime, pumpCycle] = imgReadWFTP(baseName, sInstrument)
+    function [arrayID, filter, integrationTime, pumpCycle] = imgReadWFTP(baseName,pathName, sInstrument)
         
     arrayID = [];
     filter = [];
@@ -40,3 +40,21 @@
         integrationTime = a(3);
         pumpCycle = a(4);
     end
+    
+    if isequal(sInstrument, 'FD10')
+        % this assumes:
+        % xxxxTestsiteN_P.tif;
+        a = strread(baseName, '%s', 'delimiter', '_');
+        if (length(a) ~= 2)
+            return
+        end
+        arrayID     = a(1);
+        pumpCycle   = a(2);
+        
+        sPathName = char(pathName);
+        iSlash = findstr(sPathName,'\');
+        iSlash = iSlash(length(iSlash));
+        integrationTime = cellstr(sPathName(iSlash+1:length(sPathName)));
+        filter  = 'F1';   
+    end
+    
