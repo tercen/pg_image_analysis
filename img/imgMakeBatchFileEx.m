@@ -61,7 +61,7 @@ elseif ~isfield(FileList, sGridFile)
     [clPaths{1:length(FileList)}] = deal(FileList.fPath);
     for n = 1:length(DirList)
       
-        sGridImage = [FileList(n).fPath, '\', sGridFile];
+        sGridImage = [DirList{n}, '\', sGridFile];
         
         
         

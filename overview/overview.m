@@ -287,21 +287,32 @@ iniName = max(1, lName-50);
 
 set(hFigure, 'MenuBar', 'none', 'name', ['...',imgPath(iniName:lName)]);
 set(hFigure, 'Position', [450, 200, 500, 400])
+
+ sI = size(I);
 if isequal(instrument, 'production')
-    sI = size(I);
+   
     %se = strel('disk', 6); 
-    I = I(1:2:sI(1), 1:2:sI(2));
+    indexX = [1:2:sI(1)];
+    indexY = [1:2:sI(2)];
+    I = I(indexX, indexY);
     I = imadjust(I , [0 mxScale],[0 1]);
     %I = rangefilt(I, getnhood(se));
     %I = histeq(I);     
     I = imcomplement(I);
 end
 
+
 hIm =  imshow(I, [], 'initialmagnification', 'fit');
 
 cbVal = get(findobj('Tag', 'cbGrid'), 'Value');
 if cbVal == 1
     rsPath = fnReplaceExtension(imgPath, 'txt');
+    set(gca, 'Units', 'points');
+    axPos = get(gca, 'Position');
+    axWidth = axPos(4);
+    nPixWidth = sI(1);
+    pointPerPix = axWidth/nPixWidth;
+    
     if exist(rsPath, 'file')
         
         try
@@ -315,10 +326,10 @@ if cbVal == 1
                 x = str2num(char(clData(j, iX))) + 1 - ymin;
                 y = str2num(char(clData(j, iY))) + 1 - xmin;
                 hold on
-                h = plot(x, y, 'y.');
+                h = plot(x+1, y+1, 'yo');
                 dDiam = char(clData(j, iDiam));
                 dDiam = str2num(dDiam);
-                set(h, 'LineWidth', 0.3);
+                set(h, 'LineWidth', 0.3, 'MarkerSize', pointPerPix * dDiam);
          
             end
            

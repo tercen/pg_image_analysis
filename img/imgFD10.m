@@ -1,11 +1,11 @@
 % %fd10test
-sData = 'G:\Users\Rik\FD10Renaming\Ying3\Ying3-ImageResults';
-sSettings = 'FD10mEndPoint.ini';
-sTemplate = 'G:\DataAnalysis\Bin\FD10GeTest.tpl';
+sData = 'P:\140-0 series Tested Knowhow - FMT - BTS\140-080 Array preparation BTS module 2\041223-Niek\041223-Niek-ImageResults';
+sSettings = 'C:\PamSoft\Evolve\DataAnalysis\Bin\FD10DftKinetics.ini';
+sTemplate = 'G:\DataAnalysis\Bin\FD10 imagenetempl_MK050.tpl';
 sBatch = [sData,'\ImageneBatch.bch'];
-% imgSetupBatch(sData, sSettings, sTemplate, sBatch);
+imgSetupBatch(sData, sSettings, sTemplate, sBatch);
 % curDir = pwd;
 % cd('C:\Imagene')
 % eval(['!Imagene5 -batch "',sBatch,'"']);
 % cd(curDir)
-imgCollectResults(sBatch,sData, sSettings);
+%imgCollectResults(sBatch,sData, sSettings);
