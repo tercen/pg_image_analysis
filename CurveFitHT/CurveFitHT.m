@@ -598,6 +598,8 @@ else
     drawnow;
     return
 end
+
+
 vAll = struct([]);
 % clLog will be used as hdr to the v-file
 clLog{1} = cellstr('logBegin');
@@ -743,7 +745,6 @@ for i = 1:nData
     [p(:,i), ExitFlag, wOut] = cfFit(xUsed-cfOpts.offsetX,yUsed - cfOpts.offsetY,[], Settings.Model.FunctionName, cfOpts);
     [fit(:,i),j, V] = feval(Settings.Model.FunctionName, xUsed - cfOpts.offsetX, [], p(:,i));
     absRes(:,i) = yUsed - fit(:,i);
-    aChiSqr     = sum(absRes(:,i).^2);
     %wChiSqr = sum( wOut.*(absRes(:,i).^2)  )/1000;
     
     warning('off', 'MATLAB:dividebyzero');
@@ -777,7 +778,7 @@ for i = 1:nData
    
     v(i).EndLevel   =  mean(y(Settings.vEndLevel,i) );       
     v(i).R2         =  CalcR(fit(:,i), yUsed, wOut);
-    v(i).aChiSqr    =  aChiSqr;
+    v(i).wChiSqr    =  wChiSqr;
     v(i).QcFlag     =  0;
 end
 relRes = [xUsed, relRes];
