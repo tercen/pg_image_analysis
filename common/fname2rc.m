@@ -28,7 +28,16 @@ if isequal(sInstrument, 'Detect')
         end
         r = strmatch(fname(iW+1), ps96RowStr);
         c = strmatch(fname(iW+2:iW+3), ps96ColStr);
+        if isempty(r) | isempty(c)
+            %PS4?
+            r = str2num(fname(iW+1));
+            if ~isempty(r)
+                c = 1;
+            end
+        end
+    
     end
+    
 elseif isequal(sInstrument, 'FD10')
     iMatch = findstr(fd10str, fname);
     if ~isempty(iMatch)
@@ -42,8 +51,13 @@ elseif isequal(sInstrument, 'PS96')
         end
         r = strmatch(fname(iW+1)       , ps96RowStr);
         c = strmatch(fname(iW+2:iW+3)  , ps96ColStr);
-end
-   
+
+elseif isequal(sInstrument, 'PS4')
+         r = str2num(fname(iW+1));
+            if ~isempty(r)
+                c = 1;
+            end
+end   
 
    
 
