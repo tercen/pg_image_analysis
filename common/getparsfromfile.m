@@ -53,6 +53,7 @@ while(1)
     clLine = strread(line, '%s', 'delimiter', '>');
     if (length(clLine)>1)
         iMatch = strmatch(clLine(1), clFieldNames, 'exact');
+        Val = [];
         if (~isempty(iMatch))
             if isnumeric(Pars.(char(clFieldNames(iMatch))))
                 % read in as scalar or vector
