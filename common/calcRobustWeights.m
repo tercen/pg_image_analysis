@@ -1,4 +1,4 @@
-function wRob = calcRobustWeights(res, jac)
+function wRob = calcRobustWeights(res, jac, tune)
 % wRob = calcRobustWeight(res)
 % calculates biquared robust weights from fit residuals and jacobian according
 % DuMouchel and O'Brien in
@@ -6,7 +6,11 @@ function wRob = calcRobustWeights(res, jac)
 % (Buja, A., Tukey, P.A., eds.)
 % Springer New York (1991)
 % p41-48
-K = 4.685;
+if nargin < 3
+    tune = 1;
+end
+
+K = tune*4.685;
 mad = median(abs(res));
 robVar = mad/0.6745;
 % compute leverage adjustment from the jacobian ('design matrix');

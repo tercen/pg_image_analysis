@@ -1,5 +1,13 @@
 function [pOut, ExitFlag, W] = cfFit(X, Y, W,cfModelFunc, cfFitOpts)
 % function F = cfFit(X, Y, W, cfModelFunc, cfFitOpts);
+
+if isfield(cfFitOpts, 'robTune')
+    robTune = cfFitOpts.robTune;
+else
+    robTune = 1;
+end
+
+
 if isempty(W)
     W = ones(size(Y));
 end
@@ -26,7 +34,7 @@ switch cfFitOpts.strMethod
         while(1)
             nIter = nIter + 1;          
             [fit, jac]  =  feval(cfModelFunc, X, [], p0);
-            wRob = calcRobustWeights(Y-fit, jac);
+            wRob = calcRobustWeights((Y-fit), jac, robTune);
             W = W.*wRob;        
             % re-iterate using robust weights
             [pOut, ChiSqr, Res, ExitFlag] = lsqnonlin(@cfGenFit, p0, pLower, pUpper,options, X, Y, W, cfModelFunc);
@@ -37,5 +45,7 @@ switch cfFitOpts.strMethod
                 p0 = pOut;
             end
         end 
+ 
+
 
 end
