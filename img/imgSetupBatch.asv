@@ -139,20 +139,22 @@ if (fid ~= -1)
             % image.
             
             nFound = 0;
-            ListAll = ImageList;
+     
             
-            for i = 1:length(ListAll)
+            for i = 1:length(ImageList)
                 % Add CSWFTP  attributes to image list
-                [arrayID, filter, expTime, pump, chip, sample] = imgReadWFTP(ListAll(i).fName,[], IniPars.instrument);
+                [arrayID, filter, expTime, pump, chip, sample] = imgReadWFTP(ImageList(i).fName,[], IniPars.instrument);
                 % only keep th eones with naming recognized
                 if ~(isempty(pump)|isempty(arrayID)|isempty(expTime)|isempty(filter))
                     nFound = nFound + 1;
-                    ImageList(nFound).C = char(chip);
-                    ImageList(nFound).S = char(sample);
-                    ImageList(nFound).W = char(arrayID);
-                    ImageList(nFound).F = char(filter);
-                    ImageList(nFound).T = char(expTime);
-                    ImageList(nFound).P = char(pump);
+                    FoundList(nFound).fName = ImageList(i).fName;
+                    FoundList(nFound).fPath = ImageList(i).fPath;
+                    FoundList(nFound).C = char(chip);
+                    FoundList(nFound).S = char(sample);
+                    FoundList(nFound).W = char(arrayID);
+                    FoundList(nFound).F = char(filter);
+                    FoundList(nFound).T = char(expTime);
+                    FoundList(nFound).P = char(pump);
                 else
                      fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', ImageList(i).fName);
                 end
@@ -160,7 +162,7 @@ if (fid ~= -1)
            end
             
             % get the unique entry list for C (chip) attribute 
-            uniqueChip = vGetUniqueID(ImageList, 'C');
+            uniqueChip = vGetUniqueID(FoundList, 'C');
             % the C attribute may not be defined in which case the above will
             % return uniqueChip = {''}, we can procedd as if it where
             % defined.
@@ -168,10 +170,11 @@ if (fid ~= -1)
             iDone = 0;
             for iChip = 1:length(uniqueChip)
                 
-                [chipList{1:length(ImageList)}] = deal(ImageList.C);
+                chipList = cell(length(FoundList),1);
+                [chipList{:}] = deal(FoundList.C);
                 % find the current match
                 iChipMatch = strmatch(uniqueChip{iChip}, chipList);
-                chipImageList = ImageList(iChipMatch);
+                chipImageList = FoundList(iChipMatch);
                 
                 % get the unique wells belonging to the current chip
                 uniqueWell = vGetUniqueID(chipImageList, 'W');
@@ -179,7 +182,9 @@ if (fid ~= -1)
                 for iWell = 1:length(uniqueWell)
                     iDone = iDone + 1;
                     fprintf(MSGOUT, 'preprocessing %d/%d(-)\n', iDone, 4*length(uniqueChip));
-                    [wellList{1:length(chipImageList)}] = deal(chipImageList.W);
+                    wellList = cell(length(chipImageList),1);
+                    [wellList{:}] = deal(chipImageList.W);
+                    
                     iWellMatch = strmatch(uniqueWell{iWell}, wellList);
                     wellImageList = chipImageList(iWellMatch);
                     % from the current well, get a list of
@@ -192,6 +197,8 @@ if (fid ~= -1)
                     
                     % save at appropriate location = 1levelup
                     giPath = multiExpGridImagePath(wellImageList(1));
+                    
+                    % we need to keep track of the giPath 
                     
                   
                     try
@@ -206,11 +213,11 @@ if (fid ~= -1)
             % add grid image entry to all entries in the imagelist
             
             sGridImage = 'giPath';
-            for i = 1:length(ImageList)
-                ImageList(i).(sGridImage) = multiExpGridImagePath(ImageList(1));
+            for i = 1:length(FoundList)
+                FoundList(i).(sGridImage) = multiExpGridImagePath(FoundList(i));
             end
             
-            [nFiles, msg] = imgMakeBatchFileEx(sGridImage, sBatchFile, ImageList, IniPars.imgConfiguration, sTemplateFile);
+            [nFiles, msg] = imgMakeBatchFileEx(sGridImage, sBatchFile, FoundList, IniPars.imgConfiguration, sTemplateFile);
             if isempty(msg)
                 fprintf(MSGOUT, 'Created batchfile: %s, for %d images.\n', sBatchFile, nFiles);
             else
@@ -283,11 +290,11 @@ for i=1:length(T)
 end
 
 function sName = multiExpGridImagePath(fEntry)
-iSlash = findstr(fEntry.fPath, '\');
-iSlash = iSlash(length(iSlash));
-sPath = fEntry.fPath(1:iSlash-1);
-sName = ['GridImage', fEntry.C,fEntry.W,fEntry.S,'.tif'];
 
+for i=1:length(fEntry)
+    sPath = fEntry(i).fPath;
+    sName{i} = [sPath,'\GridImage', fEntry(i).C,fEntry(i).W,fEntry(i).F,fEntry(i).S,'.tif'];
+    
        
        
        

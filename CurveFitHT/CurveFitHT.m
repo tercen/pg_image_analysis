@@ -598,8 +598,6 @@ else
     drawnow;
     return
 end
-
-
 vAll = struct([]);
 % clLog will be used as hdr to the v-file
 clLog{1} = cellstr('logBegin');
@@ -617,6 +615,7 @@ end
 % define the fit settings.
 
 % loop trough the datasets
+   allPoints = [];
 for i = 1:handles.nData;
     handles.dataset = i;
     handles = SetData(handles, 1);
@@ -625,11 +624,12 @@ for i = 1:handles.nData;
     axes(h);
     set(h, 'Tag', 'axData');
 
+ 
     if handles.bConsistent
         [x,y] = cfGetCurrentData(handles);
         title(handles.dataname, 'Interpreter', 'none');
-        [v, fit, handles.absRes, handles.relRes] = vMakeFit(x,y,cSet, cfOpts, handles.dataname, handles.iniPars.sInstrument);
-
+        [v, fit, handles.absRes, handles.relRes, points] = vMakeFit(x,y,cSet, cfOpts, handles.dataname, handles.iniPars.sInstrument);
+        allPoints = [allPoints; points];
         if v(1).Index1 ~= -1
             vAll = [vAll,v];
         else
@@ -677,6 +677,7 @@ if get(hFitAllButton, 'UserData') ~= -1
     else
         uiwait(msgbox(['Results saved to: ', vFileName],'Finished Fitting !','modal'));
     end
+    save 'allPoints.txt' allPoints -ascii
 end
 set(h, 'Tag', 'axData');
 set(hFitAllButton, 'String', 'Fit All', 'ForegroundColor',  handles.stdBlue, 'UserData', 0, 'Enable', 'on');
@@ -731,7 +732,7 @@ data = handles.data;
 Xdata = data(:,1);
 Ydata = data(:,handles.SelectedData);
 
-function [v, fit, absRes, relRes] = vMakeFit(x,y,Settings, cfOpts, dataname, sInstrument)
+function [v, fit, absRes, relRes, allPoints] = vMakeFit(x,y,Settings, cfOpts, dataname, sInstrument)
 
 pName = Settings.Model.Parameter;
 nData = size(y); nData = nData(2);
@@ -740,11 +741,17 @@ xUsed = x(vUsed);
 xDerivative = x(Settings.vDerivative);
 vDerivative = find(xUsed == xDerivative);
 
+
+allPoints = [];
 for i = 1:nData
     yUsed = y(vUsed,i);
+    errorModel = (0.022 * yUsed + 74);
+    w = 1./errorModel;
+    
     [p(:,i), ExitFlag, wOut] = cfFit(xUsed-cfOpts.offsetX,yUsed - cfOpts.offsetY,[], Settings.Model.FunctionName, cfOpts);
     [fit(:,i),j, V] = feval(Settings.Model.FunctionName, xUsed - cfOpts.offsetX, [], p(:,i));
-    absRes(:,i) = yUsed - fit(:,i);
+    absRes(:,i) = (yUsed - fit(:,i));
+    aChiSqr     = sum(absRes(:,i).^2);
     %wChiSqr = sum( wOut.*(absRes(:,i).^2)  )/1000;
     
     warning('off', 'MATLAB:dividebyzero');
@@ -777,9 +784,15 @@ for i = 1:nData
     
    
     v(i).EndLevel   =  mean(y(Settings.vEndLevel,i) );       
-    v(i).R2         =  CalcR(fit(:,i), yUsed, wOut);
-    v(i).wChiSqr    =  wChiSqr;
+    v(i).R2         =  CalcR(fit(:,i), yUsed);
+    v(i).aChiSqr    =  aChiSqr;
+    v(i).DOF        = length(yUsed) - length(p(:,i));
     v(i).QcFlag     =  0;
+    
+    points(:,1) = yUsed;
+    points(:,2) = fit(:,i);
+    points(:,3) = ones(size(yUsed)) * v(i).R2;
+    allPoints = [allPoints; points];
 end
 relRes = [xUsed, relRes];
 absRes = [xUsed, absRes];

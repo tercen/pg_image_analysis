@@ -11,8 +11,6 @@ if ~isequal(sRootDir(length(sRootDir)), '\')
     sRootDir = [sRootDir, '\'];
 end
 
-
-
 if nargin < 3
     sInstrument = 'PS96';
     sMode = 'kinetics';
@@ -340,69 +338,117 @@ clMeas{8} = 'Signal Mode';
 clMeas{9} = 'Background Mode';
 
 vRes = [];
+
 for i =1:nExp
     strFile = MultExpList(i).resultFile;
     v = vFromImgResults(strFile, clMeas);
-        strT = MultExpList(i).integrationTime;
+    strT = MultExpList(i).integrationTime;
     exposureTime = str2num(strT(2:length(strT)));
     
     for j = 1:length(v)
         % combine Gene ID with array position
         v(j).Gene_ID = [v(j).Gene_ID,'_(',num2str(v(j).Row),':',num2str(v(j).Column),')'];
         v(j).exposureTime = exposureTime;
+        v(j).C            = MultExpList(i).chipID;
+        v(j).W            = MultExpList(i).arrayID;
+        v(j).S            = MultExpList(i).sampleID;
+        v(j).F            = MultExpList(i).filter;
     end
-    v = rmfield(v, clMeas(2:3));
+    %v = rmfield(v, clMeas(2:3));
     vRes = [vRes, v];
 end
-clUniqueID  = vGetUniqueID(vRes, 'Gene_ID');
+
+clNames         = fieldnames(vRes);
+iSignal         = strmatch('Signal', clNames);
+
+
+
+clUniqueID = vGetUniqueID(vRes, 'Gene_ID');
 [clIDList{1:length(vRes)}] = deal(vRes.Gene_ID);
-
-iSet = 0;
 for i =1:length(clUniqueID)
-    % for each Gene_ID find the highest exposure time < maxModeSignal 
-    iSet = iSet + 1;
+    % every iteration i will result in 1 line in the v-file
     iMatch = strmatch(clUniqueID{i}, clIDList);
-    [clExpTime{1:length(iMatch)}] = deal(vRes(iMatch).exposureTime);
-    expTime = cell2mat(clExpTime);
-    [clModeSig{1:length(iMatch)}] = deal(vRes(iMatch).Signal_Mode);
-    modeSig = cell2Mat(clModeSig);
-    [expTime, iSort] = sort(expTime);
-    modeSig = modeSig(iSort);
-    iIn = find(modeSig <= maxModeSignal);
-    if isempty(iIn)
-        Saturation(iSet) = 1;
-        iIn = 1;
-    else
-        Saturation(iSet) = 0;
-        iIn = iIn(length(iIn));
-    end
-    % store the result in vExp;
-    vExp(iSet) = vRes(iMatch(iIn));
-end
-
-for iSet = 1:length(vExp)
-    % scale with exposure time / add background subtraction / stauration
-    % flag0
+    vExp(i).Gene_ID  = clUniqueID{i};
+    vExp(i).Row      = vRes(iMatch(1)).Row;
+    vExp(i).Column   = vRes(iMatch(1)).Column;
     
-    vExp(iSet).Signal_Mean          = vExp(iSet).Signal_Mean/vExp(iSet).exposureTime;
-    vExp(iSet).Background_Mean      = vExp(iSet).Background_Mean/vExp(iSet).exposureTime;
-    vExp(iSet).Background_Median    = vExp(iSet).Background_Median/vExp(iSet).exposureTime;
-    vExp(iSet).Signal_Median        = vExp(iSet).Signal_Median/vExp(iSet).exposureTime;
-    vExp(iSet).Signal_Mode          = vExp(iSet).Signal_Mode/vExp(iSet).exposureTime;
-    vExp(iSet).Background_Mode      = vExp(iSet).Background_Mode/vExp(iSet).exposureTime;
-    vExp(iSet).SigmBg_Mean          = vExp(iSet).Signal_Mean - vExp(iSet).Background_Mean;
-    vExp(iSet).SigmBg_Median        = vExp(iSet).Signal_Median - vExp(iSet).Background_Median;
-    vExp(iSet).SigmBg_Mode          = vExp(iSet).Signal_Mode - vExp(iSet).Background_Mode;
-    vExp(iSet).Saturation           = Saturation(iSet);
+    vExp(i).C        = vRes(iMatch(1)).C;
+    vExp(i).W        = vRes(iMatch(1)).W;
+    vExp(i).S        = vRes(iMatch(1)).S;
+    vExp(i).F        = vRes(iMatch(1)).F;
+    
+     
+     % cycle over the included measurements
+    for j=1:length(iMatch)
+            
+            strExpTime         = ['Exposure_ms_',num2str(j)];
+            expTime(j)  = vRes(iMatch(j)).exposureTime;
+            vExp(i).(strExpTime) = expTime(j);
+            
+            for k=1:length(iSignal)
+            
+            
+        
+            % cycle over the different exposure times
+            % this lists all exposure time results in a single entry of
+            % structure vExp
+            % ---> one line in the resulting v-filr
+            strSignal{k} = clNames{iSignal(k)};
+            clSignal = strread(strSignal{k}, '%s', 'delimiter', '_');
+            clType{k}  = clSignal{2};
+            strBackground{k}  = ['Background_',clSignal{2}];
+            
+            
+            S(k,j)        = vRes(iMatch(j)).(strSignal{k});
+            B(k,j)        = vRes(iMatch(j)).(strBackground{k});
+            SmB(k,j)      = S(k,j)-B(k,j);
+            
+           
+            strSignalNum       = [strSignal{k},'_',num2str(j)];
+            strBackgroundNum   = [strBackground{k},'_',num2str(j)];
+            strSigmBgNum          = ['SigmBg_',clSignal{2},'_',num2str(j) ];
+            
+           
+            vExp(i).(strSignalNum) = S(k,j);
+            vExp(i).(strBackgroundNum) = B(k,j);
+            vExp(i).(strSigmBgNum)     = SmB(k,j);
+        end
+    end
+    % Now combine the exposure times after checking for saturation using
+    % the mode signal (if present)
+    iMode = strmatch('Mode', clType);
+    if ~isempty(iMode);
+        iNonSat = find(S(iMode,:) < maxModeSignal);
+        if ~isempty(iNonSat)
+            saturated = 0;
+        else
+            % output the lowest exposure time
+            % and set the saturated flag;
+            [mn, iNonSat] = min(expTime);
+            saturated = 1;
+        end
+    end
+
+    for k = 1:length(iSignal)
+         % combine the non saturated spots to a single value (per ms)
+         cSig       = mean( S(k,iNonSat)./expTime(iNonSat) );
+         cBg        = mean( B(k,iNonSat)./expTime(iNonSat) );
+         cSigmBg    = mean( SmB(k, iNonSat)./expTime(iNonSat) );
+         strSig     = [strSignal{k},'_Combined'];
+         strBg      = [strBackground{k},'_Combined'];
+         strSigmBg  = ['SigmBg_',clType{k},'_Combined'];
+         vExp(i).(strSig)       = cSig;
+         vExp(i).(strBg)        = cBg;
+         vExp(i).(strSigmBg)    = cSigmBg;
+     end
+    vExp(i).saturated = saturated;
 end
-
-
 % save to disk.
 fName = [MultExpList(1).chipID,'_',MultExpList(1).sampleID,'_',MultExpList(1).arrayID,'_',MultExpList(1).filter,'.v'];
 
 clHdr{1}                        = fName;
-clHdr{2}                        = ['Created from data from a',num2str(length(MultExpList)),' image exposure time series'];
-clHdr{3}                        = ['All Signal and Background values have been scaled to vaue/ms.'];
+clHdr{2}                        = ['Created from data from a ',num2str(length(MultExpList)),' image exposure time series'];
+clHdr{3}                        = ['Combined Signal and Background values have been scaled to vaue/ms.'];
 vGen.Date                       = date;
 vGen.chipID                     = MultExpList(1).chipID;
 vGen.arrayID                    = MultExpList(1).arrayID;
@@ -410,3 +456,9 @@ vGen.sampleID                   = MultExpList(1).sampleID;
 vGen.maxSignal_Mode             = maxModeSignal;
 vGen.Instrument                 = sInstrument;
 vWrite([dstDir,'\',fName], vExp, vGen, clHdr);
+            
+            
+            
+            
+            
+          

@@ -196,23 +196,23 @@ if (fid ~= -1)
                     Icomb = combineExposures(wellImageList, IniPars.satLevel);
                     
                     % save at appropriate location = 1levelup
-                    giPath = multiExpGridImagePath(wellImageList(1));
-                    
-                  
-                    try
-                        imwrite(Icomb, giPath, 'compression', 'none');
-                    catch
-                        fprintf(MSGOUT, 'Warning: Could not create the grid image for: %s\n', [sPath, '\',sName]);
+                    giPath = multiExpGridImagePath(wellImageList);
+                    for x = 1:length(giPath)
+                        try
+                            imwrite(Icomb, giPath{x}, 'compression', 'none');
+                        catch
+                            fprintf(MSGOUT, 'Warning: Could not create the grid image for: %s\n', [sPath, '\',sName]);
+                        end
                     end
                 end
-                
+
             end
             
             % add grid image entry to all entries in the imagelist
             
             sGridImage = 'giPath';
             for i = 1:length(FoundList)
-                FoundList(i).(sGridImage) = multiExpGridImagePath(FoundList(i));
+                FoundList(i).(sGridImage) = char(multiExpGridImagePath(FoundList(i)));
             end
             
             [nFiles, msg] = imgMakeBatchFileEx(sGridImage, sBatchFile, FoundList, IniPars.imgConfiguration, sTemplateFile);
@@ -288,8 +288,10 @@ for i=1:length(T)
 end
 
 function sName = multiExpGridImagePath(fEntry)
-sPath = fEntry.fPath;
-sName = [sPath,'\GridImage', fEntry.C,fEntry.W,fEntry.S,'.tif'];
+clPath = vGetUniqueID(fEntry, 'fPath');
+for i=1:length(clPath)
+    sName{i} = [clPath{i},'\GridImage', fEntry(i).C,fEntry(i).W,fEntry(i).F,fEntry(i).S,'.tif'];
+end
 
        
        

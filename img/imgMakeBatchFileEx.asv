@@ -61,10 +61,7 @@ elseif ~isfield(FileList, sGridFile)
     [clPaths{1:length(FileList)}] = deal(FileList.fPath);
     for n = 1:length(DirList)
       
-        sGridImage = [FileList(n).fPath, '\', sGridFile];
-        
-        
-        
+        sGridImage = [DirList{n}, '\', sGridFile];
         iCurDir = strmatch(DirList(n), clPaths);
 
         % Image to put the grid on
@@ -100,14 +97,21 @@ elseif ~isfield(FileList, sGridFile)
     end
     
 elseif isfield(FileList, sGridFile)
-    clGridFiles = vGetUniqueID(FileList, sGridFile)
-    for i=1:length(clGridFiles)
+    clUniqueGridFiles = vGetUniqueID(FileList, sGridFile);
+    
+    for i=1:length(clUniqueGridFiles)
+        strFile = clUniqueGridFiles{i};
+        
+        iSlash = findstr(strFile, '\');
+        iSlash = iSlash(length(iSlash));
+        dstPath = strFile(1:iSlash-1);
+
         nImages = nImages + 1;
         fprintf(fid, '<Entry>\n');
-        fprintf(fid, '<Image>%s</Image>\n',sGridImage );
+        fprintf(fid, '<Image>%s</Image>\n',strFile );
         fprintf(fid, '<Template>%s</Template>\n',fTemplate);
         fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
-        fprintf(fid, '<Destination>%s</Destination>\n', FileList(i).fPath);
+        fprintf(fid, '<Destination>%s</Destination>\n', dstPath);
         fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
         fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
         fprintf(fid, '<SubstituteGridImage>null</SubstituteGridImage>\n');
@@ -125,7 +129,7 @@ elseif isfield(FileList, sGridFile)
             fprintf(fid, '<Image>%s</Image>\n',[FileList(i).fPath,'\',FileList(i).fName] );
             fprintf(fid, '<Template>%s</Template>\n',fTemplate);
             fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
-            fprintf(fid, '<Destination>%s</Destination>\n', FileList(iCurDir(i)).fPath);
+            fprintf(fid, '<Destination>%s</Destination>\n', FileList(i).fPath);
             fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
             fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
             fprintf(fid, '<SubstituteGridImage>%s</SubstituteGridImage>\n',FileList(i).(sGridFile));

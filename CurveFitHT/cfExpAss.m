@@ -20,7 +20,7 @@ function varargout = cfExpAss(X, Y, p)
 
 if nargin == 2
     % no parameters so initial guess required
-    p0(1) = 1e-7;%min(Y);
+    p0(1) = min(Y);
     p0(2) = max(Y) - min(Y);
     XMID  = (max(X) - min(X))/2;
     xi = find(X<XMID);
