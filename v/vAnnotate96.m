@@ -1,6 +1,8 @@
-function [v, msg] = vAnnotate96(v, annFile);
+function [v, annFields, msg] = vAnnotate96(v, annFile);
 msg = [];
 [a, msg]  = vReadAnnotation(annFile);
+annFields = fieldnames(a);
+annFields = annFields(3:end);
 if isempty(a)
     return;
 end

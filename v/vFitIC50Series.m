@@ -1,6 +1,6 @@
 function [T, fitFunction, xSeries, ySeries] = vFitIC50Series(T)
 
-fitFunction = 'cfIC50';
+fitFunction = 'cfIC50offset';
 fitOptions.TolX = 0.01;
 fitOptions.MaxFunEvals = 100;
 fitOptions.FitDisplay = 'none';
@@ -13,6 +13,7 @@ xSeries = fNames{iX};
 ySeries = fNames{iY};
 fLow = 10;
 for i=1:length(T)
+  
     % create series
     x = T(i).(xSeries)';
     y = T(i).(ySeries)';
@@ -27,7 +28,8 @@ for i=1:length(T)
         iReplicate = find(x == x(j));
        % use standard error as weight
         if length(iReplicate) > 1
-            w(j) = std(y(iReplicate))/sqrt(length(iReplicate));
+            %w(j) = std(y(iReplicate))/sqrt(length(iReplicate));
+            w(j) = 1;
         else
             w(j) = 1;
         end
@@ -42,7 +44,7 @@ for i=1:length(T)
     xlin = 1e6 * 10.^(x);
     fitOptions.strMethod = 'Robust';
     [pOut, eFlag, wOut] = cfFit(xlin,y,wQC,fitFunction, fitOptions);
-    wOut = wOut./w;
+    wOut = wOut;
     
     iIn = find(wOut > 0.1);
     [mx,my, stDev, nPoints] = AvReplicates(xlin(iIn), y(iIn));
@@ -52,12 +54,12 @@ for i=1:length(T)
     options = optimset('Display', 'none');
     try
        
-        pOut2 = lsqnonlin(@cfGenFit, pOut, [0;0],[1e8;1e8] ,options, mx, my, wNew, fitFunction);
+        pOut2 = lsqnonlin(@cfGenFit, pOut, [0;0;0],[1e8;1e8;1e8] ,options, mx, my, wNew, fitFunction);
     catch
        pOut2 = zeros(size(pOut)); 
     end
-    T(i).pOut(1)    = 0;
-    T(i).pOut(2:3)  = pOut2;
+    %T(i).pOut(1)    = 0;
+    T(i).pOut = pOut2;
    
     T(i).pOutName{1} = 'Y0';
     T(i).pOutName{2} = 'Ymax';

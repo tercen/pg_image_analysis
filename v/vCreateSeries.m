@@ -1,8 +1,22 @@
-function T = vCreateSeries(v, sMeasurement, sSeriesAnnotation, clDisAnnotation, varargin)
+function T = vCreateSeries(v, sMeasurement, sSeriesAnnotation, clDisAnnotation, clInclude, varargin)
 
-if nargin > 4
-    %iSkip   = strmatch('Skip', varargin);
-    clSkip  = varargin(2);
+if nargin > 5
+    iNormalize = strmatch('Normalize', varargin, 'exact')
+    if ~isempty(iNormalize)
+        strNormalizer = varargin{iNormalize(1)+1};
+        bNormalizer = isfield(v, strNormalizer);
+    end
+    iNegative = strmatch('Negative', varargin, 'exact')
+    if ~isempty(iNegative)
+        strNegative = varargin{iNegative(1)+ 1};
+        bNegative = isfield(v, strNegative);
+    end
+    
+    iControl = strmatch('Control', varargin, 'exact');
+    if ~isempty(iControl)
+        strControl = varargin(iControl(1)+1);
+        bControl = isfield(v, strControl);
+end
 end
 
 
@@ -10,16 +24,40 @@ vNames = fieldnames(v);
 
 xSeries = ['x_',sSeriesAnnotation];
 ySeries = ['y_',sMeasurement];
-bNormalizer = isfield(v, 'Normalizer');
+
 T(1).strDisAnnotation = [];
 T(1).(xSeries) = [];
 T(1).(ySeries) = [];
 T(1).QcFlag  = [];
 
+
 clExistingAnnotation = [];
+
+if bControl
+
+end
+
+
+
+
 for i=1:length(v)
-    iSkip = strmatch(v(i).ID(1:3), clSkip);
-    if isempty(iSkip)
+    if bNormalizer
+        M = v(i).(strNormalizer);
+    else
+        M = 1;
+    end
+
+    if bNegative
+        N = v(i).(strNegative);
+    else
+        N = 0;
+    end
+    
+    
+        
+    
+    iInclude = strmatch(v(i).ID(1:3), clInclude);
+    if ~isempty(iInclude)
         % create annotation string from annotations
         strDisAnnotation = [];
         for a = 1:length(clDisAnnotation)
@@ -48,23 +86,33 @@ for i=1:length(v)
             iMatch = strmatch(strDisAnnotation, clExistingAnnotation);
         end
 
+        % this is the actual normalized and background corrected entry in
+        % the series
+        
+        yPoint = M*(v(i).(sMeasurement) - N);
+
         if isempty(iMatch)
             nSeries = length(T);
 
-            T(nSeries+1).strDisAnnotation = strDisAnnotation;
-            T(nSeries+1).(xSeries)=v(i).(sSeriesAnnotation);
-            T(nSeries+1).(ySeries)=v(i).(sMeasurement);
-            T(nSeries+1).QcFlag   =v(i).QcFlag;
-            T(nSeries+1).primaryR2 = v(i).R2;
+            T(nSeries+1).strDisAnnotation   = strDisAnnotation;
+            T(nSeries+1).(xSeries)          = v(i).(sSeriesAnnotation);
+            T(nSeries+1).(ySeries)          = yPoint;
+            T(nSeries+1).QcFlag             = v(i).QcFlag;
+            T(nSeries+1).primaryR2          = v(i).R2;
+            T(nSeries+1).sRelative          = v(i).sRelative;
         else
             % add to exisiting entry
 
             nPoints = length(T(iMatch).(xSeries));
-            T(iMatch).(xSeries)(nPoints+1) = v(i).(sSeriesAnnotation);
-            T(iMatch).(ySeries)(nPoints+1) = v(i).(sMeasurement);
+            T(iMatch).(xSeries)(nPoints+1)  = v(i).(sSeriesAnnotation);
+            T(iMatch).(ySeries)(nPoints+1)  = yPoint;
             T(iMatch).QcFlag(nPoints+1)     = v(i).QcFlag;
-            T(iMatch).primaryR2(nPoints+1) = v(i).R2;
+            T(iMatch).primaryR2(nPoints+1)  = v(i).R2;
+            T(iMatch).sRelative(nPoints+1)   = v(i).sRelative;
         end
+
+
+
     end
 
 end

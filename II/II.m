@@ -335,12 +335,7 @@ for n=1:nFiles
         i = i+1;
         
         if isequal(OutputOptions.format, 'kinetics')
-            iSlash      = findstr(FileList(n).fPath);
-            iSlash      = iSlash(end);
-            fileName    = FileList(n).fPath(iSlash:end);
-            pathName    = FileList(n).fPath(1:iSlah-1);
-            [W, F, T, P] = imgReadWFTP(fileName, pathName, OutputOptions.sInstrument);
-            C(i) = 
+            C(i) = fname2cycle(FileList(n).fPath, OutputOptions.sInstrument);
         elseif isequal(OutputOptions.format, 'list')
             C(i) = cellstr(FileList(n).fPath);
         end

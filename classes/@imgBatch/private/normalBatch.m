@@ -1,4 +1,4 @@
-function [stBatch, stPp] = normalBatch(b, fList)
+function stBatch= normalBatch(b, fList)
 if ~isempty(b.ppObj)
     lpp = 1;
 else
@@ -6,7 +6,7 @@ else
 end
 
 
-stPp = [];
+
 if ~lpp
     for i=1:length(fList)
         stBatch(i).Image            = [fList(i).fPath, '\', fList(i).fName];
@@ -19,6 +19,8 @@ if ~lpp
         stBatch(i).SubstituteGridChannel = b.nChannel;
         stBatch(i).AdjustGrid = 'true';
         stBatch(i).AdjustSpots = 'true';
+        stBatch(i).isGridImage = 0;
+        stBatch(i).gridImageInfo = [];
     end
 else
     for i=1:length(fList)
@@ -36,6 +38,8 @@ else
         stBatch(j).SubstituteGridChannel = b.nChannel;
         stBatch(j).AdjustGrid = 'true';
         stBatch(j).AdjustSpots = 'true';
+        stBatch(j).isGridImage = 1;
+        stBatch(j).gridImageInfo = fList(i);
         
         % srcImage
         stBatch(j+1).Image            = [fList(i).fPath, '\', fList(i).fName];
@@ -48,9 +52,9 @@ else
         stBatch(j+1).SubstituteGridChannel = b.nChannel;
         stBatch(j+1).AdjustGrid = 'false';
         stBatch(j+1).AdjustSpots = 'true';
-    
-        stPp(i).src       = [fList(i).fPath, '\', fList(i).fName];
-        stPp(i).gridImage = [fList(i).fPath, '\', sGridImage];
+        stBatch(j+1).isGridImage = 0;
+        stBatch(j+1).gridImageSrc = [];
+        
     end
 end
 

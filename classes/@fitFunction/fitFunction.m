@@ -1,9 +1,13 @@
 function f = fitFunction(strModel)
 
 if nargin == 0 | ~ischar(strModel)
-    f.strModel  = [];
-    f.modelFunc = [];
-    f.iniFunc   = [];
+    f.strModelName  = [];
+    f.strModelDescription = [];
+    f.clParameter   = [];
+    f.strFitFunctionName = [];
+    f.strIniFunctionName = [];
+    f.jacFlag = 0;
+    
 else
     Func = funcDef();
     [clList{1:length(Func)}] = deal(Func.strModelName);
@@ -11,14 +15,13 @@ else
     if ~isempty(iMatch)
         f = Func(iMatch);
     else
-        f.strModel =  [];
-        f.modelFunc = [];
-        f.iniFunc   = [];
+        f.strModelName  = [];
+        f.strModelDescription = [];
+        f.clParameter   = [];
+        f.strFitFunctionName = [];
+        f.strIniFunctionName = [];
+        f.jacFlag = 0;
     end
     
 end
 f = class(f, 'fitFunction');
-    
-
-
-    

@@ -7,11 +7,11 @@ if ~exist(b.pathImageResults, 'dir')
     error(['Directory not found: ', b.pathImageResults]);
 end
 
-if ~exist(b.pathTemplate, 'file') & ~isequal(b.pathTemplate, 'idtest')
+if ~exist(b.pathTemplate, 'file') & ~isequal(b.pathTemplate, 'null')
     error(['file not found: ', b.pathTemplate]);
 end
 
-if ~exist(b.pathConfiguration, 'file') & ~isequal(b.pathConfiguration, 'idtest')
+if ~exist(b.pathConfiguration, 'file') & ~isequal(b.pathConfiguration, 'null')
     error(['file not found: ',b.pathConfiguration]);
 end
 
@@ -47,25 +47,28 @@ end
 
 switch b.gridMode
     % stBatch is used to write the batchfile
-    % stPrepList indicates which image must be preprocessed to what if
     % preprocessing is used    
     case 'normal'
-        [stBatch, stPrepList] = normalBatch(b,ResultList);
+        stBatch = normalBatch(b,ResultList);
     case 'last'
-        [stBatch, stPrepList] = lastBatch(b, ResultList);
-    case 'multiexp'
-        [stBatch, stPrepList] = meBatch(b, ResultList);
+        stBatch = lastBatch(b, ResultList);
     otherwise
         error(['Invalid value for gridMode: ',b.gridMode]);
 end
 
 % preprocessing, if defined
-nPreProcess = length(stPrepList);
+
 if ~isempty(b.ppObj)
-    for i=1:nPreProcess
-        msgout(b.log, ['preprocessing: ',num2str(i),'/',num2str(nPreProcess)]);
-        preProcessExe(b.ppObj, stPrepList(i).src, stPrepList(i).gridImage);
-    end
+        [isGridImage{1:length(stBatch)}] = deal(stBatch.isGridImage);
+        iGrid = find(isGridImage);
+ 
+        nPreProcess = length(iGrid);
+        for i=1:nPreProcess
+            msgout(b.log, ['preprocessing: ',num2str(i),'/',num2str(nPreProcess)]);
+            preProcessExe(b.ppObj, stBatch(iGrid(i)).gridImageSrc, stBatch(iGrid(i)).Image);
+        end
+    
+    
 end
 
 sBatchFile = [b.pathImageResults,'\',b.batchID,'_batchfile.bch'];

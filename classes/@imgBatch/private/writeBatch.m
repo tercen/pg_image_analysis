@@ -13,13 +13,15 @@ for i=1:length(stBatch)
         sOpenItem       = ['<',clNames{j},'>'];
         sCloseItem      = ['</',clNames{j},'>'];
         sValue = stBatch(i).(clNames{j});
-        if ~ischar(sValue)
+        if isnumeric(sValue)
             sValue = num2str(sValue);
         end
-        
-        fprintf(fid, '%s%s%s\n', sOpenItem, sValue, sCloseItem);
-    end
+        if ischar(sValue)
+            fprintf(fid, '%s%s%s\n', sOpenItem, sValue, sCloseItem);
+        end
+     end
     fprintf(fid, '%s\n', '</Entry>');
 end
 fprintf(fid, '%s\n', '</Batch>');
 
+fclose(fid);

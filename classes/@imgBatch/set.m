@@ -63,7 +63,13 @@ for i=1:2:length(pArgin)
                 b.imageFilter = val;
             else
                 bInvalid = 1;
-            end    
+            end
+        case 'combineExposures'
+            if isnumeric(val)
+                b.combineExposures = logical(val);
+            else
+                bInvalid = 1;
+            end
             
         case 'log'
             b.log = val;

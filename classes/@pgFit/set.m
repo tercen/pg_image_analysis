@@ -27,6 +27,8 @@ for i=1:2:length(pArgin)
     
     pName = pArgin{i};
     pVal  = pArgin{i+1};
+    
+    
     if isequal(pName, 'iniPars')
         
         if length(pVal == length(fDef.clParameter))
@@ -54,8 +56,11 @@ for i=1:2:length(pArgin)
     
     
     elseif isequal(pName, 'fitMethod')
-        p.fitMethod = pVal;
-        
+        if isequal(pVal, 'Normal')|isequal(pVal, 'Robust')|isequal(pVal, 'Filter')
+            p.fitMethod = pVal;
+        else
+            error('value for fitMethod must be ''Normal'', ''Robust'', or ''Filter''');
+        end
     elseif isequal(pName, 'jacobian')
         switch pVal
             case 'on'
@@ -74,10 +79,8 @@ for i=1:2:length(pArgin)
     elseif isequal(pName, 'maxIterations')
         p.maxIterations = pVal;
         
-    elseif isequal(pName, 'xOffset')
-        p.xOffset   = pVal;
-        
-    elseif isequal(pName, 'TolX')
+
+     elseif isequal(pName, 'TolX')
         p.TolX      = pVal;
     
     elseif isequal(pName, 'TolMode')
@@ -93,7 +96,10 @@ for i=1:2:length(pArgin)
     else
         error(['invalid property: ', pName])
     end
+
+    
 end
+
 
         
         

@@ -11,7 +11,8 @@ if nargin ==0
     b.channelName   = '';
     b.imageFilter = '*.tif*';
     b.instrument = [];
-    b.gridMode = [];   
+    b.gridMode = [];
+    b.combineExposures = 0;
     b.ppObj = [];
     b.log = 1;
     b = class(b, 'imgBatch');

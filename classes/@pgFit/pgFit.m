@@ -1,10 +1,16 @@
-function p = pgFit(model)
+function p = pgFit(varIn)
 
-f = fitFunction(model);
-if isempty(get(f, 'strModelName'))
-    error([model, ' is not an available model for use with pgFit objects']);
+if isa(varIn, 'pgFit')
+    p = varIn;
+    return
 end
-p.modelName = model;
+
+    
+f = fitFunction(varIn);
+if isempty(get(f, 'strModelName'))
+    error([varIn, ' is not an available model for use with pgFit objects']);
+end
+p.modelName = varIn;
 p.modelObj  = f;
 p.iniPars   = [];
 p.lbPars    = [];
@@ -18,7 +24,6 @@ else
     p.jacobian = 'off';
 end
 
-p.xOffset   = 0;
 p.maxIterations = 100;
 p.TolX = 1e-2;
 p.TolMode = 'Relative';
