@@ -1121,4 +1121,3 @@ if ~isempty(dataFilter)
 else
     uiwait(errordlg(['Could Not Autorun With: ',setupFileName ], 'CurveFitHT Error!'));
 end
-guidata(gcf, handles);
