@@ -128,7 +128,7 @@ end
 
 handles.hPlot = [];
 handles.stModels = stModels;
-handles.versionStr  = 'CurveFitHT v1.71';
+handles.versionStr  = 'CurveFitHT v1.72';
 
 cfFitOpts.offsetX   = 0;
 cfFitOpts.offsetY   = 0;
@@ -816,11 +816,11 @@ for i = 1:nData
     v(i).R2             =  CalcR(fit(:,i), yUsed);
     v(i).aChiSqr        =  aChiSqr/length(yUsed);
     v(i).rChiSqr        =  sum(relRes(~iOut,i).^2);
-%     v(i).sChiSqr        =  sum( (relRes(~iOut,i)/std(relRes(~iOut,i))).^2);;
+%   v(i).sChiSqr        =  sum( (relRes(~iOut,i)/std(relRes(~iOut,i))).^2);;
     v(i).t              = median(absRes)/std(absRes);
     v(i).sSig           =   std(yUsed - median(yUsed));
-%     v(i).pRuns          =  runsTest(absRes(:,i));
-%     v(i).N              =  length(yUsed);
+%   v(i).pRuns          =  runsTest(absRes(:,i));
+    v(i).N              =  length(yUsed);
     v(i).QcFlag         =  0;
               
     
@@ -1229,7 +1229,7 @@ for i=1:length(v)
         bFlag = 1;
         bBadWell = 1;
     end
-    if (v(i).aChiSqr / v(i).sSig) > Specs.maxXw
+    if (v(i).aChiSqr / (v(i).N *v(i).sSig)) > Specs.maxXw
         v(i).QcFlag = flXw;
         bFlag = 1;
     end
