@@ -1,6 +1,5 @@
 function [nImages, msg] = imgMakeBatchFileEx(sGridFile, fBatchFile,FileList, fSettings, fTemplate,nChannel, pChannelName)
-% nImages = imgMakeBatchFileEx(sMode, fBatchFile, DataDir, Filter, fSettings,
-%                           fTemplate<,nChannel, pChannelName>)
+% nImages = imgMakeBatchFileEx(sMode, fBatchFile, FileList, fSettings, fTemplate, <nChannel>, <pChannelName>)  
 % sMode: gridding mode
 %       'All'        gridding on every image
 %       If anyother sGridFile is taken as the fixed name of the image to grid on (cfi

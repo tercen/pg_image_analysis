@@ -1,7 +1,7 @@
 %fd10test
-sData = 'C:\temp\041020_FD10-3_exp1_Abl+Pepkin020_4-difwash_DMe';
+sData = 'D:\temp\data\041110 FD10-2ref290expRW';
 sSettings = 'FD10DftKinetics.ini';
-sTemplate = 'G:\DataAnalysis\Bin\FD10_pepkin020_DMe.tpl';
+sTemplate = 'D:\temp\data\041110 FD10-2ref290expRW\reftpl.tpl';
 sBatch = [sData,'\ImageneBatch.bch'];
 imgSetupBatch(sData, sSettings, sTemplate, sBatch);
 curDir = pwd;
