@@ -170,7 +170,8 @@ if (fid ~= -1)
             iDone = 0;
             for iChip = 1:length(uniqueChip)
                 
-                [chipList{1:length(FoundList)}] = deal(FoundList.C);
+                chipList = cell(length(FoundList),1);
+                [chipList{:}] = deal(FoundList.C);
                 % find the current match
                 iChipMatch = strmatch(uniqueChip{iChip}, chipList);
                 chipImageList = FoundList(iChipMatch);
@@ -181,7 +182,9 @@ if (fid ~= -1)
                 for iWell = 1:length(uniqueWell)
                     iDone = iDone + 1;
                     fprintf(MSGOUT, 'preprocessing %d/%d(-)\n', iDone, 4*length(uniqueChip));
-                    [wellList{1:length(chipImageList)}] = deal(chipImageList.W);
+                    wellList = cell(length(chipImageList),1);
+                    [wellList{:}] = deal(chipImageList.W);
+                    
                     iWellMatch = strmatch(uniqueWell{iWell}, wellList);
                     wellImageList = chipImageList(iWellMatch);
                     % from the current well, get a list of

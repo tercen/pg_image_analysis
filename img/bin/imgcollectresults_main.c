@@ -1,6 +1,6 @@
 /*
  * MATLAB Compiler: 4.1 (R14SP1)
- * Date: Sat Dec 20 11:38:05 2003
+ * Date: Wed Dec 29 13:28:23 2004
  * Arguments: "-B" "macro_default" "-m" "-W" "main" "-T" "link:exe" "-d"
  * "C:\PamSoft\DataAnalysis\img\bin" "imgCollectResults" 
  */
