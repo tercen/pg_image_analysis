@@ -26,4 +26,15 @@ if isequal(sInstrument, 'PS96')
     end
     rBase = fPath(iSlash+1:iUnderScore-1); 
 end
-      
+
+if isequal(sInstrument, 'PS4')
+    iSlash          = findstr(fPath, '\'); 
+    iSlash = iSlash(length(iSlash));
+    iUnderScore     = findstr(fPath,'_');
+    iUnderScore     = iUnderScore(length(iUnderScore));
+    if isempty(iSlash) | isempty(iUnderScore)
+        rBase = -1;
+        return
+    end
+    rBase = fPath(iSlash+1:iUnderScore-1); 
+end
