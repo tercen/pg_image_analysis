@@ -407,9 +407,11 @@ function pbGo_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 fList = handles.fList;
+nImages = length(fList);
 
 if isequal(handles.IniPars.instrument, 'PS96');
-       pCycles     = get(handles.lbCycles, 'String');
+       
+        pCycles     = get(handles.lbCycles, 'String');
         val         = get(handles.lbCycles, 'Value');
         pCycles = pCycles(val);
         nOverviews  = length(pCycles);
@@ -427,7 +429,7 @@ nImages = length(handles.fList);
 
 res = handles.IniPars.resReduction;
 
-mkDir(handles.IniPars.initialDir, '_Overviews');
+mkdir(handles.IniPars.initialDir, '_Overviews');
 ovDir = [handles.IniPars.initialDir, '\_Overviews'];
 for i=1:nOverviews
     if isequal(handles.IniPars.instrument, 'PS96');
