@@ -94,6 +94,7 @@ iniPars.dftQcSpecMinimalEndLevel = 0;
 iniPars.resHistNumOfBins = 10;
 iniPars.dftFileFilter = '*mBg.dat';
 iniPars.dftSetupFile = 'cfAutorun.cset'; % setup file is used for autorun
+iniPars.saveLocationSetupFile = 'C:\';
 handles.iniName = 'CurveFitHT.ini';
 [iniPars, inifID] = getparsfromfile(handles.iniName, iniPars);
 
@@ -1043,7 +1044,7 @@ function miSaveSetup_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 fExt = '.fset';
-[fName, fPath] = uiputfile(['*',fExt], 'Save Settings As ... ')
+[fName, fPath] = uiputfile([handles.iniPars.saveLocationSetupFile,'\*',fExt], 'Save Settings As ... ')
 
 if ischar(fName)
     iPoint = findstr(fName, '.');
@@ -1054,12 +1055,14 @@ if ischar(fName)
     Settings.SelectedData   = handles.SelectedData;
     Settings.SelectedID     = handles.SelectedID;
     dataFilter = handles.dataFilter;
+    handles.iniPars.saveLocationSetupFile = fPath;
     try
         save([fPath, '\', fName], 'Settings', 'Options', 'QcSpec', 'dataFilter','-mat');
     catch
         errordlg(['Could not create settings file: ', [fPath,'\',fName]], 'CurveFitHT Error');
     end
 end
+guidata(hObject, handles);
 
 function [Settings, Options, QcSpec, dataFilter] = cfGetSettings(handles, fSetup)
 % This gets the fit Settings, Options and QC specs from
