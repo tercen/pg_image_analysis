@@ -16,7 +16,7 @@
         % this assumes file naming in the format:
         % W[ArrayID]_F[filter]_T[integrationTime]_P[pumpCycle]
         a = strread(baseName, '%s', 'delimiter', '_');
-        if length(a) ~= 4
+        if length(a) < 4
             return
         end
         tArrayID = char(a(1));
