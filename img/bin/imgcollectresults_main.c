@@ -1,8 +1,8 @@
 /*
- * MATLAB Compiler: 4.0 (R14)
- * Date: Thu Aug 19 14:34:25 2004
+ * MATLAB Compiler: 4.1 (R14SP1)
+ * Date: Thu Dec 02 15:20:43 2004
  * Arguments: "-B" "macro_default" "-m" "-W" "main" "-T" "link:exe" "-d"
- * "C:\PamSoft\DataAnalysis\img\Bin" "imgCollectResults" 
+ * "C:\PamSoft\DataAnalysis\img\bin" "imgCollectResults" 
  */
 
 #include <stdio.h>
@@ -16,6 +16,8 @@ extern const char *__MCC_imgCollectResults_root_data;
 extern const unsigned char __MCC_imgCollectResults_session_data[];
 extern const char *__MCC_imgCollectResults_matlabpath_data[];
 extern const int __MCC_imgCollectResults_matlabpath_data_count;
+extern const char *__MCC_imgCollectResults_classpath_data[];
+extern const int __MCC_imgCollectResults_classpath_data_count;
 extern const char *__MCC_imgCollectResults_mcr_runtime_options[];
 extern const int __MCC_imgCollectResults_mcr_runtime_option_count;
 extern const char *__MCC_imgCollectResults_mcr_application_options[];
@@ -58,6 +60,8 @@ bool imgCollectResultsInitializeWithHandlers(
                                         __MCC_imgCollectResults_session_data,
                                         __MCC_imgCollectResults_matlabpath_data,
                                         __MCC_imgCollectResults_matlabpath_data_count,
+                                        __MCC_imgCollectResults_classpath_data,
+                                        __MCC_imgCollectResults_classpath_data_count,
                                         __MCC_imgCollectResults_mcr_runtime_options,
                                         __MCC_imgCollectResults_mcr_runtime_option_count,
                                         true, NoObjectType, ExeTarget, NULL,
