@@ -5,3 +5,5 @@ iniPars.refID = '';
 iniPars = getparsfromfile(settingsFile, iniPars);
 uniqueID    = vGetUniqueID(v, 'ID');
 refID       = strmatch(iniPars.refID, uniqueID);
+
+% do the ref spot statistics:
