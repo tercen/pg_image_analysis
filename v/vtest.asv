@@ -1,0 +1,3 @@
+%vtest
+file = 'G:\M96Images\Kinease\040316 N143_2\5_3_040316 JJ run 10 uur\Results\101833103071888_040316 JJ run 10 uur\_Quantified Results\';
+v = vLoad(file);

@@ -1,0 +1,32 @@
+function vOut = vMakeFit(ModelStruct,x,y, yID, strInstr)
+pName = stModels(vModel).Parameter;
+nData = size(y); nData = nData(2);
+for i=1:nData
+    [p(:,i), ExitFlag, wOut] = cfFit(x(vFirstX:vLastX),y(vFirstX:vLastX,i),[], stModels(vModel).FunctionName, cfOpts);
+    [fit,j, V] = feval(stModels(vModel).FunctionName, x(vFirstX:vLastX), [], p(:,i));
+    
+    Vini = V(vDerivative);
+    
+    
+    % make results vector for this fit
+    if nargin > 3 
+        v(i).ID = yID(i);
+        
+        if (nargin > 4)       
+        if isequal(strInstr, 'PS96')
+            [r,c] = PS96_fname2rc(handles.dataname);
+            v(i).MWRow = r;
+            v(i).MWCol = c;
+        end    
+    end    
+    end
+    for nPar = 1:length(p(:,i))
+        strfld = char(pName(nPar));
+        v(i).(strfld) = p(nPar, i);
+    end
+    v(i).Vini = Vini;
+    iIn = find(wOut ~= 0);
+    v(i).R2 = calcr(fit, y(vFirstX:vLastX,i));
+    nPoints = length(y(:,i));
+    v(i).DataEndPoint = mean(y(nPoints-2:nPoints,i));  
+end

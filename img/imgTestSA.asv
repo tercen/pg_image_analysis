@@ -1,0 +1,14 @@
+sDir        = uigetdir('C:\temp', 'Select Data Directory')
+sConfig     = 'G:\DataAnalysis\Bin\daConfigNormal.ini';
+%[sTemplate, sPath]   = uigetfile('G:\DataAnalysis\Bin\*.tpl', 'Select imagene template')
+sTemplate = 'G:\DataAnalysis\Bin\MK022_ii.tpl'
+sBatch = 'G:\DataAnalysis\Bin\nBatch.bch';
+
+cDir = pwd;
+if isstr(sDir)  & isstr(sTemplate)
+	cd('G:\DataAnalysis\MatlabCompiled4\imgSetupBatch\')
+    str = ['!imgSetupBatch.exe "',sDir,'" "',sConfig,'" "',sT]    
+    eval(str)
+    %imgSetupBatch(sDir, sConfig, sTemplate, sBatch)
+    %imgCollectResults(sBatch, sDir)
+end

@@ -1,0 +1,109 @@
+function [nImages, msg] = imgMakeBatchFileEx(sMode, fBatchFile,FileList, fSettings, fTemplate,nChannel, pChannelName)
+% nImages = imgMakeBatchFileEx(sMode, fBatchFile, DataDir, Filter, fSettings,
+%                           fTemplate<,nChannel, pChannelName>)
+% sMode: gridding mode
+%       'Normal'        gridding on every image
+%       'GridOnLast'    gridding on last image from a series
+%       If anyother sMode is taken as the name of the image to grid on (cfi
+%       (PreProcessed.tif)
+% FileList as created by FileHound2
+
+if (nargin < 6)
+    nChannel = 0;
+    pChannelName = '';
+end
+
+nImages = 0;
+szNames = size(FileList); szNames = szNames(2);
+
+fid = fopen(fBatchFile, 'wt');
+msg = [];
+if (fid == -1)
+    msg = ['Could not open batchfile: ', fBatchFile];
+    return;
+end
+% check for existence of template and configuration:
+
+if exist(fSettings, 'file') ~= 2
+    msg = ['Could not find Imagene configuration file: ',fSettings];
+    return;
+end
+if exist(fTemplate, 'file') ~= 2
+    msg = ['Could not find Imagene template file: ', fTemplate];
+end
+
+
+fprintf(fid, '<Batch>\n');
+if isequal(sMode, 'Normal')
+
+    for n=1:szNames
+        fprintf(fid, '<Entry>\n');
+        fprintf(fid, '<Image>%s</Image>\n', [FileList(n).fPath,'\',FileList(n).fName]);
+        fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+        fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+        fprintf(fid, '<Destination>%s</Destination>\n', FileList(n).fPath);
+        fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+        fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
+        fprintf(fid, '<SubstituteGridImage>null</SubstituteGridImage>');
+        fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>');
+        fprintf(fid, '<AdjustGrid>true</AdjustGrid>');
+        fprintf(fid, '<AdjustSpots>true</AdjustSpots>');
+        fprintf(fid, '</Entry>\n');
+    end
+
+else
+    DirList = vGetUniqueID(FileList, 'fPath');
+    [clPaths{1:length(DirList}] = deal(FileList.fPath);
+        for n = 1:length(DirList)
+            iCurDir = strmatch(DirList(n), clPaths);
+             
+            % Image to put the grid on
+            fprintf(fid, '<Entry>\n');
+            fprintf(fid, '<Image>%s</Image>\n',[FileList(iCurDir(m)).fPath,'\',sMode] );
+            fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+            fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+            fprintf(fid, '<Destination>%s</Destination>\n', FileList(iCurDir(m)).fPath);
+            fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+            fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
+            fprintf(fid, '<SubstituteGridImage>null</SubstituteGridImage>');
+            fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>');
+            fprintf(fid, '<AdjustGrid>true</AdjustGrid>');
+            fprintf(fid, '<AdjustSpots>true</AdjustSpots>');
+            fprintf(fid, '</Entry>\n');
+            
+            
+            
+            for m = 1:length(iCurDir)
+                fprintf(fid, '<Entry>\n');
+                fprintf(fid, '<Image>%s</Image>\n',[FileList(iCurDir(m)).fPath,'\',FileList(iCurDir(m)).fName] );
+                fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+                fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+                fprintf(fid, '<Destination>%s</Destination>\n', FileList(iCurDir(m)).fPath);
+                fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+                fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);
+                fprintf(fid, '<SubstituteGridImage>%s</SubstituteGridImage>',[FileList(iCurDir(m)).fPath,'\',sMode]);
+                fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>');
+                fprintf(fid, '<AdjustGrid>false</AdjustGrid>');
+                fprintf(fid, '<AdjustSpots>false</AdjustSpots>');
+            fprintf(fid, '</Entry>\n');
+        
+
+            end
+            
+            
+
+
+            end
+            
+            
+            
+            end
+            
+            
+
+
+
+%write footer
+fprintf(fid, '</Batch>\n');
+fclose(fid);
+%

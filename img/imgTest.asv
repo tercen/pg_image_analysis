@@ -1,0 +1,20 @@
+sDir        = uigetdir('C:\temp', 'Select Data Directory')
+sConfig     = 'G:\DataAnalysis\DatConfigurations\PS96DftKinetics.ini';
+[sTemplate, sPath]   = uigetfile('G:\DataAnalysis\Bin\*.tpl', 'Select imagene template')
+sBatch = 'G:\DataAnalysis\Bin\nBatch.bch';
+
+if isstr(sDir)  & isstr(sTemplate)
+    t0 = clock;
+    cDir = pwd;
+    sTemplate = [sPath,'\',sTemplate];
+    cd('G:\DataAnalysis\MatlabCompiled4\imgSetupBatch');
+    str = ['!imgSetupBatch "',sDir,'" "',sConfig,'" "',sTemp
+    etime(clock, t0)
+    cDir = pwd;
+    cd('C:\ImagenePG');
+    str = ['!Imagene5 -batch "',sBatch,'"']
+    %eval(str);
+    cd(cDir);
+    etime(clock, t0)
+    imgCollectResults(sBatch, sDir);
+end

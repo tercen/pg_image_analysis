@@ -1,0 +1,17 @@
+function clList = vPick(v, strID);
+% clList = vPick(v, strID)
+% Displays a GUI that allows selection of entries from the string field
+% strID of the input structure v.
+% Returns clList, a cell array with the selected entries
+% This function is usefull for selecting ID's for , for instance,
+% vArrange96
+% EXAMPLE:
+% clList = vPick(v, 'ID');
+% Map = vArrange96(v, 'ID', clList, 'Vini');
+% SEE: vArrange96, vMap96
+
+h = vPickList(v, strID);
+waitfor(h, 'Visible');
+handles = guidata(h);
+delete(h);
+clList = handles.strList;

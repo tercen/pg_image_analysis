@@ -1,0 +1,13 @@
+function clList = vList(v)
+% function clList = vList(v)
+clNames = fieldnames(v);
+nFields = length(clNames);
+nVecs = length(v);
+% First line are headers
+strList = '';
+for i=1:length(clNames)
+    strList = [strList,sprintf('%s\t',char(clNames(i)))]; 
+end   
+clList(1) = cellstr(strList);
+for j=1:nVecs
+    for i=1:

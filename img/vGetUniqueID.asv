@@ -1,0 +1,14 @@
+function [clID, msg] = vGetUniqueID(v, fName)
+% clID = vGetUniqueID(v, fName)
+% return the unique values in structure v, field fName
+
+% check if field fName exists
+names = fieldnames(v);
+if isempty(strmatch(fName, names))
+    msg = ['vGetUniqueID: input structure v does not contain required field ',fName,'.'];
+    clID = [];
+    return
+end
+
+for i=1:length(v)
+    

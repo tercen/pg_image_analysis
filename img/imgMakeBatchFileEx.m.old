@@ -1,0 +1,130 @@
+function [nImages, msg] = imgMakeBatchFileEx(sMode, fBatchFile,FileList, fSettings, fTemplate,nChannel, pChannelName)
+% nImages = imgMakeBatchFileEx(sMode, fBatchFile, DataDir, Filter, fSettings,
+%                           fTemplate<,nChannel, pChannelName>)
+% sMode: gridding mode
+%       'Normal'        gridding on every image
+%       'GridOnLast'    gridding on last image from a series
+%       If anyother sMode is taken as the name of the image to grid on (cfi
+%       (PreProcessed.tif)
+
+if (nargin < 6)
+    nChannel = 0;
+    pChannelName = '';
+end
+
+nImages = 0;
+szNames = size(FileList); szNames = szNames(2);
+
+fid = fopen(fBatchFile, 'wt');
+msg = [];
+if (fid == -1)
+    msg = ['Could not open batchfile: ', fBatchFile];
+    return;
+end
+% check for existence of template and configuration:
+
+if exist(fSettings, 'file') ~= 2
+    msg = ['Could not find Imagene configuration file: ',fSettings];
+    return;
+end
+if exist(fTemplate, 'file') ~= 2
+    msg = ['Could not find Imagene template file: ', fTemplate];
+end
+
+
+fprintf(fid, '<Batch>\n');
+if isequal(sMode, 'Normal') 
+   
+    for n=1:szNames
+        dest = FileList(n).fPath;
+        iB = findstr(dest, '\'); iB = iB(length(iB));
+        dest = dest(1:iB-1);
+        nImages = nImages + 1;
+        fprintf(fid, '<Entry>\n');
+        fprintf(fid, '<Image>%s</Image>\n', FileList(n).fPath);
+        fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+        fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+        fprintf(fid, '<Destination>%s</Destination>\n', dest);
+        fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+        fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);		
+        fprintf(fid, '<SubstituteGridImage>null</SubstituteGridImage>');
+        fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>');
+        fprintf(fid, '<AdjustGrid>true</AdjustGrid>');
+        fprintf(fid, '<AdjustSpots>true</AdjustSpots>');
+        fprintf(fid, '</Entry>\n');
+    end
+
+end
+
+if isequal(sMode, 'GridOnLast')
+    nImages = 0; 
+    m = 0;
+    
+    while (nImages < szNames)
+        % cycles through the filelist to collect files from the same directory 
+        % then determine the highest cycle number
+        nImages =nImages+1;
+        iPeriod = findstr('.', FileList(nImages).fPath); iPeriod = iPeriod(length(iPeriod));
+        iSlash =  findstr('\', FileList(nImages).fPath); iSlash = iSlash(length(iSlash));
+        baseName = FileList(nImages).fPath(iSlash + 1: iPeriod-1);
+        [dummy1, dummy2, dummy3, strP] = imgReadWFTP(baseName, 'PS96');
+        if ~isempty(strP)
+            m=m+1;
+            strP = char(strP);
+            p(m) = str2num(strP(2:length(strP)));
+            CurDir(m).fPath = FileList(nImages).fPath;
+        else 
+            msg = ['file naming was not recognized: ', baseName];
+            return
+        end
+        if FileList(nImages).isLast
+            [mx, iLast] = max(p);
+            fLast = CurDir(iLast).fPath;
+            iNotLast = find([1:length(CurDir)] ~= iLast);
+            dest = FileList(nImages).fPath;
+            iB = findstr(dest, '\'); iB = iB(length(iB));
+            dest = dest(1:iB-1);
+            % write the first entry for the directory: the last image 
+            fprintf(fid, '<Entry>\n');
+            fprintf(fid, '<Image>%s</Image>\n', fLast);
+            fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+            fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+            fprintf(fid, '<Destination>%s</Destination>\n', dest);
+            fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+            fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);		
+            fprintf(fid, '<SubstituteGridImage>null</SubstituteGridImage>\n');
+            fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>\n');
+            fprintf(fid, '<AdjustGrid>true</AdjustGrid>\n');
+            fprintf(fid, '<AdjustSpots>true</AdjustSpots>\n');
+            fprintf(fid, '</Entry>\n');
+            
+            % now write the other entries with gridding switched off
+            for k = 1:length(iNotLast)
+                   fprintf(fid, '<Entry>\n');
+                   fprintf(fid, '<Image>%s</Image>\n', CurDir(iNotLast(k)).fPath);
+                   fprintf(fid, '<Template>%s</Template>\n',fTemplate);
+                   fprintf(fid, '<Configuration>%s</Configuration>\n',fSettings);
+                   fprintf(fid, '<Destination>%s</Destination>\n', dest);
+                   fprintf(fid, '<Channel>%d</Channel>\n', nChannel);
+                   fprintf(fid, '<ChannelName>%s</ChannelName>\n', pChannelName);		
+                   fprintf(fid, '<SubstituteGridImage>%s</SubstituteGridImage>\n', fLast);
+                   fprintf(fid, '<SubstituteGridChannel>0</SubstituteGridChannel>\n');
+                   fprintf(fid, '<AdjustGrid>false</AdjustGrid>\n');
+                   fprintf(fid, '<AdjustSpots>false</AdjustSpots>\n');
+                   fprintf(fid, '</Entry>\n');
+            end            
+            % and proceed with the next dir
+            m = 0;
+            p = [];
+            CurDir = struct([]);     
+        end
+    end
+end
+
+
+
+
+%write footer
+fprintf(fid, '</Batch>\n');
+fclose(fid);
+%
