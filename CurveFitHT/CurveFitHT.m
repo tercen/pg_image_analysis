@@ -836,18 +836,26 @@ function decFlag = makeQcFlag(v, QcSpec);
 
 
 flag = '00000000';
+% in case flag is not zero bit 8 is always set
+%  (f(BitDepth))
+% plus another one referring to the reason for flagging
+
+
 fBitDepth = length(flag);
 if v.R2 < QcSpec.minimalR2
+    %'[]101';
     flag(fBitDepth) = '1';
     flag(fBitDepth - 2) = '1';
 end
 
 if v.Vini <QcSpec.minimalVini;
+    %'[]1001'
     flag(fBitDepth) = '1';
     flag(fBitDepth - 3) = '1';
 end
 
 if v.EndLevel < QcSpec.minimalEndLevel
+    %[]10001'
     flag(fBitDepth) = '1';
     flag(fBitDepth - 4) = '1';
 end

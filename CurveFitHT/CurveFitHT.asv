@@ -156,6 +156,8 @@ else
     set(findobj('Tag', 'rbRobust'), 'Value', 0);
 end
 
+guidata(hObject, handles);
+
  if ~isempty(varargin)
   iMatch = strmatch('data', varargin);
   if ~isempty(iMatch)
@@ -179,7 +181,7 @@ end
   handles = cfAutoRun(handles, dataDir, vFileName, setupFileName); 
 end
 
-guidata(hObject, handles);
+
 
 % UIWAIT makes CurveFitHT wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -195,7 +197,7 @@ function varargout = CurveFitHT_OutputFcn(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 % Get default command line output from handles structure
-varargout{1} = handles.output;
+varargout{1} = cellstr('End CurveFitHT');
 
 
 % --- Executes on button press in pbGetData.
@@ -212,7 +214,7 @@ end
 dataDir = uigetdir(handles.iniPars.DataDir, 'select data directory');
 if ischar(dataDir)
     handles.iniPars.DataDir = dataDir;
-    handles = initializeData(handles)
+    handles = initializeData(handles);
 end    
 set(hObject, 'Enable', 'on')
 guidata(hObject, handles);
@@ -828,18 +830,26 @@ function decFlag = makeQcFlag(v, QcSpec);
 
 
 flag = '00000000';
+% in case flag is not zero bit 8 is always set
+%  (f(BitDepth))
+% plus another one referring to the reason for flagging
+
+
 fBitDepth = length(flag);
 if v.R2 < QcSpec.minimalR2
+    %'[]101';
     flag(fBitDepth) = '1';
     flag(fBitDepth - 2) = '1';
 end
 
 if v.Vini <QcSpec.minimalVini;
+    %'[]1001'
     flag(fBitDepth) = '1';
     flag(fBitDepth - 3) = '1';
 end
 
 if v.EndLevel < QcSpec.minimalEndLevel
+    %[]10001'
     flag(fBitDepth) = '1';
     flag(fBitDepth - 4) = '1';
 end
@@ -1102,7 +1112,7 @@ if ~isempty(dataFilter)
         
         set(findobj('Tag', 'lbData'), 'Value', S.SelectedID);      
         mList = get(findobj('Tag', 'puModel'), 'String');
-        iMatch = strmatch(char(S.Model.ModelName),mList)
+        iMatch = strmatch(char(S.Model.ModelName),mList);
         set(findobj('Tag', 'puModel'), 'Value', iMatch);
         set(findobj('Tag', 'puUseX'), 'Value', S.vUseX);
         set(findobj('Tag', 'puEndLevel'), 'Value', S.vEndLevel);
@@ -1115,6 +1125,7 @@ if ~isempty(dataFilter)
        pbGetData_Callback(findobj('Tag', 'pbGetData'), [], handles)
     end
     handles = cfFitAll(findobj('Tag', 'pbAll'), handles, vFileName, setupFileName);
+    CloseFcn(gcf, [], handles);
 else
     uiwait(errordlg(['Could Not Autorun With: ',setupFileName ], 'CurveFitHT Error!'));
 end
