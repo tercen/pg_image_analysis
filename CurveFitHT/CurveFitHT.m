@@ -90,9 +90,10 @@ iniPars.FitDisplay = 'off';
 iniPars.DftMaxFunEvals = 200;
 iniPars.DftMethod = 'Normal';
 iniPars.sInstrument = 'Detect';
-iniPars.dftQcSpecMinimalR  = 0.7;
-iniPars.dftQcSpecMinimalVini    = 0;
-iniPars.dftQcSpecMinimalEndLevel = 0;
+iniPars.sQcSettingsFile   = 'dftKinaseQc.ini';
+% iniPars.dftQcSpecMinimalR         = 0.7;
+% iniPars.dftQcSpecMinimalVini      = 0;
+% iniPars.dftQcSpecMinimalEndLevel  = 0;
 iniPars.resHistNumOfBins = 10;
 iniPars.dftFileFilter = '*mBg.dat';
 iniPars.dftSetupFile = 'cfAutorun.cset'; % setup file is used for autorun
@@ -108,18 +109,10 @@ if isempty(stModels)
      delete(gcf);
      return;
 end
-
-
 handles.iniPars     = iniPars;
 set(findobj('Tag', 'edTolerance'), 'String', iniPars.DftTolerance, 'Enable', 'off');
 handles.dataFilter = iniPars.dftFileFilter;
 set(findobj('Tag', 'edFilter'), 'String', handles.dataFilter);
-
-
-%for compilation purposes list the model functions here in pragma
-%#function cfExpAss
-%#function cfViniP2
-
 
 nModels = length(stModels);
 clModelNames = cell(nModels,1);
@@ -132,7 +125,7 @@ end
 
 handles.hPlot = [];
 handles.stModels = stModels;
-handles.versionStr  = 'CurveFitHT v1.6';
+handles.versionStr  = 'CurveFitHT v1.7';
 
 cfFitOpts.offsetX   = 0;
 cfFitOpts.offsetY   = 0;
@@ -142,11 +135,10 @@ cfFitOpts.FitDisplay = iniPars.FitDisplay;
 cfFitOpts.strMethod = iniPars.DftMethod;
 handles.cfFitOpts = cfFitOpts;
 
-QcSpec.minimalR2 = iniPars.dftQcSpecMinimalR;
-QcSpec.minimalEndLevel = iniPars.dftQcSpecMinimalEndLevel;
-QcSpec.minimalVini  = iniPars.dftQcSpecMinimalVini;
-handles.QcSpec = QcSpec;
-
+%QcSpec.minimalR2 = iniPars.dftQcSpecMinimalR;
+%QcSpec.minimalEndLevel = iniPars.dftQcSpecMinimalEndLevel;
+%QcSpec.minimalVini  = iniPars.dftQcSpecMinimalVini;
+%handles.QcSpec = QcSpec;
 
 if isequal(cfFitOpts.strMethod, 'Normal')
     set(findobj('Tag', 'rbFast'), 'Value' , 1);
@@ -183,8 +175,6 @@ guidata(hObject, handles);
    
   handles = cfAutoRun(handles, dataDir, vFileName, setupFileName); 
 end
-
-
 
 % UIWAIT makes CurveFitHT wait for user response (see UIRESUME)
 % uiwait(handles.figure1);
@@ -608,8 +598,6 @@ else
     drawnow;
     return
 end
-
-
 vAll = struct([]);
 % clLog will be used as hdr to the v-file
 clLog{1} = cellstr('logBegin');
@@ -622,7 +610,7 @@ else
 end
 
 % import settings from GUI
-[cSet, cfOpts, QcSettings] = cfGetSettings(handles, setupFileName);
+[cSet, cfOpts] = cfGetSettings(handles, setupFileName);
 % note that th structures cSet and cfOPts, together with handles.QcSpec
 % define the fit settings.
 
@@ -638,7 +626,7 @@ for i = 1:handles.nData;
     if handles.bConsistent
         [x,y] = cfGetCurrentData(handles);
         title(handles.dataname, 'Interpreter', 'none');
-        [v, fit, handles.absRes, handles.relRes] = vMakeFit(x,y,cSet, cfOpts, QcSettings, handles.dataname, handles.iniPars.sInstrument);
+        [v, fit, handles.absRes, handles.relRes] = vMakeFit(x,y,cSet, cfOpts, handles.dataname, handles.iniPars.sInstrument);
 
         if v(1).Index1 ~= -1
             vAll = [vAll,v];
@@ -704,7 +692,7 @@ enableGui('off');
 set(gcf, 'Pointer', 'watch');
 
 
-[cSet, cfOpts, QcSettings] = cfGetSettings(handles);
+[cSet, cfOpts] = cfGetSettings(handles);
 
 [x,y] = cfGetCurrentData(handles);
 
@@ -715,7 +703,7 @@ hold on
 axes(h);
 nData = size(y); nData = nData(2);
 title(handles.dataname, 'Interpreter', 'none');
-[v, fit, aRes, rRes] = vMakeFit(x,y,cSet, cfOpts, QcSettings, handles.dataname, handles.iniPars.sInstrument);    
+[v, fit, aRes, rRes] = vMakeFit(x,y,cSet, cfOpts, handles.dataname, handles.iniPars.sInstrument);    
 handles.absRes = aRes;
 handles.relRes = rRes;
 
@@ -741,7 +729,7 @@ data = handles.data;
 Xdata = data(:,1);
 Ydata = data(:,handles.SelectedData);
 
-function [v, fit, absRes, relRes] = vMakeFit(x,y,Settings, cfOpts, QcSpec, dataname, sInstrument)
+function [v, fit, absRes, relRes] = vMakeFit(x,y,Settings, cfOpts, dataname, sInstrument)
 
 pName = Settings.Model.Parameter;
 nData = size(y); nData = nData(2);
@@ -755,9 +743,12 @@ for i = 1:nData
     [p(:,i), ExitFlag, wOut] = cfFit(xUsed-cfOpts.offsetX,yUsed - cfOpts.offsetY,[], Settings.Model.FunctionName, cfOpts);
     [fit(:,i),j, V] = feval(Settings.Model.FunctionName, xUsed - cfOpts.offsetX, [], p(:,i));
     absRes(:,i) = yUsed - fit(:,i);
+    aChiSqr     = sum(absRes(:,i).^2);
+    %wChiSqr = sum( wOut.*(absRes(:,i).^2)  )/1000;
     
     warning('off', 'MATLAB:dividebyzero');
     relRes(:,i) = (yUsed - fit(:,i))./yUsed;
+    wChiSqr = sum( wOut.*(relRes(:,i).^2));
     warning('on', 'MATLAB:dividebyzero');
     
         
@@ -782,13 +773,16 @@ for i = 1:nData
     else
         v(i).Vini = [];
     end
-    iIn = find(wOut ~= 0);
-    v(i).R2 = CalcR(fit(iIn,i), yUsed(iIn));
-    v(i).EndLevel = mean(y(Settings.vEndLevel,i) );       
-    v(i).QcFlag = makeQcFlag(v(i), QcSpec);
+    
+   
+    v(i).EndLevel   =  mean(y(Settings.vEndLevel,i) );       
+    v(i).R2         =  CalcR(fit(:,i), yUsed, wOut);
+    v(i).aChiSqr    =  aChiSqr;
+    v(i).QcFlag     =  0;
 end
 relRes = [xUsed, relRes];
 absRes = [xUsed, absRes];
+
 function hPlot = cfPlotFit(x, fit, v, Settings)
 hPlot = plot(x(Settings.vUseX),fit );
 
@@ -834,34 +828,34 @@ for i=1:length(settings.vEndLevel)
 end
 vG.iEndLevel    = svEndLevel;
 
-function decFlag = makeQcFlag(v, QcSpec);
-
-
-flag = '00000000';
-% in case flag is not zero bit 8 is always set
-%  (f(BitDepth))
-% plus another one referring to the reason for flagging
-
-
-fBitDepth = length(flag);
-if v.R2 < QcSpec.minimalR2
-    %'[]101';
-    flag(fBitDepth) = '1';
-    flag(fBitDepth - 2) = '1';
-end
-
-if v.Vini <QcSpec.minimalVini;
-    %'[]1001'
-    flag(fBitDepth) = '1';
-    flag(fBitDepth - 3) = '1';
-end
-
-if v.EndLevel < QcSpec.minimalEndLevel
-    %[]10001'
-    flag(fBitDepth) = '1';
-    flag(fBitDepth - 4) = '1';
-end
-decFlag = bin2dec(flag);
+% function decFlag = makeQcFlag(v, QcSpec);
+% 
+% 
+% flag = '00000000';
+% % in case flag is not zero bit 8 is always set
+% %  (f(BitDepth))
+% % plus another one referring to the reason for flagging
+% 
+% 
+% fBitDepth = length(flag);
+% if v.R2 < QcSpec.minimalR2
+%     %'[]101';
+%     flag(fBitDepth) = '1';
+%     flag(fBitDepth - 2) = '1';
+% end
+% 
+% if v.Vini <QcSpec.minimalVini;
+%     %'[]1001'
+%     flag(fBitDepth) = '1';
+%     flag(fBitDepth - 3) = '1';
+% end
+% 
+% if v.EndLevel < QcSpec.minimalEndLevel
+%     %[]10001'
+%     flag(fBitDepth) = '1';
+%     flag(fBitDepth - 4) = '1';
+% end
+% decFlag = bin2dec(flag);
 
 % --- Executes during object creation, after setting all properties.
 function listbox2_CreateFcn(hObject, eventdata, handles)
@@ -990,22 +984,22 @@ aboutStr = [handles.versionStr,' (c) 2004 PamGene International BV'];
 uiwait(msgbox(aboutStr, 'About CurveFitHT ...'));
 
 
-% --------------------------------------------------------------------
-function miFitQC_Callback(hObject, eventdata, handles)
-% hObject    handle to miFitQC (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-
-hQcSettings = QCSettings(handles.QcSpec.minimalR2, handles.QcSpec.minimalEndLevel, handles.QcSpec.minimalVini);
-drawnow;
-waitfor(hQcSettings, 'Visible');
-NewQcSettings = guidata(hQcSettings);
-if isequal(NewQcSettings.bPressed, 'OK')
-    handles.QcSpec.minimalR2 = NewQcSettings.minimalR2;
-    handles.QcSpec.minimalEndLevel = NewQcSettings.minimalEndLevel;
-    handles.QcSpec.minimalVini = NewQcSettings.minimalVini;
-end
-guidata(hObject,handles);
+% % --------------------------------------------------------------------
+% function miFitQC_Callback(hObject, eventdata, handles)
+% % hObject    handle to miFitQC (see GCBO)
+% % eventdata  reserved - to be defined in a future version of MATLAB
+% % handles    structure with handles and user data (see GUIDATA)
+% 
+% hQcSettings = QCSettings(handles.QcSpec.minimalR2, handles.QcSpec.minimalEndLevel, handles.QcSpec.minimalVini);
+% drawnow;
+% waitfor(hQcSettings, 'Visible');
+% NewQcSettings = guidata(hQcSettings);
+% if isequal(NewQcSettings.bPressed, 'OK')
+%     handles.QcSpec.minimalR2 = NewQcSettings.minimalR2;
+%     handles.QcSpec.minimalEndLevel = NewQcSettings.minimalEndLevel;
+%     handles.QcSpec.minimalVini = NewQcSettings.minimalVini;
+% end
+% guidata(hObject,handles);
 
 
 
@@ -1061,27 +1055,27 @@ if ischar(fName)
     if isempty(iPoint)
         fName = [fName,fExt];
     end
-    [Settings, Options, QcSpec] = cfGetSettings(handles);
+    [Settings, Options] = cfGetSettings(handles);
     Settings.SelectedData   = handles.SelectedData;
     Settings.SelectedID     = handles.SelectedID;
     dataFilter = handles.dataFilter;
     handles.iniPars.saveLocationSetupFile = fPath;
     try
-        save([fPath, '\', fName], 'Settings', 'Options', 'QcSpec', 'dataFilter','-mat');
+        save([fPath, '\', fName], 'Settings', 'Options','dataFilter','-mat');
     catch
         errordlg(['Could not create settings file: ', [fPath,'\',fName]], 'CurveFitHT Error');
     end
 end
 guidata(hObject, handles);
 
-function [Settings, Options, QcSpec, dataFilter] = cfGetSettings(handles, fSetup)
+function [Settings, Options, dataFilter] = cfGetSettings(handles, fSetup)
 % This gets the fit Settings, Options and QC specs from
 % 1. The GUI, if fSetup is not specified
 % 2. The settings file fSetup if specified.
 
 if nargin == 1 | isempty(fSetup)
     % read settings from the GUI
-    QcSpec = handles.QcSpec;
+    %QcSpec = handles.QcSpec;
     stModels = handles.stModels;
     vModel      = get(findobj('Tag', 'puModel'), 'Value');
     Settings.Model      = stModels(vModel);
@@ -1098,7 +1092,7 @@ else
         Setup = load(fSetup, '-mat');
         Settings    = Setup.Settings;
         Options     = Setup.Options;
-        QcSpec      = Setup.QcSpec;
+        %QcSpec      = Setup.QcSpec;
         dataFilter  = Setup.dataFilter;
     catch
         Settings = [];
@@ -1109,10 +1103,10 @@ else
 end
 
 function handles = cfAutoRun(handles, dataDir, vFileName, setupFileName)
-[S, O, Q, dataFilter] = cfGetSettings([], setupFileName);
+[S, O,dataFilter] = cfGetSettings([], setupFileName);
 if ~isempty(dataFilter)
     if ~isempty(dataDir)
-        handles.QcSpec = Q;
+        %handles.QcSpec = Q;
         handles.cfFitOpts = O;
 		handles.iniPars.DataDir = dataDir;
         handles.dataFilter = dataFilter;

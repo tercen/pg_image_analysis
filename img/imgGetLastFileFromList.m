@@ -1,10 +1,10 @@
-function [clLastName, clNotRec] = imgGetLastFileFromList(clList, sInstrument)
+function [clLastName, clNotRec, clFirstName] = imgGetLastFileFromList(clList, pathList, sInstrument)
 clLastName = [];
 clNotRec = [];
 nNotRec = 0;
 nRec = 0;
 for i=1:length(clList)
-    [dummy, dummy, dummy, strP] = imgReadWFTP(char(clList(i)), sInstrument);
+    [dummy, dummy, dummy, strP] = imgReadWFTP(char(clList(i)), char(pathList(i)), sInstrument);
     if ~isempty(strP)
         nRec = nRec + 1;
         strP = char(strP);
@@ -12,11 +12,13 @@ for i=1:length(clList)
         index(nRec) = i;
     else
         nNotRec = nNotRec + 1;
-        clNotRec(nNotRec) = clList(i);
+        clNotRec{nNotRec} = clList(i);
     end
 end
 
 if (nRec > 0)
     [Pmax, iMax] = max(P);
+    [Pmin, iMin] = min(P);
     clLastName = clList(index(iMax));
+    clFirstName = clList(index(iMin));
 end
