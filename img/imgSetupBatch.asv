@@ -1,4 +1,5 @@
 function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile, sBatchFile)
+%function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile,sBatchFile)
 global MSGOUT
 MSGOUT = 1;
 
@@ -51,24 +52,29 @@ if (fid ~= -1)
 
         elseif isequal(IniPars.batchMode, 'Last')
             % find all the different directories in ImageList
-            fprintf(MSGOUT, 'Preprocessing ...\n');
             uniqueDirList = vGetUniqueID(ImageList, 'fPath');
             [clAllDir{1:length(ImageList)}] = deal(ImageList.fPath);
             for iDir = 1:length(uniqueDirList)
+                fprintf(MSGOUT, 'Preprocessing %d/%d\n',iDir, length(uniqueDirList));
                 % in every directory, identify the last image (in cycles)
                 iFiles = strmatch(uniqueDirList(iDir), clAllDir);
-                [clCurDir{1:length(iFiles)}] = deal(ImageList(iFiles).fName);
+                
+				[clCurDir{1:length(iFiles)}] = deal(ImageList(iFiles).fName);
                 [clLast, clNotRec] = imgGetLastFileFromList(clCurDir, IniPars.instrument);
                 if ~isempty(clNotRec)
                     for iNr = 1:length(clNotRec)
-                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s', char(clNotRec(iNr)));
+                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', char(clNotRec(iNr)));
                     end
                 end
                 if ~isempty(clLast)
                     % load the last image / preprocess / save under fixed
                     % name
                     strIlast = [char(uniqueDirList(iDir)),'\',char(clLast)];
-                    Ilast = imread(strIlast);
+                    try
+                        Ilast = imread(strIlast);
+                    catch
+                        fprintf(MSGOUT, 'Could not open: %s\n', strIlast);
+                    end
                     % preprocessing
                     if ~isequal(IniPars.ppUseName, 'none');
                         Ilast = feval(PPF(iPPF).ppFunction, Ilast, ppParVals);
@@ -86,19 +92,27 @@ if (fid ~= -1)
 
         elseif isequal(IniPars.batchMode, 'Average')
             % average all the images from a directory in grid Image.
-            fprintf(MSGOUT, 'Preprocessing...\n');
+
             uniqueDirList = vGetUniqueID(ImageList,'fPath');
             [clAllDir{1:length(ImageList)}] = deal(ImageList.fPath);
             for iDir = 1:length(uniqueDirList)
+                fprintf(MSGOUT, 'Preprocessing %d/%d\n',iDir, length(uniqueDirList));
                 iFiles = strmatch(uniqueDirList(iDir), clAllDir);
+                % read in all images in directory
                 Iav = double(imread([ImageList(iFiles(1)).fPath,'\',ImageList(iFiles(1)).fName]));
                 if length(iFiles) > 1
                     for nF = 2:length(iFiles)
-                        Iav = Iav + double(imread(ImageList(iFiles(nF)).fPath,'\',ImageList(iFiles(nF)).fName]));
+                        Iav = Iav + double(imread([ImageList(iFiles(nF)).fPath,'\',ImageList(iFiles(nF)).fName]));
                     end
                 end
+                % scale to max scale 8bit image
                 mxI = max(max(Iav));
                 Iav = uint8(255* (Iav/mxI));
+                
+                % prefilter (if requested) and save
+                if ~isequal(IniPars.ppUseName, 'none');
+                    Iav = feval(PPF(iPPF).ppFunction, Iav, ppParVals);
+                end
                 imwrite(Iav,  [char(uniqueDirList(iDir)),'\',ppFixedName], 'Compression', 'none');
             end
             [nFiles, msg] = imgMakeBatchFileEx(ppFixedName, sBatchFile, ImageList, IniPars.imgConfiguration, sTemplateFile);

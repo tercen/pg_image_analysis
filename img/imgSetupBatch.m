@@ -1,4 +1,5 @@
 function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile, sBatchFile)
+%function imgSetupBatch(sDataRoot, sConfigurationFile, sTemplateFile,sBatchFile)
 global MSGOUT
 MSGOUT = 1;
 
@@ -57,23 +58,32 @@ if (fid ~= -1)
                 fprintf(MSGOUT, 'Preprocessing %d/%d\n',iDir, length(uniqueDirList));
                 % in every directory, identify the last image (in cycles)
                 iFiles = strmatch(uniqueDirList(iDir), clAllDir);
-                [clCurDir{1:length(iFiles)}] = deal(ImageList(iFiles).fName);
+                clCurDir = {};
+				[clCurDir{1:length(iFiles)}] = deal(ImageList(iFiles).fName);
                 [clLast, clNotRec] = imgGetLastFileFromList(clCurDir, IniPars.instrument);
                 if ~isempty(clNotRec)
                     for iNr = 1:length(clNotRec)
-                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s', char(clNotRec(iNr)));
+                        fprintf(MSGOUT, 'Warning: the naming of the following file was not recognized: %s\n', char(clNotRec(iNr)));
                     end
                 end
                 if ~isempty(clLast)
                     % load the last image / preprocess / save under fixed
                     % name
                     strIlast = [char(uniqueDirList(iDir)),'\',char(clLast)];
-                    Ilast = imread(strIlast);
-                    % preprocessing
-                    if ~isequal(IniPars.ppUseName, 'none');
-                        Ilast = feval(PPF(iPPF).ppFunction, Ilast, ppParVals);
+                    try
+                        Ilast = imread(strIlast);
+                    catch
+                        fprintf(MSGOUT, 'Could not open: %s\n', strIlast);
+                        Ilast = [];
+                        exitCode = 0;
                     end
-                    imwrite(Ilast, [char(uniqueDirList(iDir)),'\',ppFixedName], 'Compression', 'none');
+                    % preprocessing
+                    if ~isempty(Ilast)
+                        if ~isequal(IniPars.ppUseName, 'none');
+                            Ilast = feval(PPF(iPPF).ppFunction, Ilast, ppParVals);
+                        end
+                        imwrite(Ilast, [char(uniqueDirList(iDir)),'\',ppFixedName], 'Compression', 'none');
+                    end
                 end
             end
             [nFiles, msg] = imgMakeBatchFileEx(ppFixedName, sBatchFile, ImageList, IniPars.imgConfiguration, sTemplateFile);
@@ -132,4 +142,4 @@ else
     fprintf(MSGOUT, 'Could not open setup configuration file: %s\n', sConfigurationFile);
     exitCode = 0;
 end
-
+fprintf(MSGOUT, 'Exit Code = %d\n', exitCode);

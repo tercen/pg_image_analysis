@@ -1,8 +1,8 @@
 /*
  * MATLAB Compiler: 4.0 (R14)
- * Date: Thu Aug 19 15:19:03 2004
+ * Date: Thu Aug 26 11:49:54 2004
  * Arguments: "-B" "macro_default" "-m" "-W" "main" "-T" "link:exe" "-d"
- * "C:\PamSoft\DataAnalysis\img\Bin" "imgSetupBatch" "ppFun5" 
+ * "C:\PamSoft\DataAnalysis\img\bin" "imgSetupBatch" "ppFun5" 
  */
 
 #include <stdio.h>
