@@ -4,11 +4,11 @@ close all
 
 % enter strings that correspond to column names in annotation file
 % discrimninating annotation:
-clDisAnnotation{1} = 'kinase';
+clDisAnnotation{1} = 'Kinase';
 %clDisAnnotation{2} = 'C';
 
 % series annotation:
-seriesAnnotation = 'inhibitor';
+seriesAnnotation = 'LogInh';
 
 % identify the measurement to be fitted:
 meas = 'Vini';

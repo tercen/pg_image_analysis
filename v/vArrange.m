@@ -11,7 +11,7 @@ function [Map, Message] = vArrange(v, strIDField, fID, strValField, optOut)
 % 'Std': see Average, but standard deviation
 % 'Columns': Map is a 8 x 12N array with the cols of the multiple IDs
 %  next to each other: Map =  [ [rep1(:,1), rep2(:,1), ... repN(:,1)], ...., [rep1(:,12),rep2(:,12), repN(:,12)] ]
-%
+%  
 % EXAMPLE:
 % clList = vPick(v, 'ID');
 % out = vArrange96(v, 'ID', clList, 'Vini', 'Columns');
@@ -61,6 +61,14 @@ switch optOut
             ColMap = [ColMap, squeeze(Map(:,i,:))];
         end
         Map = ColMap;
+    case('V')
+        Map = reshape(Map, s1*s2, s3);
+    case('AV')
+        Map = mean(Map, 3);
+        Map = reshape(Map, s1*s2, 1);
+   case('AVT')
+        Map = mean(Map, 3)';
+        Map = reshape(Map, s1*s2, 1);
     otherwise
         Message = ['Warning: unkown option for optOut, referting to default: Maps'];
 end

@@ -1,4 +1,5 @@
 function qcModule(vFile, settingsFile)
+% qcModile(vFile, settingsFile)
 % Module for qc of v-file
 % 
 global MSGOUT
@@ -19,9 +20,18 @@ if isempty(v);
     return
 end
 
+iPoint = findstr(vFile,'.');
+vFileOut = [vFile(1:iPoint-1),'_qcout.v'];
+
 eCode = 1;
 if isequal(iniPars.qcMethod, 'Kinase')
-    [vOut, eCode] = qcKinase(v, settingsFile);
+    [vOut, eCode] = qcKinase(v, settingsFile,1);
+    vWrite(vFileOut, vOut);
+elseif isequal(iniPars.qcMethod, 'Ref')
+    qcRef(v, settingsFile,1);
+    
+
+
 else
     fprintf(MSGOUT, 'Unknown QC method: %s',iniPars.qcMethod);
     eCode = 0;

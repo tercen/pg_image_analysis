@@ -1,9 +1,11 @@
 %****************CALCULATIONS **************************************
 disp('Loading ...');
 v = vLoad([vPath,'\',vName]);
+disp([vPath,'\',vName]);
 v = vResetFlags(v);
 disp('Annotating ...')
 [v, aMsg]  = vAnnotate96(v, [aPath, '\',aName]);
+disp([aPath, '\', aName]);
 disp('Normalizing ...');
 v = vNormalize(v, '290', 4, 0.5);
 disp('Making Series ...');

@@ -1,4 +1,4 @@
-function [pOut, ExitFlag, W] = cfFit(X, Y, W,cfModelFunc, cfFitOpts)
+function [pOut, ExitFlag, W] = cfFit(X, Y, W,cfModelFunc, cfFitOpts, p0)
 % function F = cfFit(X, Y, W, cfModelFunc, cfFitOpts);
 
 if isfield(cfFitOpts, 'robTune')
@@ -7,14 +7,22 @@ else
     robTune = 1;
 end
 
+if ~isfield(cfFitOpts, 'jacobian')
+    cfFitOpts.jacobian = 'on';
+end
+
 
 if isempty(W)
     W = ones(size(Y));
 end
-[p0, pLower, pUpper] = feval(cfModelFunc, X, Y);
+
+[pX, pLower, pUpper] = feval(cfModelFunc, X, Y);
+if nargin < 6
+   p0 = pX; 
+end
 switch cfFitOpts.strMethod
     case 'Normal'
-        options = optimset('Jacobian', 'on', 'Display', cfFitOpts.FitDisplay, 'MaxFunEvals', 3, 'TolX', 1e-8);
+        options = optimset('Jacobian', cfFitOpts.jacobian, 'Display', cfFitOpts.FitDisplay, 'MaxFunEvals', 10, 'TolX', 1e-8);
         nIter = 0;
         while(1)
             nIter = nIter + 1;
@@ -29,7 +37,7 @@ switch cfFitOpts.strMethod
    
    
     case 'Robust'
-        options = optimset('Jacobian', 'on', 'Display', cfFitOpts.FitDisplay, 'MaxFunEvals', 3, 'TolX', 1e-8);
+        options = optimset('Jacobian', cfFitOpts.jacobian, 'Display', cfFitOpts.FitDisplay, 'MaxFunEvals', 3, 'TolX', 1e-8);
         nIter = 0;
         while(1)
             nIter = nIter + 1;          
