@@ -20,10 +20,11 @@ modelName   = get(f,'strModelName');
 modelDescription = get(f, 'strModelDescription');
 clNames = get(f, 'clParameter');
 nPar = length(clNames);
+parNames = char(clNames);
 
-parNames = [clNames{1}];
-for i=2:nPar
-    parNames = [parNames,'_',clNames{i}];
-end
+% parNames = [clNames{1}];
+% for i=2:nPar
+%     parNames = [parNames,'_',clNames{i}];
+% end
 
     
