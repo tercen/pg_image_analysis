@@ -1,4 +1,4 @@
-function [modelName, modelDescription, nPar, parNames] = getmodeldef()
+function [modelName, modelDescription, nPar, clNames] = getmodeldef()
 global model
 global xScale
 global fitMode
@@ -20,7 +20,7 @@ modelName   = get(f,'strModelName');
 modelDescription = get(f, 'strModelDescription');
 clNames = get(f, 'clParameter');
 nPar = length(clNames);
-parNames = char(clNames);
+
 
 % parNames = [clNames{1}];
 % for i=2:nPar

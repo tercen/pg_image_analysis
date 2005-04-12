@@ -25,7 +25,7 @@ end
 
 if iDim == 1
     yData = yData';
-    yFit = fData';
+    yFit = yFit';
 end
 R2 = CalcR(yFit, yData);
 aX2 = sum((yFit-yData).^2);
