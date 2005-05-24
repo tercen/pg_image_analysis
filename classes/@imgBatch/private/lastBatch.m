@@ -7,8 +7,15 @@ if ~isempty(b.ppObj)
 else
     lpp = 0;
 end
+
+if b.adjustSpots
+    strAdjustSpots = 'true';
+else
+    strAdjustSpots = 'false';
+end
+
 nEntry = 0;
-clUnW = getUniqueID(ResultList, 'W');
+clUnW = getUniqueID(ResList, 'W');
 [clWList{1:length(ResList)}] = deal(ResList.W);
 
 % create list cResult of matching WFT and find the last cycle image
@@ -21,9 +28,10 @@ for w=1:length(clUnW)
     for f=1:length(clUnF)
         % loop over filters
         iF = strmatch(clUnF{f}, clFList);
+        length(cResult);
         cResult = cResult(iF);
         clUnT = getUniqueID(cResult, 'T');
-        [clTList{1:length(cResult)}] = deal(cResult.Y);
+        [clTList{1:length(cResult)}] = deal(cResult.T);
         for t=1:length(clUnT)
             %loop over exposure times
             iT = strmatch(clUnT{t}, clTList);
@@ -42,7 +50,7 @@ for w=1:length(clUnW)
             
             if lpp
                 bName      = fnRemoveExtension(cResult(iGridImage).fName);
-                sGridImage =  [cResult(iCGridImage).fPath,'\GridImage',bName,'.tif'];
+                sGridImage =  [cResult(iGridImage).fPath,'\GridImage',bName,'.tif'];
             else
                 sGridImage = [cResult(iGridImage).fPath, '\', cResult(iGridImage).fName];
             end
@@ -73,12 +81,15 @@ for w=1:length(clUnW)
                 stBatch(nEntry).SubstituteGridImage = sGridImage;
                 stBatch(nEntry).SubstituteGridChannel = b.nChannel;
                 stBatch(nEntry).AdjustGrid = 'false';
-                stBatch(nEntry).AdjustSpots = 'true';
+                stBatch(nEntry).AdjustSpots = strAdjustSpots;
                 stBatch(nEntry).isGridImage = 0;
                 stBatch(nEntry).gridImageInfo = [];
             end
 
+            clear clPump
         end
+        clear clTList
     end
+    clear clFList
 end
 

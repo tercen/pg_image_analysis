@@ -13,6 +13,7 @@ if nargin ==0
     b.instrument = [];
     b.gridMode = [];
     b.combineExposures = 0;
+    b.adjustSpots = 1;
     b.ppObj = [];
     b.log = 1;
     b = class(b, 'imgBatch');

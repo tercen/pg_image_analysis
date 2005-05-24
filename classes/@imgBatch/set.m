@@ -70,6 +70,12 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
+        case 'adjustSpots'
+            if isnumeric(val)
+                b.adjustSpots = logical(val);
+            else
+                bInvalid = 0;
+            end
             
         case 'log'
             b.log = val;

@@ -49,10 +49,10 @@
         stRes.C = a(iChip);
     end
 
-    stRes.W = arrayID;
-    stRes.F = filter;
-    stRes.T = integrationTime;
-    stRes.P = pumpCycle;
+    stRes.W = char(arrayID);
+    stRes.F = char(filter);
+    stRes.T = char(integrationTime);
+    stRes.P = char(pumpCycle);
     
     
 

@@ -60,12 +60,14 @@ end
 
 if ~isempty(b.ppObj)
         [isGridImage{1:length(stBatch)}] = deal(stBatch.isGridImage);
-        iGrid = find(isGridImage);
+        iGrid = find(cell2mat(isGridImage));
  
         nPreProcess = length(iGrid);
         for i=1:nPreProcess
+            k = iGrid(i);
+            gridImageSrc = [stBatch(k).gridImageInfo.fPath, '\', stBatch(k).gridImageInfo.fName];
             msgout(b.log, ['preprocessing: ',num2str(i),'/',num2str(nPreProcess)]);
-            preProcessExe(b.ppObj, stBatch(iGrid(i)).gridImageSrc, stBatch(iGrid(i)).Image);
+            preProcessExe(b.ppObj, gridImageSrc, stBatch(k).Image);
         end
     
     
@@ -73,6 +75,7 @@ end
 
 sBatchFile = [b.pathImageResults,'\',b.batchID,'_batchfile.bch'];
 msgout(b.log, ['Creating batch file for: ',num2str(length(stBatch)),' images']);
+
 msg = writeBatch(sBatchFile, stBatch);
 if ~isempty(msg)
     error(['Error creating: ',sBatchFile,': ', msg]);
