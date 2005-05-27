@@ -12,6 +12,6 @@ for i = 1:nRows
         [level, eps] = graythresh(Ispot);
         spots(i,j).cLu = [xLu, yLu];
         spots(i,j).binSpot = im2bw(Ispot, level);
-        spots(i,j).eps  = eps;
+        spots(i,j).thrEff  = eps;        
     end
 end

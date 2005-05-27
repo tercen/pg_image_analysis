@@ -21,9 +21,9 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-        case 'spotAreaSize'
+        case 'areaSize'
               if isnumeric(val) & length(val) == 1
-                s.spotAreaSize  = val;
+                s.areaSize  = val;
             else
                 bInvalid = 1;
             end
