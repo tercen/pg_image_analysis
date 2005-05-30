@@ -25,10 +25,10 @@ else
             q(i,j).outlierMethod        = 'none';
             q(i,j).quantitationMetric   = 'median';
             q(i,j).background = [];
-            q(i,j).backgroundPercentiles = [0.025, 0.0975];
+            q(i,j).backgroundPercentiles = [0.01, 0.99];
             q(i,j).signal = [];
             q(i,j).signalPercentiles = [0.1, 0.98];
-            q(i,j).backgroundDiameter = 5;    
+            q(i,j).backgroundDiameter = 4;    
             %oq(i,j) = class(q(i,j), 'spotQuantification');
             %if length(varargin) > 1
              %   oq(i,j) = set(oq(i,j), varargin{:});

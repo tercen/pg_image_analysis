@@ -5,7 +5,7 @@ end
 
 
 hImage = imshow(I, dr);
-colormap('jet');
+colormap(gca, 'jet');
 hold on
 spots = s.spots;
 [nRows, nCols] = size(spots);
