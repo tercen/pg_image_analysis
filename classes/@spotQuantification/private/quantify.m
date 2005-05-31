@@ -15,9 +15,16 @@ for i=1:nRows
         xSpot = oq(i,j).cLu(1):oq(i,j).cLu(1)+sArea(1)-1;
         ySpot = oq(i,j).cLu(2):oq(i,j).cLu(2)+sArea(2)-1;
         Ispot = I(xSpot, ySpot);
+        
         data = double(Ispot(oq(i,j).binSpot));
         q = quantile(data, oq(i,j).signalPercentiles);
-        data = data(data>q(1) & data<q(2));
+        
+        [iOut, jOut] = find(oq(i,j).binSpot & (Ispot < q(1) | Ispot > q(2)));
+        
+        ignoredPixels = zeros(size(oq(i,j).binSpot));
+        ignoredPixels(iOut, jOut) = 1;
+        oq(i,j).ignoredPixels = ignoredPixels;
+        data = data(data>=q(1) & data<=q(2));
         if isequal(qMetric, 'median')
             oq(i,j).signal = median(data);
         elseif isequal(qMetric, 'mean')

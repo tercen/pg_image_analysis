@@ -1,17 +1,17 @@
-function value = get(q, strField)
+function value = get(p, strField)
 
-clNames = fieldnames(q);
+clNames = fieldnames(p);
 if nargin == 1
     for i=1:length(clNames)
         if ~isequal(clNames{i}, 'private')
-            value.(clNames{i}) = q.(clNames{i});
+            value.(clNames{i}) = p.(clNames{i});
         end
     end    
 else
     
     for i=1:length(clNames)
         if isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
-            value = q.(clNames{i});
+            value = p.(clNames{i});
             return
         end
 

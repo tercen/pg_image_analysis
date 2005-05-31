@@ -28,6 +28,7 @@ else
             q(i,j).backgroundPercentiles = [0.01, 0.99];
             q(i,j).signal = [];
             q(i,j).signalPercentiles = [0.1, 0.98];
+            q(i,j).ignoredPixels = [];
             q(i,j).backgroundDiameter = 4;    
             %oq(i,j) = class(q(i,j), 'spotQuantification');
             %if length(varargin) > 1

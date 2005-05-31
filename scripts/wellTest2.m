@@ -73,7 +73,7 @@ rSpotSize  = spotSize * mean(rSize./size(I));
 axRot = [-1:0.25:1];
 oGrid = grid('spotSize', rSpotSize, 'spotPitch', rPitch, 'mask', mask, 'rotation', axRot);
 
-
+disp('initializing ...')
 for i=1:length(fList)
     I = imread([fList(i).fPath, '\', fList(i).fName]);
     Il = imread([fList2(i).fPath, '\', fList2(i).fName]);
@@ -86,19 +86,16 @@ for i=1:length(fList)
     y = y* (size(I,2)/rSize(2));
     
     oS = segmentation(I, x,y, 'areaSize', spotPitch);
-    figure(1)
+    oQ = spotQuantification(oS, I, x, y, 'signalPercentiles', [0,1]);
+    disp('quantification done ...');
+    %show(oS, I);
     
-    %h1 = show(oS, I);
-    %subplot(2,2,2)
-    h2 = show(oS, Il, [0 60000]);
+    %p = gridPresenter('image', I, 'oQuantification', oQ, 'oSegmentation', oS , 'xGrid', x, 'yGrid', y);
+    %refresh(p);
+   
+    hp = presenter(Il,x,y,oS,oQ);
+    set(hp, 'name', fList2(i).fName);
+    pause;
     
-  
-    
-    
-    %     imshow(Ir, [])
-%     hold on
-%     plot(y,x, 'yx')
-%     title([str,' ',fList(i).fName], 'interpreter', 'none')
-     pause
 end
 
