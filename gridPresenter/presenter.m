@@ -57,17 +57,28 @@ handles.output = hObject;
 handles.I = varargin{1};
 handles.x = varargin{2};
 handles.y = varargin{3};
-oS = varargin{4};
+handles.oS = varargin{4};
 handles.oQ = varargin{5};
+
+if length(varargin) == 6
+    handles.xSeries = varargin{6};
+else
+    handles.xSeries = 1:size(handles.I,3);
+end
+
+
+
+
 
 % show images
 focus = [1,1];
-[handles.hImage, handles.hSpots] = showImage(handles.axImage, oS, handles.I);
+xFocus = size(handles.I,3);
+[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oS, handles.I(:,:,xFocus));
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
-focalSpot(hAx, handles.I, handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2)), handles.hSpots(end, end), handles.oQ(end, end));
+handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), xFocus, handles.xSeries);
 
-handles.focus = focus;
-
+handles.focus       = focus;
+handles.xFocus      = xFocus;
 
 
 % Update handles structure
@@ -126,7 +137,7 @@ L = (dx.^2 + dy.^2);
 iOld = handles.focus(1);
 jOld = handles.focus(2);
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
-focalSpot(hAx, handles.I , handles.hSpots(iFocus, jFocus), handles.oQ(iFocus, jFocus), handles.hSpots(iOld, jOld), handles.oQ(iOld, jOld));
+handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus) , handles.hSpots(iFocus, jFocus), handles.oQ(iFocus, jFocus, :), handles.hSpots(iOld, jOld), handles.oQ(iOld, jOld), handles.xFocus, handles.xSeries);
 handles.focus = [iFocus, jFocus];
 
 guidata(hObject, handles);
@@ -135,15 +146,27 @@ function spot_Callback(hObject, eventData, handles);
 iOld = handles.focus(1);
 jOld = handles.focus(2);
 
-qOld = handles.oQ(iOld, jOld);
+qOld = handles.oQ(iOld, jOld,:);
 hOldFocus = handles.hSpots(iOld, jOld);
 [iNew, jNew] = find(handles.hSpots == hObject);
-qNew = handles.oQ(iNew, jNew);
+qNew = handles.oQ(iNew, jNew,:);
 
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
-focalSpot(hAx, handles.I, hObject, qNew, hOldFocus, qOld);
+handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus), hObject, qNew, hOldFocus, qOld, handles.xFocus, handles.xSeries);
 handles.focus = [iNew, jNew];
 guidata(hObject, handles);
+
+function plot_Callback(hObject, eventData, handles)
+delete(handles.hFocusPlot);
+xPoint = get(handles.axQuantification,'CurrentPoint');
+xPoint = xPoint(1,1) * ones(size(handles.xSeries));
+[mdx,handles.xFocus] = min(abs(xPoint - handles.xSeries));
+[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oS, handles.I(:,:,handles.xFocus));
+hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
+focus = handles.focus;
+handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), handles.xFocus, handles.xSeries);
+guidata(handles.axQuantification, handles);
+
 function [hImage, hSpots] = showImage(hAxis, oS, I,focus, dr);
 
 if nargin < 4
@@ -155,18 +178,20 @@ axes(hAxis);
 set(hImage, 'ButtonDownFcn', 'presenter(''image_Callback'',gcbo,[],guidata(gcbo))');
 set(hSpots, 'ButtonDownFcn', 'presenter(''spot_Callback'',gcbo,[],guidata(gcbo))');
 
-function focalSpot(hAx, I, hNewFocus, qNew, hOldFocus, qOld);
+function hFocusPlot = focalSpot(hAx, I, hNewFocus, qNew, hOldFocus, qOld, xFocus, xSeries);
 
 axes(hAx(1));
-set(hNewFocus, 'color', 'm', 'linewidth', 2);
-if get(qOld, 'isSpot');
+if get(qOld(xFocus), 'isSpot');
     set(hOldFocus,'color', 'w', 'linewidth', 0.5);
 else
     set(hOldFocus, 'color', 'k', 'linewidth', 0.5);
 end
+
+set(hNewFocus, 'color', 'm', 'linewidth', 2);
+
 axes(hAx(2))
-bin = get(qNew, 'binSpot');
-ignored = get(qNew, 'ignoredPixels');
+bin = get(qNew(xFocus), 'binSpot');
+ignored = get(qNew(xFocus), 'ignoredPixels');
 segview = double(bin);
 
 [iIgnored, jIgnored] = find(ignored == 1);
@@ -176,7 +201,7 @@ imshow(segview);
 colormap(gca, 'jet');
 
 axes(hAx(3))
-cLu = get(qNew, 'cLu');
+cLu = get(qNew(xFocus), 'cLu');
 x = cLu(1):cLu(1) + size(bin,1) - 1;
 y = cLu(2):cLu(2) + size(bin,2) - 2;
 imshow(I(x,y));
@@ -184,18 +209,38 @@ colormap(gca, 'jet');
 
 axes(hAx(4));
 hold off
-s = get(qNew, 'signal');
-b = get(qNew, 'background');
-n = s-b;
-h = bar(1,s);
-set(h, 'facecolor', 'r');
-hold on
-h = bar(2,b);
-set(h, 'facecolor', 'b');
-h = bar(3,n);
-set(h, 'facecolor', 'g');
 
-set(gca, 'xticklabel', []);
+nImages = length(qNew);
+if nImages > 1
+    %image series
+  
+    for i=1:nImages
+        s(i) = get(qNew(i), 'signal');
+        b(i) = get(qNew(i), 'background');
+    end
+    n = s-b;
+    hold off
+    h(1) = plot(xSeries, s, 'ro-');
+    hold on
+    h(2) = plot(xSeries, b, 'bo-');
+    h(3) = plot(xSeries, n, 'go-');
+    hFocusPlot = plot(xSeries(xFocus), [s(xFocus),b(xFocus),n(xFocus)], 'mdiamond');
+    set(hFocusPlot, 'markerfacecolor', 'm');
+    set(h, 'ButtonDownFcn', 'presenter(''plot_Callback'',gcbo,[],guidata(gcbo))');
+    set(h, 'MarkerSize', 6);
+else
+    s = get(qNew, 'signal');
+    b = get(qNew, 'background');
+    n = s-b;
+    h = bar(1,s);
+    set(h, 'facecolor', 'r');
+    hold on
+    h = bar(2,b);
+    set(h, 'facecolor', 'b');
+    h = bar(3,n);
+    set(h, 'facecolor', 'g');
 
+    set(gca, 'xticklabel', []);
+end
 
 
