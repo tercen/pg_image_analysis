@@ -115,7 +115,7 @@ function cbSigmBg_Callback(hObject, eventdata, handles)
 % Hint: get(hObject,'Value') returns toggle state of cbSigmBg
 
 function image_Callback(hObject, eventData, handles)
-point = get(handles.axImage, 'CurrentPoint')
+point = get(handles.axImage, 'CurrentPoint');
 yPoint = point(1,1) * ones(size(handles.x));
 xPoint = point(1,2) * ones(size(handles.y));
 dx = handles.x-xPoint;
@@ -166,7 +166,13 @@ else
 end
 axes(hAx(2))
 bin = get(qNew, 'binSpot');
-imshow(bin);
+ignored = get(qNew, 'ignoredPixels');
+segview = double(bin);
+
+[iIgnored, jIgnored] = find(ignored == 1);
+segview(iIgnored, jIgnored) = 0.5;
+
+imshow(segview);
 colormap(gca, 'jet');
 
 axes(hAx(3))

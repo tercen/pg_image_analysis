@@ -6,7 +6,7 @@ logIC50      = par(2);
 h = -1;
 
 
-u = (logIC50-x)*h;
+u = -(logIC50-x)*h;
 U = 10.^u;
 A = 1./(1+U);
 
