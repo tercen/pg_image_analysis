@@ -12,6 +12,9 @@ global xToleranceMode
 global jacobian
 global maxIterations
 
+x = double(x);
+par = double(par);
+
 if ~isnumeric(xScale) |length(xScale) > 1
     error('Invalid value for xScale');
 end

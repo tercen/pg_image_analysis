@@ -12,6 +12,9 @@ global xToleranceMode
 global jacobian
 global maxIterations
 
+x = double(x);
+y = double(y);
+
 if isempty(model)
     error('Model has not been defined');
     return
