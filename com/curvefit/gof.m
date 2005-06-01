@@ -31,5 +31,5 @@ R2 = CalcR(yFit, yData);
 aX2 = sum((yFit-yData).^2);
 iZero = yData == 0;
 rX2 = sum(((yFit(~iZero)-yData(~iZero))./yData(~iZero)).^2);
-zRuns = runsTest(yFit-yData);
+zRuns = -1;     %runsTest(yFit-yData);
 

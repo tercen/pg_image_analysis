@@ -20,6 +20,9 @@ if xScale < 0
     error('Invalid value for xScale');
 end
 
+if isempty(xScale)
+    xScale = 0;
+end
 if xScale == 0
     xIn = x;
 else

@@ -16,6 +16,11 @@ if isempty(model)
     error('Model has not been defined');
     return
 end
+
+if isempty(xScale)
+    xScale = 0;
+end
+
 if ~isnumeric(xScale) |length(xScale) > 1
     error('Invalid value for xScale');
 end
