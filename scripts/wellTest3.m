@@ -54,9 +54,10 @@ oPP = preprocess();
 set(oPP, 'nCircle', 380);
 t = clock;
 for i = 1:length(uWell);
-    disp(['loading data for ', uWell{i}]); 
+    
     iMatch = strmatch(uWell{i}, wellList);
-   for j=1:length(iMatch);
+   disp(['loading ', num2str(length(iMatch)), ' images for ', uWell{i}]); 
+    for j=1:length(iMatch);
        I(:,:,j) = imread([data(iMatch(j)).fPath, '\', data(iMatch(j)).fName]);
        pump  = char(data(iMatch(j)).P);
        c(j) = str2num(pump(2:end));
