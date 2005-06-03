@@ -16,7 +16,6 @@ g.spotPitch      = [];
 g.spotSize       = [];
 g.rotation       =  0;
 g.method         = 'correlation2D';
-
 g.private        = struct([]);
 
 g = class(g, 'grid');
