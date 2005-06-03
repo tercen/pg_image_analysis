@@ -1,4 +1,4 @@
-function clID = fromFile(g, fName)
+function clLine = fromFile(g, fName)
 fid = fopen(fName, 'rt');
 if fid == -1
     error(['Could not open: ', fName]);
@@ -9,17 +9,20 @@ hdrLine{2} = 'Col';
 hdrLine{3} = 'ID';
 hdrLine{4} = 'Xoff';
 hdrLine{5} = 'Yoff';
-clLine(i,:) = strread(fgetl(fid), '%u%u%s%d%d', 'delimiter', '\t');
+clLine = strread(fgetl(fid), '%s', 'delimiter', '\t')';
+if ~isequal(clLine, hdrLine)
+    warning([fName, ' is not a valid grid file']);
+end
 
 
 
-i = 1;
-while(l)
+n = 1;
+while(1)
     strLine = fgetl(fid);
     if strLine == -1
         break;
     end
-    clLine  = strread(strLine, '%s', 'delimiter', '\t');
-    i =  i + 1;
+    clLine(n,:)  = strread(strLine, '%d%d%s%d%d', 'delimiter', '\t');
+    n= n+ 1;
 end
     
