@@ -56,10 +56,10 @@ for i=1:2:length(pArgin)
     
     
     elseif isequal(pName, 'fitMethod')
-        if isequal(pVal, 'Normal')|isequal(pVal, 'Robust')|isequal(pVal, 'Filter')
+        if isequal(pVal, 'Normal')|isequal(pVal, 'Robust')|isequal(pVal, 'Robust2')|isequal(pVal, 'Filter')
             p.fitMethod = pVal;
         else
-            error('value for fitMethod must be ''Normal'', ''Robust'', or ''Filter''');
+            error('value for fitMethod must be ''Normal'', ''Robust'', ''Robust2'', or ''Filter''');
         end
     elseif isequal(pName, 'jacobian')
         switch pVal

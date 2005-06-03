@@ -58,7 +58,7 @@ for i=1:sy2
             nIter = 0;
             while(1)
                 nIter = nIter + 1;
-                [pOut, ChiSqr, Res, ExitFlag, dummy, dummy, jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
+               [pOut, ChiSqr, Res, ExitFlag,dummy1,dummy2,jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
               
                 if bRelative
                     iZero = p0 == 0;
@@ -84,7 +84,7 @@ for i=1:sy2
             % first iteration before reweight
             [pOut, ChiSqr, Res, ExitFlag,dummy1,dummy2,jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
             fit = getCurve(pgfit.modelObj, X, pOut);
-            wRob = calcRobustWeights((Y(:,i)-fit), full(jac), pgfit.robTune);
+            wRob = calcRobustWeights((Y(:,i)-fit), pgfit.robTune);
             wIn = W(:,i).*wRob;
             
             while(1)
@@ -92,7 +92,7 @@ for i=1:sy2
                 [pOut, ChiSqr, Res, ExitFlag,dummy1,dummy2,jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), wIn);
                 fit = getCurve(pgfit.modelObj, X, pOut);
 
-                wRob = calcRobustWeights((Y(:,i)-fit), jac, pgfit.robTune);
+                wRob = calcRobustWeights((Y(:,i)-fit), pgfit.robTune);
                 wIn = W(:,i).*wRob;
                 
                 if bRelative
@@ -111,6 +111,42 @@ for i=1:sy2
             end
             pRes(:,i) = pOut;
             wRes(:,i) = wIn;
+        case 'Robust2'
+                options = optimset('Jacobian', pgfit.jacobian,'Display', 'none' ,'MaxFunEvals', 5, 'TolX', 1e-8);
+            nIter = 0;
+            
+            % first iteration before reweight
+            [pOut, ChiSqr, Res, ExitFlag,dummy1,dummy2,jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), W(:,i));
+            fit = getCurve(pgfit.modelObj, X, pOut);
+            wRob = calcRobustWeights2((Y(:,i)-fit), full(jac), pgfit.robTune);
+            wIn = W(:,i).*wRob;
+            
+            while(1)
+                nIter = nIter + 1;
+                [pOut, ChiSqr, Res, ExitFlag,dummy1,dummy2,jac] = lsqnonlin(@lsqFun, p0, pLower, pUpper,options,pgfit, X, Y(:,i), wIn);
+                fit = getCurve(pgfit.modelObj, X, pOut);
+
+                wRob = calcRobustWeights2((Y(:,i)-fit), jac, pgfit.robTune);
+                wIn = W(:,i).*wRob;
+                
+                if bRelative
+                    iZero = p0 == 0;
+                    p0(iZero) = 1e-10;
+                    eps = abs((p0-pOut)./p0);
+                else
+                    eps = abs(p0-pOut);
+                end
+
+                if eps <= pgfit.TolX | nIter >= pgfit.maxIterations
+                    break;
+                else
+                    p0 = pOut;
+                end
+            end
+            pRes(:,i) = pOut;
+            wRes(:,i) = wIn;
+        
+        
         case 'Filter'
             cppgFit = pgFit(pgfit);
             cppgFit = set(cppgFit, 'fitMethod','Robust');
