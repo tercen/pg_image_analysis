@@ -21,9 +21,9 @@ mask(end, end-1) = 1;
 
 
 disp('Searching data ... ');
-dDir = 'C:\Temp\merck\SO-0346C7-on Merck 50cyc-run 14-02-35 24-May-2005-ImageResults';
+dDir = 'C:\Users\Rik\data\SO-0288C45';
     
-
+fTemp = [dDir, '\template.txt'];
 fList = filehound2(dDir, '*.tiff');
 n = 0;
 for i=1:length(fList)
@@ -49,7 +49,11 @@ rPitch = spotPitch * (rSize./size(I));
 rSpotSize  = spotSize * mean(rSize./size(I));
 
 axRot = [-1:0.25:1];
-oGrid = grid('spotSize', rSpotSize, 'spotPitch', rPitch, 'mask', mask, 'rotation', axRot);
+oGrid = grid('spotSize', rSpotSize, 'spotPitch', rPitch, 'rotation', axRot);
+[oGrid, clID] = fromFile(oGrid, fTemp, '#');
+mask = get(oGrid, 'mask');
+[nRows, nCols] = size(mask);
+
 oPP = preprocess();
 set(oPP, 'nCircle', 380);
 t = clock;
@@ -79,9 +83,20 @@ for i = 1:length(uWell);
    y = y* (size(I,2)/rSize(2));
    oS = segmentation(Ipp, x,y, 'areaSize', spotPitch + 1);
    
+   
+   %%
    for j =1:size(I,3)
        oQ(:,:,j) = spotQuantification(oS, I(:,:,j), x, y, 'signalPercentiles', [0,1]);
+       for row = 1:nRows
+           for col = 1:nCols
+               set(oQ(row,col,j), 'ID', clID{row,col});
+           end
+       end
+
+
    end
+  %%
+   
    disp('Quantification done ...')
    hp = presenter(I,x,y,oS,oQ,c);
    set(hp, 'name', uWell{i});

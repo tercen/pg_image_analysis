@@ -9,6 +9,8 @@ for i=1:2:length(pArgin)
     prop = pArgin{i};
     val =  pArgin{i+1};
     switch prop
+        case 'ID'
+            q.ID = val;       
         case 'backgroundMethod'
             if isequal(val, 'interleaved')
                q.backgroundMethod = val;

@@ -11,6 +11,9 @@ if length(varargin) == 1
     end
 else
 
+    
+
+
     spots = get(s, 'spots');
     [nRows, nCols] = size(spots);
     for i=1:nRows
@@ -21,6 +24,7 @@ else
     
     for i=1:nRows
         for j=1:nCols            
+            q(i,j).ID = [];
             q(i,j).backgroundMethod     = 'interleaved';
             q(i,j).outlierMethod        = 'none';
             q(i,j).quantitationMetric   = 'median';
