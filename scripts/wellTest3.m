@@ -21,8 +21,9 @@ mask(end, end-1) = 1;
 
 
 disp('Searching data ... ');
-dDir = 'C:\Users\Rik\data\SO-0288C45';
-    
+dDir = 'D:\temp\data\SO-0288C45 StandardKinaseRH050530 -run 12-56-51 30-May-2005';
+mkdir(dDir, '_Quantified Results');
+resDir = [dDir, '\_Quantified Results'];
 fTemp = [dDir, '\template.txt'];
 fList = filehound2(dDir, '*.tiff');
 n = 0;
@@ -65,7 +66,9 @@ for i = 1:length(uWell);
        I(:,:,j) = imread([data(iMatch(j)).fPath, '\', data(iMatch(j)).fName]);
        pump  = char(data(iMatch(j)).P);
        c(j) = str2num(pump(2:end));
-   end
+    end
+   T = data(iMatch(1)).T;
+   F = data(iMatch(1)).F;
    [c, iSort] = sort(c);
    I = I(:,:,iSort);
    disp('preprocessing ...');
@@ -81,7 +84,7 @@ for i = 1:length(uWell);
    [x,y,rotOut, oGrid] = gridFind(oGrid, histeq(Ippr));
    x = x* (size(I,1)/rSize(1));
    y = y* (size(I,2)/rSize(2));
-   oS = segmentation(Ipp, x,y, 'areaSize', spotPitch + 1);
+   oS = segmentation(Ipp, x,y, 'areaSize', spotPitch + 2);
    
    
    %%
@@ -89,19 +92,18 @@ for i = 1:length(uWell);
        oQ(:,:,j) = spotQuantification(oS, I(:,:,j), x, y, 'signalPercentiles', [0,1]);
        for row = 1:nRows
            for col = 1:nCols
-               set(oQ(row,col,j), 'ID', clID{row,col});
+               oQ(row, col, j) = set(oQ(row,col,j), 'ID', clID{row,col});
            end
        end
-
-
    end
   %%
-   
    disp('Quantification done ...')
-   hp = presenter(I,x,y,oS,oQ,c);
-   set(hp, 'name', uWell{i});
-   pause;
-   
+%    hp = presenter(I,x,y,oS,oQ,c);
+%    set(hp, 'name', uWell{i});
+%    %pause;
+   disp('Exporting kinetics ...');
+   eBase = [resDir,'\',uWell{i},'_',F,'_',T,'_Median'];
+   export(oQ, 'kinetics', eBase, c); 
 end
 etime(clock, t)
 % 
