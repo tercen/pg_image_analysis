@@ -21,7 +21,7 @@ mask(end, end-1) = 1;
 
 
 disp('Searching data ... ');
-dDir = 'D:\temp\data\SO-0288C44_FynROWS_PreincKinase050527RH';
+dDir = 'D:\temp\data\SO-0288C45 StandardKinaseRH050530 -run 12-56-51 30-May-2005';
 mkdir(dDir, '_Quantified Results');
 resDir = [dDir, '\_Quantified Results'];
 fTemp = [dDir, '\template.txt'];
@@ -58,10 +58,17 @@ mask = get(oGrid, 'mask');
 oPP = preprocess();
 set(oPP, 'nCircle', 380);
 t = clock;
-for i = 1:length(uWell);
-    
-    iMatch = strmatch(uWell{i}, wellList);
-   disp(['loading ', num2str(length(iMatch)), ' images for ', uWell{i}]); 
+while(1)
+   iMatch = [];
+   while isempty(iMatch) 
+        reqWell = input('Well?', 's');
+        if length(reqWell) >= 4
+            iMatch = strmatch(reqWell, wellList);
+   
+        end
+   end
+   
+   disp(['loading ', num2str(length(iMatch)), ' images for ', reqWell]); 
     for j=1:length(iMatch);
        I(:,:,j) = imread([data(iMatch(j)).fPath, '\', data(iMatch(j)).fName]);
        pump  = char(data(iMatch(j)).P);
@@ -99,12 +106,11 @@ for i = 1:length(uWell);
   %%
    disp('Quantification done ...')
    hp = presenter(I,x,y,oS,oQ,c);
-   set(hp, 'name', uWell{i});
-   drawnow
+   set(hp, 'name', reqWell);
 %    %pause;
-   disp('Exporting kinetics ...');
-   eBase = [resDir,'\',uWell{i},'_',F,'_',T,'_Median'];
-   export(oQ, 'kinetics', eBase, c); 
+%    disp('Exporting kinetics ...');
+%    eBase = [resDir,'\',uWell{i},'_',F,'_',T,'_Median'];
+%    export(oQ, 'kinetics', eBase, c); 
 end
 etime(clock, t)
 % 
