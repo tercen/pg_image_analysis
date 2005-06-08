@@ -173,7 +173,7 @@ if nargin < 4
     dr = [];
 end
 axes(hAxis);
-[hImage, hSpots] =show(oS, I, dr);
+[hImage, hSpots] =show(oS, I,dr);
 
 set(hImage, 'ButtonDownFcn', 'presenter(''image_Callback'',gcbo,[],guidata(gcbo))');
 set(hSpots, 'ButtonDownFcn', 'presenter(''spot_Callback'',gcbo,[],guidata(gcbo))');
@@ -242,5 +242,6 @@ else
 
     set(gca, 'xticklabel', []);
 end
-
+id = get(qNew(1), 'ID');
+title(id, 'interpreter', 'none', 'fontsize', 8);
 
