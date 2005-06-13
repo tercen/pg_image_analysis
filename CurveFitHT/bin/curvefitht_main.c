@@ -1,8 +1,8 @@
 /*
- * MATLAB Compiler: 4.0 (R14)
- * Date: Thu Sep 23 13:50:09 2004
+ * MATLAB Compiler: 4.2 (R14SP2)
+ * Date: Mon Jun 13 10:41:29 2005
  * Arguments: "-B" "macro_default" "-m" "-W" "main" "-T" "link:exe" "-d"
- * "C:\PamSoft\DataAnalysis\CurveFitHT\Bin" "CurveFitHT" "CurveFitHT_pragma" 
+ * "C:\PamSoft\DataAnalysis\CurveFitHT\bin" "CurveFitHT" "CurveFitHT_pragma" 
  */
 
 #include <stdio.h>
@@ -16,6 +16,10 @@ extern const char *__MCC_CurveFitHT_root_data;
 extern const unsigned char __MCC_CurveFitHT_session_data[];
 extern const char *__MCC_CurveFitHT_matlabpath_data[];
 extern const int __MCC_CurveFitHT_matlabpath_data_count;
+extern const char *__MCC_CurveFitHT_classpath_data[];
+extern const int __MCC_CurveFitHT_classpath_data_count;
+extern const char *__MCC_CurveFitHT_lib_path_data[];
+extern const int __MCC_CurveFitHT_lib_path_data_count;
 extern const char *__MCC_CurveFitHT_mcr_runtime_options[];
 extern const int __MCC_CurveFitHT_mcr_runtime_option_count;
 extern const char *__MCC_CurveFitHT_mcr_application_options[];
@@ -42,6 +46,15 @@ static int mclDefaultErrorHandler(const char *s)
     return written;
 }
 
+
+/* This symbol is defined in shared libraries. Define it here
+ * (to nothing) in case this isn't a shared library. 
+ */
+#ifndef LIB_CurveFitHT_C_API 
+#define LIB_CurveFitHT_C_API /* No special import/export declaration */
+#endif
+
+LIB_CurveFitHT_C_API 
 bool CurveFitHTInitializeWithHandlers(
     mclOutputHandlerFcn error_handler,
     mclOutputHandlerFcn print_handler
@@ -58,6 +71,10 @@ bool CurveFitHTInitializeWithHandlers(
                                         __MCC_CurveFitHT_session_data,
                                         __MCC_CurveFitHT_matlabpath_data,
                                         __MCC_CurveFitHT_matlabpath_data_count,
+                                        __MCC_CurveFitHT_classpath_data,
+                                        __MCC_CurveFitHT_classpath_data_count,
+                                        __MCC_CurveFitHT_lib_path_data,
+                                        __MCC_CurveFitHT_lib_path_data_count,
                                         __MCC_CurveFitHT_mcr_runtime_options,
                                         __MCC_CurveFitHT_mcr_runtime_option_count,
                                         true, NoObjectType, ExeTarget, NULL,
@@ -66,12 +83,14 @@ bool CurveFitHTInitializeWithHandlers(
     return true;
 }
 
+LIB_CurveFitHT_C_API 
 bool CurveFitHTInitialize(void)
 {
     return CurveFitHTInitializeWithHandlers(mclDefaultErrorHandler,
                                             mclDefaultPrintHandler);
 }
 
+LIB_CurveFitHT_C_API 
 void CurveFitHTTerminate(void)
 {
     if (_mcr_inst != NULL)
@@ -87,7 +106,7 @@ int main(int argc, const char **argv)
     
     if (!CurveFitHTInitialize())
         return -1;
-    _retval = mclMain(_mcr_inst, argc, argv, "curvefitht", 1);
+    _retval = mclMain(_mcr_inst, argc, argv, "CurveFitHT", 1);
     if (_retval == 0 /* no error */) mclWaitForFiguresToDie(NULL);
     CurveFitHTTerminate();
     mclTerminateApplication();

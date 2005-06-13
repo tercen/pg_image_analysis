@@ -128,7 +128,7 @@ end
 
 handles.hPlot = [];
 handles.stModels = stModels;
-handles.versionStr  = 'CurveFitHT v1.73';
+handles.versionStr  = 'CurveFitHT v1.74';
 
 cfFitOpts.offsetX   = 0;
 cfFitOpts.offsetY   = 0;
@@ -837,7 +837,7 @@ absRes = [xUsed, absRes];
 
 function hPlot = cfPlotFit(x, fit, v, Settings)
 hPlot = plot(x(Settings.vUseX),fit );
-
+axLim = axis;
 % plot Vini tangent if appropriate
 if  ~isempty(v.Vini)
     xDerivative = x(Settings.vDerivative);
@@ -852,6 +852,7 @@ if  ~isempty(v.Vini)
     dx  = xPlot(Settings.vDerivative+2) - xPlot(Settings.vDerivative);
     vy = [fit(vDerivative),fit(vDerivative) + v.Vini*dx];
     plot(vx, vy, 'm');
+    axis(axLim);
 end
 % plot measured end level
 
