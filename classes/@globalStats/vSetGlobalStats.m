@@ -8,7 +8,7 @@ uID = vGetUniqueID(v, 'ID');
 iMatch = strmatch(strID, uID);
 clID = uID(iMatch);
  if isempty(clID)
-     error(['ID not found: ', strID]);
+     error('GlobalStats:IDNotFound', '%s', ['ID not found: ', strID]);
  end
  
 refMaps = vArrange(v, 'ID', clID, qType);

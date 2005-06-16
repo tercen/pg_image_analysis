@@ -1,4 +1,4 @@
-function bg = backgroundInterleaved(oq, I, cx, cy);
+function [bgMedian, bgMean] = backgroundInterleaved(oq, I, cx, cy);
 
 bg = [];
 
@@ -38,19 +38,21 @@ for i=1:nRows
         iLin = sub2ind(size(I), x,y);
         data = double(I(iLin));
         q = quantile(data, oq.backgroundPercentiles);
-        data = data(data > q(1) & data < q(2)); 
-        
-        if isequal(oq.quantitationMetric, 'median')
-            bgInterleaved(i,j) = median(data);
-        elseif isequal(oq.quantitationMetric, 'mean')
-            bgInterleaved(i,j) = mean(data);
-        end
-        I(iLin) = 2^16;
+        data = data(data > q(1) & data < q(2));
+
+
+        bgInterleavedMedian(i,j) = median(data);
+
+        bgInterleavedMean(i,j) = mean(data);
     end
+    I(iLin) = 2^16;
 end
 
-bg = interp2(1:nCols, 1:nRows, double(bgInterleaved), 0.5 + [1:nCols-1], 0.5 + [1:nRows-1]');
-end
+
+
+bgMedian = interp2(1:nCols, 1:nRows, double(bgInterleavedMedian), 0.5 + [1:nCols-1], 0.5 + [1:nRows-1]');
+bgMean   = interp2(1:nCols, 1:nRows, double(bgInterleavedMean), 0.5 + [1:nCols-1], 0.5 + [1:nRows-1]'); 
+
         
         
 

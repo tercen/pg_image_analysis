@@ -27,13 +27,15 @@ else
             q(i,j).ID = [];
             q(i,j).backgroundMethod     = 'interleaved';
             q(i,j).outlierMethod        = 'none';
-            q(i,j).quantitationMetric   = 'median';
-            q(i,j).background = [];
+            q(i,j).medianBackground = [];
+            q(i,j).meanBackground = [];
             q(i,j).backgroundPercentiles = [0.01, 0.99];
-            q(i,j).signal = [];
+            q(i,j).medianSignal = [];
+            q(i,j).meanSignal = [];
             q(i,j).signalPercentiles = [0.1, 0.98];
             q(i,j).ignoredPixels = [];
-            q(i,j).backgroundDiameter = 4;    
+            q(i,j).backgroundDiameter = 4;
+            
             %oq(i,j) = class(q(i,j), 'spotQuantification');
             %if length(varargin) > 1
              %   oq(i,j) = set(oq(i,j), varargin{:});

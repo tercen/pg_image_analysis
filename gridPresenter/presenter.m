@@ -175,7 +175,7 @@ end
 axes(hAxis);
 [hImage, hSpots] =show(oS, I,dr);
 
-set(hImage, 'ButtonDownFcn', 'presenter(''image_Callback'',gcbo,[],guidata(gcbo))');
+%set(hImage, 'ButtonDownFcn', 'presenter(''image_Callback'',gcbo,[],guidata(gcbo))');
 set(hSpots, 'ButtonDownFcn', 'presenter(''spot_Callback'',gcbo,[],guidata(gcbo))');
 
 function hFocusPlot = focalSpot(hAx, I, hNewFocus, qNew, hOldFocus, qOld, xFocus, xSeries);
@@ -215,8 +215,8 @@ if nImages > 1
     %image series
   
     for i=1:nImages
-        s(i) = get(qNew(i), 'signal');
-        b(i) = get(qNew(i), 'background');
+        s(i) = get(qNew(i), 'medianSignal');
+        b(i) = get(qNew(i), 'medianBackground');
     end
     n = s-b;
     hold off
