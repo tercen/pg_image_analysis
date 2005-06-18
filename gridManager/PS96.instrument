@@ -1,6 +1,9 @@
-spotSize	10
-spotPitch	17.7
-ppSmall	3
-ppLarge	9
-ppCircle	380
-ppBlurr	60
+spotPitch>17.7
+spotSize>10
+minRot>-2
+maxRot>2
+dRot>0.25
+nSmallDisk>3
+nLargeDisk>9
+nCircle>380
+nBlurr>60
