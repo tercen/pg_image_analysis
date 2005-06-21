@@ -50,8 +50,8 @@ for i=1:nRows
         fprintf(fid, '%d\t', q(i,j).medianSignal - q(i,j).medianBackground);
         sHok = size(q(i,j).binSpot); 
         cGrid = q(i,j).cLu + sHok/2;    
-        fprintf(fid, '%f\t', cGrid(1));
-        fprintf(fid, '%f\t', cGrid(2));
+        fprintf(fid, '%f\t', q(i,j).cx);
+        fprintf(fid, '%f\t', q(i,j).cy);
         if ~isempty(q(i,j).Centroid)              
             offset = q(i,j).Centroid - sHok/2;
             fprintf(fid, '%f\t', offset(1));

@@ -1,5 +1,6 @@
 function oq = spotQuantification(s, I, cx, cy, varargin);
 
+
 if length(varargin) == 1
     % use existing object
     bIn = varargin{1};
@@ -10,9 +11,6 @@ if length(varargin) == 1
         error(['5th argument must be a spotQuantification object']);
     end
 else
-
-    
-
 
     spots = get(s, 'spots');
     [nRows, nCols] = size(spots);
@@ -25,6 +23,9 @@ else
     for i=1:nRows
         for j=1:nCols            
             q(i,j).ID = [];
+            q(i,j).cx = cx(i,j);
+            q(i,j).cy = cy(i,j);
+         
             q(i,j).backgroundMethod     = 'interleaved';
             q(i,j).outlierMethod        = 'none';
             q(i,j).medianBackground = [];
