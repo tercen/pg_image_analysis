@@ -27,13 +27,12 @@ fprintf(fidsig, '\n');
 fprintf(fidbg, '\n');
 fprintf(fidsigmbg, '\n');
 
-% write data
 for n = 1:nCycles
     fprintf(fidsig, '%d\t', xas(n));
     fprintf(fidbg, '%d\t', xas(n));
     fprintf(fidsigmbg, '%d\t', xas(n));
 
-    [sig, bg, sigmbg] = getSignals(q(:,:,n));
+    [sig, bg, sigmbg] = getSignals(q(:,:,n), 'median');
     for  i = 1:nRows
         for j=1:nCols
             fprintf(fidsig, '%f\t', sig(i,j));
