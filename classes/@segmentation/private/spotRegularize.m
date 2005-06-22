@@ -34,9 +34,10 @@ classifier = s.classifier;
 
         % 2. get metrics
         if s.spots(i,j).isSpot
-            metrics             = regionprops(double(s.spots(i,j).binSpot), 'MajorAxisLength', 'MinorAxisLength', 'Perimeter', 'Area');
+            metrics             = regionprops(double(s.spots(i,j).binSpot), 'MajorAxisLength', 'MinorAxisLength', 'Perimeter', 'Area', 'Centroid');
             s.spots(i,j).Diameter       = metrics.MajorAxisLength;
             s.spots(i,j).AspectRatio    = metrics.MajorAxisLength/metrics.MinorAxisLength;
+            s.spots(i,j).Centroid       = metrics.Centroid;
             if metrics.Perimeter
                 s.spots(i,j).FormFactor     = (metrics.Area * 4*pi )/(metrics.Perimeter)^2;
             else

@@ -4,7 +4,7 @@ Ymax    = par(1);
 logIC50 = par(2);
 h       = par(3);
 
-u = -(logIC50-x)*h;
+u = (logIC50-x)*h;
 U = 10.^u;
 A = 1./(1+U);
 

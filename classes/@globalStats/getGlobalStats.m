@@ -29,11 +29,12 @@ for i=1:s2
     end
 end
 
+sData = std(mData,0,2);
 mData = mean(mData,2);
 
 
 
-sData = std(mData,0,2);
+
 globalCVAll = std(mData)/mean(mData);
 
 

@@ -82,6 +82,7 @@ Func(6).clParameter{3}          = 'logIC50';
 
 Func(6).strFitFunctionName      = 'cfLogIC50_3';
 Func(6).strIniFunctionName       = 'ifLogIC50_3';
+Func(6).jacFlag                 = 1;
 %#function cfLogIC50_3
 %#function ifLogIC50_3
 
@@ -94,7 +95,20 @@ Func(7).clParameter{2}         = 'logIC50';
 
 Func(7).strFitFunctionName      = 'cfLogIC50_4';
 Func(7).strIniFunctionName      = 'ifLogIC50_4';
+%#function cfLogIC50_4
+%#function ifLogIC50_4
+Func(8).strModelName            = 'logEC50_1';
+Func(8).strModelDescription     = 'logEC50, Ymin to Ymax';
 
+Func(8).clParameter{1}          = 'Ymin';
+Func(8).clParameter{2}          = 'Ymax';
+Func(8).clParameter{3}          = 'logEC50';
+
+Func(8).strFitFunctionName      = 'cfLogEC50_1';
+Func(8).strIniFunctionName      = 'ifLogEC50_1';
+Func(8).jacFlag                 = 1;
+%#function cfLogEC50_1
+%#function ifLogEC50_1
 
 
 

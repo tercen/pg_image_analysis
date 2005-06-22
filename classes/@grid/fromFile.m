@@ -38,11 +38,15 @@ fclose(fid);
 % and create mask;
 if ~isempty(gridRefMarker)
     iMatch = strmatch(gridRefMarker, ID);
-    mask = zeros(max(row), max(col));
-    for n=1:length(iMatch)
-        i = row(iMatch(n));
-        j = col(iMatch(n));
-        mask(i,j) = 1;
+    if ~isempty(iMatch)
+        mask = zeros(max(row), max(col));
+        for n=1:length(iMatch)
+            i = row(iMatch(n));
+            j = col(iMatch(n));
+            mask(i,j) = 1;
+        end
+    else
+        mask = ones(max(row), max(col));
     end
 else
     mask = ones(max(row), max(col));
