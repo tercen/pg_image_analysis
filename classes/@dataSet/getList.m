@@ -9,4 +9,8 @@ switch d.instrument
     otherwise
         error(['Unknown instrument: ', d.instrument]);
 end
+
 d.list = list;
+str = [list(1).path, '\', list(1).name];
+info = imfinfo(str);
+d.imageSize = [info.Height, info.Width];

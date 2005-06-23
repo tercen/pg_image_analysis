@@ -11,6 +11,7 @@ d.path = [];
 d.instrument = [];
 d.filter = '*.tif*';
 d.list = [];
+d.imageSize = [];
 
 d = class(d, 'dataSet');
 if length(varargin) > 1
