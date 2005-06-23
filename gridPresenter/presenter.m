@@ -57,11 +57,10 @@ handles.output = hObject;
 handles.I = varargin{1};
 handles.x = varargin{2};
 handles.y = varargin{3};
-handles.oS = varargin{4};
-handles.oQ = varargin{5};
+handles.oQ = varargin{4};
 
-if length(varargin) == 6
-    handles.xSeries = varargin{6};
+if length(varargin) == 5
+    handles.xSeries = varargin{5};
 else
     handles.xSeries = 1:size(handles.I,3);
 end
@@ -73,7 +72,7 @@ end
 % show images
 focus = [1,1];
 xFocus = size(handles.I,3);
-[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oS, handles.I(:,:,xFocus));
+[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oQ(:,:,xFocus), handles.I(:,:,xFocus));
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
 handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), xFocus, handles.xSeries);
 
@@ -161,19 +160,19 @@ delete(handles.hFocusPlot);
 xPoint = get(handles.axQuantification,'CurrentPoint');
 xPoint = xPoint(1,1) * ones(size(handles.xSeries));
 [mdx,handles.xFocus] = min(abs(xPoint - handles.xSeries));
-[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oS, handles.I(:,:,handles.xFocus));
+[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oQ(:,:,handles.xFocus), handles.I(:,:,handles.xFocus));
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
 focus = handles.focus;
 handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), handles.xFocus, handles.xSeries);
 guidata(handles.axQuantification, handles);
 
-function [hImage, hSpots] = showImage(hAxis, oS, I,focus, dr);
+function [hImage, hSpots] = showImage(hAxis, oQ, I,focus, dr);
 
 if nargin < 4
     dr = [];
 end
 axes(hAxis);
-[hImage, hSpots] =show(oS, I,dr);
+[hImage, hSpots] =show(oQ, I,dr);
 
 %set(hImage, 'ButtonDownFcn', 'presenter(''image_Callback'',gcbo,[],guidata(gcbo))');
 set(hSpots, 'ButtonDownFcn', 'presenter(''spot_Callback'',gcbo,[],guidata(gcbo))');
