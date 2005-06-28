@@ -8,5 +8,5 @@ maxRot>2
 dRot>0.25
 nSmallDisk>4
 nLargeDisk>10
-nCircle>490 
+nCircle>490
 nBlurr>60

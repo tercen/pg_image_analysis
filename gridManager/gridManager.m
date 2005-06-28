@@ -294,9 +294,12 @@ end
             
 function arrays = initializeDataSet(list, instrument)
 
-
+if isequal(instrument(1:4), 'QC96');
+    instrument = 'PS96';
+end
+    
 switch instrument(1:4)
-    case 'PS96' || 'QC96'
+    case 'PS96' 
         wells = ones(12,8);
         strRow = ['ABCDEFGH'];
         strCol = ['01';'02';'03';'04';'05';'06';'07';'08';'09'; '10'; '11'; '12'];

@@ -1,8 +1,11 @@
 function parameters = readInstrumentParameters(sFile);
 parameters.spotPitch = [];
 parameters.spotSize = [];
+parameters.dftSpot = [];
 parameters.minRot = [];
 parameters.maxRot = [];
+parameters.minDiameter = [];
+parameters.maxDiameter = [];
 parameters.dRot = [];
 parameters.nSmallDisk = [];
 parameters.nLargeDisk = [];
