@@ -60,6 +60,9 @@ iniPars.dftInstrument = 'detect';
 iniPars.xResize = 256;
 iniPars.yResize = 256;
 iniPars.gridRefMarker = '#';
+iniPars.bZoom = 1;
+iniPars.dataSearchFilter = '*.tif*';
+iniPars.dataForceStructure = 1;
 handles.iniPars = getparsfromfile(handles.iniFile, iniPars);
 handles.list = [];
 handles.selectedWell = [];
@@ -147,7 +150,8 @@ guidata(hObject, handles);
         if newDir
             handles.iniPars.dataDir = newDir;
             try
-                oData = dataSet('path', newDir, 'instrument', handles.iniPars.dftInstrument);
+                oData = dataSet('path', newDir, 'instrument', handles.iniPars.dftInstrument, ... 
+                    'filter', handles.iniPars.dataSearchFilter, 'forceStructure',handles.iniPars.dataForceStructure );
                 set(gcf, 'pointer', 'watch');
                 drawnow;
                 oData = getList(oData);
@@ -160,7 +164,7 @@ guidata(hObject, handles);
 
             catch
                 set(gcf, 'pointer', 'arrow');
-                errstr = lasterr;
+                [errstr, errid] = lasterr;
                 errordlg(lasterr,'Load Failed !!!');
                 return
             end
@@ -180,6 +184,8 @@ guidata(hObject, handles);
                 end
             end
 
+
+            % instrument specific parameters
             % take image resize into account!
             rSize = [handles.iniPars.xResize, handles.iniPars.yResize];
             rPitch     = pars.spotPitch * (rSize./imSize);
@@ -190,7 +196,13 @@ guidata(hObject, handles);
             axRot = [pars.minRot:pars.dRot:pars.maxRot];
             handles.oArray = set(handles.oArray, 'rotation', axRot);
             handles.oP = set(handles.oP, 'nCircle',pars.nCircle, 'nLargeDisk', pars.nLargeDisk, 'nSmallDisk', pars.nSmallDisk, 'nBlurr', pars.nBlurr );
-
+            handles.oS = segmentation();
+            cfr = get(handles.oS, 'classifier');
+            cfr.minDiameter = pars.minDiameter;
+            cfr.maxDiameter = pars.maxDiameter;
+            handles.oS = set(handles.oS, 'classifier', cfr, 'dftSpotDiameter', pars.dftSpot);
+            
+            %%%%%%%%%%%
             arrays = initializeDataSet(list, handles.instrument);
             arrays = initializeGraph(handles.axes1, arrays);
 
@@ -283,8 +295,8 @@ end
 function arrays = initializeDataSet(list, instrument)
 
 
-switch instrument
-    case 'PS96'
+switch instrument(1:4)
+    case 'PS96' || 'QC96'
         wells = ones(12,8);
         strRow = ['ABCDEFGH'];
         strCol = ['01';'02';'03';'04';'05';'06';'07';'08';'09'; '10'; '11'; '12'];
@@ -303,7 +315,7 @@ switch instrument
                 end
             end
         end
-    case 'PS4';
+    case 'PS4_';
         wells = ones(4,1);
         [nRows, nCols] = size(wells);
         row = [1:4];
@@ -473,7 +485,7 @@ switch handles.gridMode
             I = I(:,:,iSort);
              expNames = expNames(iSort);
             
-            [x,y,oQ, handles.oArray] = gridKinetics(I, nImages, handles.oArray, handles.oP, rSize, handles.clID);
+            [x,y,oQ, handles.oArray] = gridKinetics(I, nImages, handles.oArray, handles.oP, handles.oS, rSize, handles.clID);
            
             
 %         catch
@@ -494,7 +506,7 @@ switch handles.gridMode
             I = I(:,:,iSort);
             expNames = expNames(iSort);
           
-            [x,y,oQ, handles.oArray] = gridKinetics(I, 1, handles.oArray, handles.oP, rSize, handles.clID);
+            [x,y,oQ, handles.oArray] = gridKinetics(I, 1, handles.oArray, handles.oP, handles.oS, rSize, handles.clID);
         
          catch
             errordlg(lasterr);
@@ -517,13 +529,38 @@ set(gcf, 'pointer', 'arrow');
 stString = ['Ready (',num2str(etime(clock, time)),'s)'];
 set(handles.stStatus, 'String', stString);
 if handles.bShow
-    hp = presenter(I,x,y,oQ,c);
+   
+    if handles.iniPars.bZoom
+        [zI, zQ] = qZoom(I,x,y ,oQ);
+    end
+   
+    hp = presenter(I,oQ,c);
     set(hp, 'name', currentArray.id);
 end
 strBase = [currentList(i).W, '_', currentList(i).F, '_', currentList(i).T];
 resBase = [handles.iniPars.dataDir,'\', handles.iniPars.resDir, '\', strBase];
 exportWell(expNames, resBase, expMode, c, oQ);
 % --------------------------------------------------------------------
+function[I, oQ] = qZoom(I, x,y, oQ);
+lu = [x(1,1), y(1,1)];
+pitch = x(1,2) - x(1,1);
+rl = [x(end,end), y(end,end)];
+luz = round(lu - 2*pitch);
+rlz = round(rl + 2*pitch);
+I = I(luz(1):rlz(1), rlz(1):rlz(2), :);
+[s1, s2, s3] = size(oQ);
+for i=1:s1
+    for j = 1:s2
+        for k=1:s3
+            cx = get(oQ(i,j,k), 'cx');
+            cy = get(oQ(i,j,k), 'cy');
+            oQ(i,j,k) = set(oQ(i,j,k), 'cx',cx -luz(1)+ 1);
+            oQ(i,j,k) = set(oQ(i,j,k), 'cy',cy - luz(2)+ 1);
+        end
+    end
+end
+
+
 function miUpdate_Callback(hObject, eventdata, handles)
 % hObject    handle to miUpdate (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -533,6 +570,8 @@ if isequal(get(hObject, 'checked'), 'on')
 else
     set(hObject, 'checked', 'on');
 end
+
+
 
 function exportWell(imNames, aggrName, aggrMode, aggrAxis, oQ)
 export(oQ, 'images', imNames);
