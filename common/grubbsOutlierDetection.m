@@ -23,6 +23,7 @@ if nargin == 2
         strCentralTendency = 'mean';
 end
 lOutlier = logical(zeros(size(data)));
+lOutlier(isnan(data)) = 1;
 
 while(1)
    tData = data(~lOutlier);

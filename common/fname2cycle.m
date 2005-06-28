@@ -16,7 +16,7 @@ if isequal(szInstrument, 'PS96')
   iSlash = findstr(fname, '\');
   iSlash = iSlash(length(iSlash));
   bName = fname(iSlash+1:length(fname));
-  [aID, fID, iID, pID] = imgReadWFTP(bName, szInstrument);
+  [aID, fID, iID, pID] = imgReadWFTP(bName, [],szInstrument);
   pID = char(pID);
   pID = pID(2:length(pID));
   c = str2num(pID);
@@ -26,7 +26,7 @@ if isequal(szInstrument, 'PS4')
   iSlash = findstr(fname, '\');
   iSlash = iSlash(length(iSlash));
   bName = fname(iSlash+1:length(fname));
-  [aID, fID, iID, pID] = imgReadWFTP(bName, szInstrument);
+  [aID, fID, iID, pID] = imgReadWFTP(bName, [],szInstrument);
   pID = char(pID);
   pID = pID(2:length(pID));
   c = str2num(pID);
