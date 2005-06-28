@@ -38,7 +38,7 @@ for i=1:nRows
         iLin = sub2ind(size(I), x,y);
         data = double(I(iLin));
         q = quantile(data, oq.backgroundPercentiles);
-        data = data(data > q(1) & data < q(2));
+        data = data(data >= q(1) & data <= q(2));
 
 
         bgInterleavedMedian(i,j) = median(data);

@@ -62,7 +62,18 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-                
+        case 'cx'
+            if isnumeric(val) && length(val) == 1
+                q.cx = val;
+            else
+                bInvalid = 1;
+            end
+          case 'cy'
+            if isnumeric(val) && length(val) == 1
+                q.cy = val;
+            else
+                bInvalid = 1;
+            end   
                 
         otherwise
             error(['Invalid property: ', prop]);

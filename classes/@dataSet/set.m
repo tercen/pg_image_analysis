@@ -20,7 +20,20 @@ for i=1:2:length(pArgin)
                 d.instrument = val;
             else
                 bInvalid = 1;
-            end    
+            end
+        case 'filter'
+            if ischar(val)
+                d.filter = val;
+            else
+                bInvalid = 1;
+            end
+        case 'forceStructure'
+            if isnumeric(val)
+                d.forceStructure = logical(val);
+            else
+                bInvalid = 1;
+            end
+                
         otherwise
             error(['Invalid property: ', prop]);
     end

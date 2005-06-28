@@ -2,7 +2,7 @@ function d = getList(d)
 
 switch d.instrument
     case 'detect';
-        [list, instrument] = searchDetect(d.path, d.filter);
+        [list, instrument] = searchDetect(d.path, d.filter, d.forceStructure);
         d.instrument = instrument;
     case 'PS96'
         list = searchPS96(d.path, d.filter);

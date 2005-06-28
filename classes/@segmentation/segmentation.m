@@ -31,4 +31,6 @@ if length(varargin) > 1
     s = set(s, varargin{:});
 end
 
-s = segment(s, I, cx, cy);
+if nargin ~= 0
+    s = segment(s, I, cx, cy);
+end

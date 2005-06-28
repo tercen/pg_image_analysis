@@ -1,35 +1,51 @@
-function [list, instrument] = searchDetect(path, filter)
+function [list, instrument] = searchDetect(path, filter, forceStructure)
 % check for image results
 dirList = dir(path);
-bFound = 0;
-for i=1:length(dirList)
-    if dirList(i).isdir && ~isempty(findstr(dirList(i).name, 'ImageResults'));
-        bFound = 1;
-        break;
+if forceStructure
+    bFound = 0;
+    for i=1:length(dirList)
+        if dirList(i).isdir && ~isempty(findstr(dirList(i).name, 'ImageResults'));
+            bFound = 1;
+            srchDir = [path, '\', dirList(i).name];
+            break;
+        end
     end
+else
+    bFound = 1;
+    srchDir = path;
 end
 
 if ~bFound
-    error(['No ImageResults found in: ',path]);
+    error('dataSet:NoImageResults', '%s', ['No ImageResults found in: ',path]);
 end
-srchDir = [path, '\', dirList(i).name];
+
 fList = filehound(srchDir, filter);
 n = 0;
 list = struct([]);
 bFD10 = 0;
+bQC = 0;
 for i=1:length(fList)
     bName = fList(i).fName;
+    
+    % Detect deviating data naming sets lijke FD10 and QC system
     if ~isempty(findstr(bName, 'TestSite'));
         % detect FD10 named data
         bFD10 = 1
         break;
     end
     
-    
     iPoint = findstr('.', bName);
     bName = bName(1:iPoint-1);
-    
     a = strread(bName, '%s', 'delimiter', '_');
+    
+    if length(a) > 2
+        if ~isempty(str2num(a{end-1})) && ~isempty(str2num(a{end}))
+            bQC = 1;
+            break;
+        end
+        
+    end
+    
     bWFTP = 1;
     iW = strmatch('W', a);
     iF = strmatch('F', a);
@@ -59,18 +75,69 @@ for i=1:length(fList)
         end
             
     end
-end
-
-if bFD10
-    % TO DO;
-    error('Sorry, FD10 named data is currently not supported');
-end
 
 if isempty(str2num(list(1).W(2)))
     % detect PS96 naming
     instrument = 'PS96';
 else
-    instrument = 'PS4';
+    str = [list(1).path, '\', list(1).name];
+    info = imfinfo(str);
+    is = [info.Height, info.Width];
+    if is < 1000
+        instrument = 'PS4_12';
+    else
+        instrument = 'PS4_23';
+    end
 end
+
+end
+
+
+
+if bFD10
+    % TO DO;
+    instrument = 'FD10';
+    error(['Sorry, FD10 named data is not supported']);
+end
+
+if bQC
+  % map qc naming to PS96 naming
+  instrument = 'QC96';
+  n = 0;
+  for i=1:length(fList)
+      rowStr = ['ABCDEFGH'];
+      colStr = ['01';'02';'03';'04';'05';'06';'07';'08';'09';'10';'11';'12'];
+      bName = fList(i).fName;
+      iPoint = findstr(bName, '.');
+      iPoint = iPoint(end);
+      bName = bName(1:iPoint-1);
+      a = strread(bName, '%s', 'delimiter', '_');
+      nChip = str2num(a{end-1});
+      nArray = str2num(a{end});
+      W = [];
+      if nChip <= 12 & nArray >= 1 & nArray <=4 
+        W = ['W',rowStr(nArray),colStr(nChip,:)];
+      elseif nChip > 12 & nArray >= 1 & nArray <=4 
+        W = ['W',rowStr(nArray+4),colStr(nChip-12,:)];
+      end
+      if ~isempty(W)
+        n = n+1;
+        list(n).name = fList(i).fName;
+        list(n).path = fList(i).fPath;
+        list(n).W    = W;
+        list(n).P    = 'P1';
+        list(n).F    = 'FX';
+        list(n).T    = 'TX';
+        list(n).C    = [];
+        list(n).S    = [];
+        
+      
+      
+      end
+      
+  end
+end
+   
+
 
     

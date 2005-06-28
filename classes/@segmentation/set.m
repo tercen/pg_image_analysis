@@ -26,8 +26,23 @@ for i=1:2:length(pArgin)
                 s.areaSize  = val;
             else
                 bInvalid = 1;
+              end
+        case 'classifier'
+            if isstruct(val)
+                s.classifier = val;
+            else
+                bInvalid = 1;
             end
+        case 'dftSpotDiameter'
+            if isnumeric(val)
+                s.dftSpotDiameter = val;
+            else
+                bInvalid = 1;
+            end
+            
                 
+            
+        
         otherwise
             error(['Invalid property: ', prop]);
     end

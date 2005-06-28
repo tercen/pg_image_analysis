@@ -22,7 +22,7 @@ oS = segment(oS, Ipp, x,y);
 
 [nRows, nCols] = size(get(oArray, 'mask'));
 for j =1:size(I,3)
-       oQ(:,:,j) = spotQuantification(oS, I(:,:,j), x, y, 'signalPercentiles', [0,1]);
+       oQ(:,:,j) = spotQuantification(oS, I(:,:,j), x, y, 'signalPercentiles', [0,1], 'backgroundPercentiles', [0,1]);
        for row = 1:nRows
            for col = 1:nCols
                oQ(row, col, j) = set(oQ(row,col,j), 'ID', clID{row,col});
