@@ -44,10 +44,10 @@ if (nLargeDisk > 0) & (nRoiDiam > 0)
     mF = (1./(nFilter*nFilter))*ones(nFilter);
     iRoi1 = double(iRoi1);
     iRoi1 = imfilter(iRoi1, mF);
-    Ipp = double(Ipp) .* iRoi1;
-    Ipp = uint16(Ipp);
-    Inoise = uint16(100*randn(size(Ipp)));
-    Ipp = imadd(Ipp, Inoise);
+    Ipp = double(Ipp).* double(iRoi1);
+%     Ipp = uint16(Ipp);
+%     Inoise = uint16(100*randn(size(Ipp)));
+%     Ipp = imadd(Ipp, Inoise);
 end
 
 if (nLargeDisk <= 0) & (nRoiDiam > 0)
@@ -59,9 +59,19 @@ if (nLargeDisk <= 0) & (nRoiDiam > 0)
     mF = (1./(nFilter*nFilter))*ones(nFilter);
     iRoi1 = double(iRoi1);
     iRoi1 = imfilter(iRoi1, mF);
-    Ipp = double(Ipp) .* iRoi1;
-    Ipp = uint16(Ipp);
+    Ipp = double(Ipp) .* double(iRoi1);
+%   Ipp = uint16(Ipp);
 end
+
+switch class(I)
+    case 'uint8'
+        Ipp = uint8(Ipp);
+    case 'double'
+        Ipp = double(Ipp);
+    case 'uint16'
+        Ipp = uint16(Ipp);
+end
+
 
 
 %EOF
