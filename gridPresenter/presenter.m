@@ -55,12 +55,10 @@ function presenter_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for presenter
 handles.output = hObject;
 handles.I = varargin{1};
-handles.x = varargin{2};
-handles.y = varargin{3};
-handles.oQ = varargin{4};
+handles.oQ = varargin{2};
 
-if length(varargin) == 5
-    handles.xSeries = varargin{5};
+if length(varargin) == 3
+    handles.xSeries = varargin{3};
 else
     handles.xSeries = 1:size(handles.I,3);
 end
@@ -228,10 +226,11 @@ if nImages > 1
     set(h, 'ButtonDownFcn', 'presenter(''plot_Callback'',gcbo,[],guidata(gcbo))');
     set(h, 'MarkerSize', 6);
 else
-    s = get(qNew, 'signal');
-    b = get(qNew, 'background');
+    s = get(qNew, 'medianSignal');
+    b = get(qNew, 'medianBackground');
     n = s-b;
     h = bar(1,s);
+    hFocusPlot = h;
     set(h, 'facecolor', 'r');
     hold on
     h = bar(2,b);
