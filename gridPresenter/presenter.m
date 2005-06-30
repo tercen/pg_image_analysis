@@ -203,7 +203,16 @@ x = cLu(1):cLu(1) + size(bin,1) - 1;
 y = cLu(2):cLu(2) + size(bin,2) - 2;
 imshow(I(x,y));
 colormap(gca, 'jet');
+hold on
+B = bwboundaries(bin);
+bound = cell2mat(B);
 
+isSpot = get(qNew(xFocus), 'isSpot');
+if isSpot
+        plot(bound(:,2) , bound(:,1), 'w');
+else
+        plot(bound(:,2) , bound(:,1), 'k');
+end
 axes(hAx(4));
 hold off
 

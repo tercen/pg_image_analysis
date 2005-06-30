@@ -26,25 +26,27 @@ bFD10 = 0;
 bQC = 0;
 for i=1:length(fList)
     bName = fList(i).fName;
-    
-    % Detect deviating data naming sets lijke FD10 and QC system
+
+    % Detect non WFTP data naming sets like FD10 and QC system
     if ~isempty(findstr(bName, 'TestSite'));
         % detect FD10 named data
         bFD10 = 1
         break;
     end
-    
+
     iPoint = findstr('.', bName);
     bName = bName(1:iPoint-1);
     a = strread(bName, '%s', 'delimiter', '_');
-    
+
     if length(a) > 2
         if ~isempty(str2num(a{end-1})) && ~isempty(str2num(a{end}))
             bQC = 1;
             break;
         end
-        
+
     end
+    
+    % read in WFTP set
     
     bWFTP = 1;
     iW = strmatch('W', a);
@@ -53,8 +55,8 @@ for i=1:length(fList)
     iP = strmatch('P', a);
     iC = strmatch('C', a);
     iS = strmatch('S', a);
-    
-    
+
+
     if ~isempty(iW) && ~isempty(iT) && ~isempty(iF) && ~isempty(iP)
         n = n+1;
         list(n).name = fList(i).fName;
@@ -73,26 +75,30 @@ for i=1:length(fList)
         else
             list(n).S = [];
         end
-            
-    end
 
-if isempty(str2num(list(1).W(2)))
-    % detect PS96 naming
-    instrument = 'PS96';
-else
-    str = [list(1).path, '\', list(1).name];
-    info = imfinfo(str);
-    is = [info.Height, info.Width];
-    if is < 1000
-        instrument = 'PS4_12';
+    end
+end
+
+% detect WFTP instrument
+if ~bFD10 & ~bQC
+    if isempty(list)
+        error(['No data found in: ', path])
+    end
+    
+    if isempty(str2num(list(1).W(2)))
+        % detect PS96 naming
+        instrument = 'PS96';
     else
-        instrument = 'PS4_23';
+        str = [list(1).path, '\', list(1).name];
+        info = imfinfo(str);
+        is = [info.Height, info.Width];
+        if is < 1000
+            instrument = 'PS4_12';
+        else
+            instrument = 'PS4_23';
+        end
     end
 end
-
-end
-
-
 
 if bFD10
     % TO DO;
