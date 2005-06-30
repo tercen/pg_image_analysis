@@ -520,10 +520,6 @@ switch handles.gridMode
 
 end
 
-
-
-
-
 %qSave(oQ, currentArray.strResultFile);
 
 currentArray.done = 1;
@@ -532,11 +528,6 @@ set(gcf, 'pointer', 'arrow');
 stString = ['Ready (',num2str(etime(clock, time)),'s)'];
 set(handles.stStatus, 'String', stString);
 if handles.bShow
-   
-    if handles.iniPars.bZoom
-        [zI, zQ] = qZoom(I,x,y ,oQ);
-    end
-   
     hp = presenter(I,oQ,c);
     set(hp, 'name', currentArray.id);
 end

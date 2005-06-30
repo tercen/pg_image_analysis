@@ -14,7 +14,8 @@ y = spotPitch(2)*(iy-mean(1:nCols));
 
 if nargin > 3
     teta = (2*pi/360) * rotation;   
-    R = [cos(teta), -sin(teta); sin(teta), cos(teta)];
+    R = [cos(teta), -sin(teta); 
+         sin(teta), cos(teta)];
     
     for i=1:length(x)
         v = R*[x(i);y(i)];
