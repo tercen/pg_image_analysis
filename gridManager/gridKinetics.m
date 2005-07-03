@@ -1,11 +1,6 @@
-function [x,y,oQ, oArray] = gridKinetics(I, iGrid, oArray, oPP, oS, rSize, clID);
+function [x,y,oQ, oArray] = gridKinetics(I, Igrid, Isegment, oArray, oS, rSize, clID);
 
-Ipp = getPrepImage(oPP, I(:,:,iGrid));
-Ippr = imresize(Ipp, rSize);
-
-
-
-[x,y,rotOut, oArray] = gridFind(oArray, histeq(Ippr));
+[x,y,rotOut, oArray] = gridFind(oArray, Igrid);
 x = x* (size(I,1)/rSize(1));
 y = y* (size(I,2)/rSize(2));
 
@@ -18,7 +13,7 @@ rPitch = get(oArray, 'spotPitch');
 spotPitch = rPitch(1) * (size(I,1)/rSize(1));
 
 oS = set(oS,'areaSize', spotPitch + 2);
-oS = segment(oS, Ipp, x,y);
+oS = segment(oS, Isegment, x,y);
 
 [nRows, nCols] = size(get(oArray, 'mask'));
 for j =1:size(I,3)

@@ -22,7 +22,7 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 21-Jun-2005 12:51:22
+% Last Modified by GUIDE v2.5 01-Jul-2005 21:09:05
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -60,7 +60,6 @@ iniPars.dftInstrument = 'detect';
 iniPars.xResize = 256;
 iniPars.yResize = 256;
 iniPars.gridRefMarker = '#';
-iniPars.bZoom = 1;
 iniPars.dataSearchFilter = '*.tif*';
 iniPars.dataForceStructure = 1;
 handles.iniPars = getparsfromfile(handles.iniFile, iniPars);
@@ -78,8 +77,8 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
 handles.version = 'alpha';
-
-
+miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles)
+handles.prepMode = 'fast';
 guidata(hObject, handles);
 
 % UIWAIT makes gridManager wait for user response (see UIRESUME)
@@ -202,6 +201,11 @@ guidata(hObject, handles);
             cfr.maxDiameter = pars.maxDiameter;
             handles.oS = set(handles.oS, 'classifier', cfr, 'dftSpotDiameter', pars.dftSpot);
             
+            %%% initialilzie exposure time popup
+            uT = vGetUniqueID(list, 'T');
+            set(handles.puIntegrationTime, 'String', uT);
+            uF = vGetUniqueID(list, 'F');
+            set(handles.puFilter', 'String', uF);
             %%%%%%%%%%%
             arrays = initializeDataSet(list, handles.instrument);
             arrays = initializeGraph(handles.axes1, arrays);
@@ -451,16 +455,37 @@ function handles = analyze(hObject, handles);
 
 set(gcf, 'pointer', 'watch');
 drawnow
+
+
+
 % find selected well entries
+% W
 currentArray = handles.arrays(handles.selectedWell(1), handles.selectedWell(2));
 [wellList{1:length(handles.list)}] = deal(handles.list.W);
-iCurrent = strmatch(currentArray.id, wellList); 
-currentList = handles.list(iCurrent);
+iCurrentWell = strmatch(currentArray.id, wellList); 
+currentList = handles.list(iCurrentWell);
+
+% F
+val =   get(handles.puFilter, 'value');
+clFilter =   get(handles.puFilter, 'String');
+[filterList{1:length(currentList)}] = deal(currentList.F);
+iCurrentFilter = strmatch(clFilter{val}, filterList);
+currentList = currentList(iCurrentFilter);
+
+% T
+val  = get(handles.puIntegrationTime, 'value');
+clTime  = get(handles.puIntegrationTime, 'String');
+[timeList{1:length(currentList)}] =  deal(currentList.T);
+iCurrentTime = strmatch(clTime{val}, timeList);
+currentList = currentList(iCurrentTime);
+
 nImages = length(currentList);
+
 stString = ['Analyzing ',num2str(nImages), ' images for well ',currentArray.id,'...'];
 set(handles.stStatus, 'String', stString);
 drawnow
 rSize = [handles.iniPars.xResize, handles.iniPars.yResize];
+
 try
     for i=1:nImages
         
@@ -470,13 +495,16 @@ catch
     errordlg(lasterr, currentArray.id);
     return
 end
-
 drawnow;
 time = clock;
+
+
+
+
 switch handles.gridMode
 
     case 'kinLast'
-%        try 
+       %try 
             expMode = 'kinetics';
             for i = 1:nImages
                    pump  = char(currentList(i).P);
@@ -486,16 +514,16 @@ switch handles.gridMode
             end
             [c, iSort] = sort(c);
             I = I(:,:,iSort);
-             expNames = expNames(iSort);
-            
-            [x,y,oQ, handles.oArray] = gridKinetics(I, nImages, handles.oArray, handles.oP, handles.oS, rSize, handles.clID);
+            expNames = expNames(iSort);
+            [Igrid, Isegment] = gridImage(I(:,:,nImages), handles.oP, handles.prepMode, rSize);
+            [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
 %         catch
 %             errordlg(lasterr);
 %             set(gcf, 'pointer', 'arrow');
 %            return;
-   %     end
+%        end
         
         case 'kinFirst'
          try 
@@ -535,24 +563,7 @@ strBase = [currentList(i).W, '_', currentList(i).F, '_', currentList(i).T];
 resBase = [handles.iniPars.dataDir,'\', handles.iniPars.resDir, '\', strBase];
 exportWell(expNames, resBase, expMode, c, oQ);
 % --------------------------------------------------------------------
-function[I, oQ] = qZoom(I, x,y, oQ);
-lu = [x(1,1), y(1,1)];
-pitch = x(1,2) - x(1,1);
-rl = [x(end,end), y(end,end)];
-luz = round(lu - 2*pitch);
-rlz = round(rl + 2*pitch);
-I = I(luz(1):rlz(1), rlz(1):rlz(2), :);
-[s1, s2, s3] = size(oQ);
-for i=1:s1
-    for j = 1:s2
-        for k=1:s3
-            cx = get(oQ(i,j,k), 'cx');
-            cy = get(oQ(i,j,k), 'cy');
-            oQ(i,j,k) = set(oQ(i,j,k), 'cx',cx -luz(1)+ 1);
-            oQ(i,j,k) = set(oQ(i,j,k), 'cy',cy - luz(2)+ 1);
-        end
-    end
-end
+
 
 
 function miUpdate_Callback(hObject, eventdata, handles)
@@ -600,4 +611,100 @@ if isequal(get(hObject, 'checked'), 'on')
 else
     set(hObject, 'checked', 'on');
 end
+
+
+
+% --------------------------------------------------------------------
+function miPreprocessing_Callback(hObject, eventdata, handles)
+% hObject    handle to miPreprocessing (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function Untitled_3_Callback(hObject, eventdata, handles)
+% hObject    handle to Untitled_3 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function miPreprocessingNone_Callback(hObject, eventdata, handles)
+% hObject    handle to miPreprocessingNone (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(hObject, 'Checked', 'on');
+handles.prepMode = 'none';
+set(handles.miPreProcessingFast, 'checked', 'off');
+set(handles.miPreprocessingSlow, 'checked', 'off');
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function miPreProcessingFast_Callback(hObject, eventdata, handles)
+% hObject    handle to miPreProcessingFast (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(hObject, 'Checked', 'on');
+handles.prepMode = 'fast';
+set(handles.miPreprocessingNone, 'checked', 'off');
+set(handles.miPreprocessingSlow, 'checked', 'off');
+guidata(hObject, handles);
+% --------------------------------------------------------------------
+function miPreprocessingSlow_Callback(hObject, eventdata, handles)
+% hObject    handle to miPreprocessingSlow (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(hObject, 'Checked', 'on');
+handles.prepMode = 'slow';
+set(handles.miPreprocessingNone, 'checked', 'off');
+set(handles.miPreProcessingFast, 'checked', 'off');
+guidata(hObject, handles);
+% --- Executes on selection change in puIntegrationTime.
+function puIntegrationTime_Callback(hObject, eventdata, handles)
+% hObject    handle to puIntegrationTime (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = get(hObject,'String') returns puIntegrationTime contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from puIntegrationTime
+
+
+% --- Executes during object creation, after setting all properties.
+function puIntegrationTime_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to puIntegrationTime (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
+
+
+
+% --- Executes on selection change in puFilter.
+function puFilter_Callback(hObject, eventdata, handles)
+% hObject    handle to puFilter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = get(hObject,'String') returns puFilter contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from puFilter
+
+
+% --- Executes during object creation, after setting all properties.
+function puFilter_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to puFilter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+
 
