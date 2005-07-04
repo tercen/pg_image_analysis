@@ -22,7 +22,7 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 01-Jul-2005 21:09:05
+% Last Modified by GUIDE v2.5 04-Jul-2005 11:15:52
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -53,7 +53,9 @@ function gridManager_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to gridManager (see VARARGIN)
 
 handles.iniFile = 'gridManager.ini';
+
 iniPars.dataDir = 'C:\';
+iniPars.imagesDir = 'C:\';
 iniPars.templateDir = pwd;
 iniPars.resDir  = '_Quantified';
 iniPars.dftInstrument = 'detect';
@@ -301,7 +303,10 @@ function arrays = initializeDataSet(list, instrument)
 if isequal(instrument(1:4), 'QC96');
     instrument = 'PS96';
 end
-    
+
+if isequal(instrument(1:4), 'FD10');
+    instrument = 'PS4_';
+end
 switch instrument(1:4)
     case 'PS96' 
         wells = ones(12,8);
@@ -504,7 +509,7 @@ time = clock;
 switch handles.gridMode
 
     case 'kinLast'
-       %try 
+       try 
             expMode = 'kinetics';
             for i = 1:nImages
                    pump  = char(currentList(i).P);
@@ -519,31 +524,33 @@ switch handles.gridMode
             [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
-%         catch
-%             errordlg(lasterr);
-%             set(gcf, 'pointer', 'arrow');
-%            return;
-%        end
+        catch
+            errordlg(lasterr);
+            set(gcf, 'pointer', 'arrow');
+           return;
+       end
         
         case 'kinFirst'
-         try 
-             expMode = 'kinetics';
-             for i = 1:nImages
+          try 
+            expMode = 'kinetics';
+            for i = 1:nImages
                    pump  = char(currentList(i).P);
                    c(i) = str2num(pump(2:end));
-                   expNames{i} = [currentList(i).path, '\', currentList(i).name];
+                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], 'txt');
+                   expNames(i) = cellstr(str); 
             end
             [c, iSort] = sort(c);
             I = I(:,:,iSort);
             expNames = expNames(iSort);
-          
-            [x,y,oQ, handles.oArray] = gridKinetics(I, 1, handles.oArray, handles.oP, handles.oS, rSize, handles.clID);
-        
-         catch
+            [Igrid, Isegment] = gridImage(I(:,:,1), handles.oP, handles.prepMode, rSize);
+            [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
+           
+            
+        catch
             errordlg(lasterr);
             set(gcf, 'pointer', 'arrow');
            return;
-        end
+       end
 
 
 end
@@ -706,5 +713,24 @@ function puFilter_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+
+
+
+% --------------------------------------------------------------------
+function miLoadImages_Callback(hObject, eventdata, handles)
+% hObject    handle to miLoadImages (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+[sFiles, sPath] = uigetfile([handles.iniPars.imagesDir,'\*.*'], 'multiselect', 'on');
+if ~isequal(sFiles, 0)
+    handles.iniPars.imagesDir = sPath;
+end
+guidata(hObject, handles);
+        
+    
+
+    
+
 
 

@@ -201,7 +201,7 @@ axes(hAx(3))
 cLu = get(qNew(xFocus), 'cLu');
 x = cLu(1):cLu(1) + size(bin,1) - 1;
 y = cLu(2):cLu(2) + size(bin,2) - 2;
-imshow(I(x,y));
+imshow(I(x,y), []);
 colormap(gca, 'jet');
 hold on
 B = bwboundaries(bin);
