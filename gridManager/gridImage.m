@@ -10,7 +10,8 @@ switch ppMode
         Isegment = I;
     case 'slow'
         Igrid = getPrepImage(oPP, I);
-        Isegment = imresize(Ipp, rSize);
+        Isegment = Igrid;
+        Igrid = imresize(Igrid, rSize);
 end
 Igrid = histeq(Igrid);
 

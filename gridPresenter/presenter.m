@@ -230,6 +230,9 @@ if nImages > 1
     hold on
     h(2) = plot(xSeries, b, 'bo-');
     h(3) = plot(xSeries, n, 'go-');
+    vAx = axis;
+    vAx(3) = 0;
+    axis(vAx);
     hFocusPlot = plot(xSeries(xFocus), [s(xFocus),b(xFocus),n(xFocus)], 'mdiamond');
     set(hFocusPlot, 'markerfacecolor', 'm');
     set(h, 'ButtonDownFcn', 'presenter(''plot_Callback'',gcbo,[],guidata(gcbo))');

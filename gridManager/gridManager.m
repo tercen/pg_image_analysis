@@ -22,7 +22,7 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 04-Jul-2005 11:15:52
+% Last Modified by GUIDE v2.5 04-Jul-2005 22:22:34
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -74,13 +74,18 @@ handles.oArray = [];
 handles.template = [];
 handles.oArray = array();
 handles.oP      = preProcess();
+
 set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha';
-miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles)
+handles.version = 'alpha.2';
+miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
+handles.segMode = 'fixed';
+miFixedSegmentation_Callback(handles.miFixedSegmentation, [], handles);
+strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
+set(handles.miFilter, 'Label', strLabel);
 guidata(hObject, handles);
 
 % UIWAIT makes gridManager wait for user response (see UIRESUME)
@@ -521,6 +526,10 @@ switch handles.gridMode
             I = I(:,:,iSort);
             expNames = expNames(iSort);
             [Igrid, Isegment] = gridImage(I(:,:,nImages), handles.oP, handles.prepMode, rSize);
+            if isequal(handles.segMode, 'adapt')
+                Isegment = [];
+            end
+            
             [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
@@ -543,6 +552,10 @@ switch handles.gridMode
             I = I(:,:,iSort);
             expNames = expNames(iSort);
             [Igrid, Isegment] = gridImage(I(:,:,1), handles.oP, handles.prepMode, rSize);
+            if isequal(handles.segMode, 'adapt')
+                Isegment = [];
+            end
+            
             [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
@@ -566,9 +579,21 @@ if handles.bShow
     hp = presenter(I,oQ,c);
     set(hp, 'name', currentArray.id);
 end
+% Export
 strBase = [currentList(i).W, '_', currentList(i).F, '_', currentList(i).T];
 resBase = [handles.iniPars.dataDir,'\', handles.iniPars.resDir, '\', strBase];
-exportWell(expNames, resBase, expMode, c, oQ);
+if isequal(get(handles.miExportImages, 'checked'), 'on')
+    bImages = 1;
+else
+    bImages = 0;
+end
+if isequal(get(handles.miExportQuantified, 'checked'), 'on')
+    bQuant = 1;
+else
+    bQuant = 0;
+end
+
+exportWell(expNames, resBase, expMode, c, oQ, bImages, bQuant);
 % --------------------------------------------------------------------
 
 
@@ -585,10 +610,13 @@ end
 
 
 
-function exportWell(imNames, aggrName, aggrMode, aggrAxis, oQ)
-export(oQ, 'images', imNames);
-export(oQ, aggrMode, aggrName,aggrAxis);
-
+function exportWell(imNames, aggrName, aggrMode, aggrAxis, oQ, bImages, bSeries)
+if bImages
+    export(oQ, 'images', imNames);
+end
+if bSeries
+    export(oQ, aggrMode, aggrName,aggrAxis);
+end
 
 % --------------------------------------------------------------------
 function miExport_Callback(hObject, eventdata, handles)
@@ -628,11 +656,6 @@ function miPreprocessing_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 
-% --------------------------------------------------------------------
-function Untitled_3_Callback(hObject, eventdata, handles)
-% hObject    handle to Untitled_3 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
 
 
 % --------------------------------------------------------------------
@@ -727,10 +750,52 @@ if ~isequal(sFiles, 0)
     handles.iniPars.imagesDir = sPath;
 end
 guidata(hObject, handles);
-        
-    
-
-    
+       
 
 
+% --------------------------------------------------------------------
+function miFilter_Callback(hObject, eventdata, handles)
+% hObject    handle to miFilter (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
+a = inputdlg('edit here: ', 'Filter', 1, cellstr(handles.iniPars.dataSearchFilter));
+if ~isempty(a)
+    handles.iniPars.dataSearchFilter = char(a);
+    guidata(hObject, handles);
+    strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
+    set(hObject, 'Label', strLabel);
+end
+
+
+
+
+
+
+% --------------------------------------------------------------------
+function miSegmentation_Callback(hObject, eventdata, handles)
+% hObject    handle to miSegmentation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function miFixedSegmentation_Callback(hObject, eventdata, handles)
+% hObject    handle to miFixedSegmentation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(hObject, 'checked', 'on');
+set(handles.miAdaptSegmentation, 'checked', 'off')
+handles.segMode = 'fixed';
+guidata(hObject, handles);
+% --------------------------------------------------------------------
+function miAdaptSegmentation_Callback(hObject, eventdata, handles)
+% hObject    handle to miAdaptSegmentation (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(hObject, 'checked', 'on');
+set(handles.miFixedSegmentation, 'checked', 'off')
+handles.segMode = 'adapt';
+guidata(hObject, handles);
