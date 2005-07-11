@@ -26,7 +26,7 @@ classifier = s.classifier;
         s.spots(i,j).isSpot = 1;
 
         if nObject
-            s.spots(i,j).binSpot = logical(zeros(sHok));
+            s.spots(i,j).binSpot = false(sHok);
             s.spots(i,j).binSpot(L == nObject) = 1;
         else
             s.spots(i,j).isSpot = 0;
@@ -71,7 +71,7 @@ classifier = s.classifier;
         
         if ~s.spots(i,j).isSpot && bReplace
            
-            s.spots(i,j).binSpot = logical(zeros(sHok));
+            s.spots(i,j).binSpot = false(sHok);
             mp = sHok/2;
             lu = 1 + round(mp - sDftSpot/2);
             s.spots(i,j).binSpot(lu(1):-1 + lu(1)+sDftSpot(1), lu(2):-1 + lu(2)+sDftSpot(2)) = dftSpot;

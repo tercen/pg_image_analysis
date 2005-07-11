@@ -15,7 +15,9 @@ for i = 1:nRows
         xRl = min(xRl, size(I,1));
         yRl = min(yRl, size(I,2));
         
-        Ispot = imadjust(I(xLu:xRl, yLu:yRl));
+        Ispot = I(xLu:xRl, yLu:yRl);
+        Ispot = Ispot/max(Ispot(1:numel(Ispot)));
+        
         [level, eps] = graythresh(Ispot);
         spots(i,j).cLu = [xLu, yLu];
         spots(i,j).binSpot = im2bw(Ispot, level);
