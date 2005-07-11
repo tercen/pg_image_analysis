@@ -79,7 +79,7 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.2';
+handles.version = 'alpha.3';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.segMode = 'fixed';
@@ -514,7 +514,7 @@ time = clock;
 switch handles.gridMode
 
     case 'kinLast'
-       try 
+      try 
             expMode = 'kinetics';
             for i = 1:nImages
                    pump  = char(currentList(i).P);
@@ -573,7 +573,9 @@ end
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
 set(gcf, 'pointer', 'arrow');
-stString = ['Ready (',num2str(etime(clock, time)),'s)'];
+strTime = num2str(etime(clock, time));
+%disp([currentArray.id, ':', strTime]);
+stString = ['Ready (',strTime,'s)'];
 set(handles.stStatus, 'String', stString);
 if handles.bShow
     hp = presenter(I,oQ,c);
@@ -596,7 +598,7 @@ end
 exportWell(expNames, resBase, expMode, c, oQ, bImages, bQuant);
 % --------------------------------------------------------------------
 
-
+clear oQ
 
 function miUpdate_Callback(hObject, eventdata, handles)
 % hObject    handle to miUpdate (see GCBO)
