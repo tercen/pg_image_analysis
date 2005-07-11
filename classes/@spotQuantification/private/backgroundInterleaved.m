@@ -31,35 +31,24 @@ xDisk = xDisk - mp(1);
 yDisk = yDisk - mp(2);
 
 [nRows,nCols] = size(xi);
+bgInterleavedMedian = zeros(nRows, nCols);
+bgInterLeavedMean   = zeros(nRows, nCols);
 for i=1:nRows
     for j=1:nCols
         x = round(xi(i,j) + xDisk);
         y = round(yi(i,j) + yDisk);
         iLin = sub2ind(size(I), x,y);
         data = double(I(iLin));
-        q = quantile(data, oq.backgroundPercentiles);
-        data = data(data >= q(1) & data <= q(2));
-
+        %q = quantile(data, oq.backgroundPercentiles);
+        %data = data(data >= q(1) & data <= q(2));
 
         bgInterleavedMedian(i,j) = median(data);
-
         bgInterleavedMean(i,j) = mean(data);
     end
-    I(iLin) = 2^16;
+ 
 end
-
-
 
 bgMedian = interp2(1:nCols, 1:nRows, double(bgInterleavedMedian), 0.5 + [1:nCols-1], 0.5 + [1:nRows-1]');
 bgMean   = interp2(1:nCols, 1:nRows, double(bgInterleavedMean), 0.5 + [1:nCols-1], 0.5 + [1:nRows-1]'); 
 
         
-        
-
-
-
-
-
-
-
-

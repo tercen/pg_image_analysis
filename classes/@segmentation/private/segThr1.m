@@ -1,6 +1,7 @@
-function spots = segThr1(I, cx,cy, spotAreaSize)
+function spots = segThr1(I, cx,cy, spotAreaSize, mFull)
 
 [nRows, nCols] = size(cx);
+
 for i = 1:nRows
     for j=1:nCols
         cLu  = round([cx(i,j), cy(i,j)] - (spotAreaSize/2));
@@ -16,7 +17,7 @@ for i = 1:nRows
         yRl = min(yRl, size(I,2));
         
         Ispot = I(xLu:xRl, yLu:yRl);
-        Ispot = Ispot/max(Ispot(1:numel(Ispot)));
+        Ispot = (mFull/max(Ispot(1:numel(Ispot)))) * Ispot;
         
         [level, eps] = graythresh(Ispot);
         spots(i,j).cLu = [xLu, yLu];

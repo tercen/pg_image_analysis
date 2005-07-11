@@ -18,14 +18,14 @@ for i=1:nRows
         Ispot = I(xSpot, ySpot);
 
         data = double(Ispot(oq(i,j).binSpot));
-        q = quantile(data, oq(i,j).signalPercentiles);
+        %q = quantile(data, oq(i,j).signalPercentiles);
 
-        [iOut, jOut] = find(oq(i,j).binSpot & (Ispot < q(1) | Ispot > q(2)));
+        %[iOut, jOut] = find(oq(i,j).binSpot & (Ispot < q(1) | Ispot > q(2)));
 
         ignoredPixels = zeros(size(oq(i,j).binSpot));
-        ignoredPixels(iOut, jOut) = 1;
+        %ignoredPixels(iOut, jOut) = 1;
         oq(i,j).ignoredPixels = ignoredPixels;
-        data = data(data>=q(1) & data<=q(2));
+        %data = data(data>=q(1) & data<=q(2));
 
         oq(i,j).medianSignal = median(data);
 
