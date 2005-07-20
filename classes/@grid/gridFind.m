@@ -1,17 +1,21 @@
 function [x,y, rot, g] = gridFind(g, I)
-% function [x,y,rot, g] = gridFind(g, I)
+% array.gridFind
+% function [x,y,rot,oArrayOut] = gridFind(oArray, I)
 % IN:
-% g, grid object as defines by g = grid(args)
+% oArray, grid object as defined by oArray = array(args)
 % I, image to find the grid on.
 % OUT:
 % x [nRow, nCol] , x(i,j) is the x coordinate of spot(i,j)
 % y [nRow, nCol] , y(i,j) is the y coordinate of spot(i,j)
 % rot, optimal rotation out of the rotation axis supplied to the grid
 % object
-% g: updated grid object, in case of g.method = 'corelation2D' the first
+% oArrayOut: updated grid object, in case of array.method = 'corelation2D' the first
 % call of the gridFind function will be much slower than subsequent calls
 % with the updated object.
-% See also GRIDOBJECT
+% See also array/array, array/fromfile
+%
+% method: 'correlation2D', uses 2D template correlation to find the
+% location of the grid.
 
 fNames  = fieldnames(g);
 % check if all required settings have been set
