@@ -22,7 +22,7 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 04-Jul-2005 22:22:34
+% Last Modified by GUIDE v2.5 11-Jul-2005 15:17:55
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -79,10 +79,12 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.3';
+handles.version = 'alpha.4';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.segMode = 'fixed';
+handles.spotWeight = 'equal';
+
 miFixedSegmentation_Callback(handles.miFixedSegmentation, [], handles);
 strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
 set(handles.miFilter, 'Label', strLabel);
@@ -525,7 +527,7 @@ switch handles.gridMode
             [c, iSort] = sort(c);
             I = I(:,:,iSort);
             expNames = expNames(iSort);
-            [Igrid, Isegment] = gridImage(I(:,:,nImages), handles.oP, handles.prepMode, rSize);
+            [Igrid, Isegment] = gridImage(I(:,:,nImages), handles.oP, handles.prepMode, rSize, handles.spotWeight);
             if isequal(handles.segMode, 'adapt')
                 Isegment = [];
             end
@@ -533,9 +535,11 @@ switch handles.gridMode
             [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
-        catch
-            errordlg(lasterr);
-            set(gcf, 'pointer', 'arrow');
+      catch
+          set(gcf, 'pointer', 'arrow');
+          drawnow;
+          errordlg(lasterr);
+            
            return;
        end
         
@@ -545,7 +549,7 @@ switch handles.gridMode
             for i = 1:nImages
                    pump  = char(currentList(i).P);
                    c(i) = str2num(pump(2:end));
-                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], 'txt');
+                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], 'pgr');
                    expNames(i) = cellstr(str); 
             end
             [c, iSort] = sort(c);
@@ -559,9 +563,12 @@ switch handles.gridMode
             [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
-        catch
-            errordlg(lasterr);
-            set(gcf, 'pointer', 'arrow');
+          catch
+
+              set(gcf, 'pointer', 'arrow');
+              drawnow;
+              errordlg(lasterr);
+            
            return;
        end
 
@@ -800,4 +807,33 @@ function miAdaptSegmentation_Callback(hObject, eventdata, handles)
 set(hObject, 'checked', 'on');
 set(handles.miFixedSegmentation, 'checked', 'off')
 handles.segMode = 'adapt';
+guidata(hObject, handles);
+
+
+% --------------------------------------------------------------------
+function miSpotWeight_Callback(hObject, eventdata, handles)
+% hObject    handle to miSpotWeight (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function miSpotWeightIntensity_Callback(hObject, eventdata, handles)
+% hObject    handle to miSpotWeightIntensity (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(hObject, 'checked', 'on')
+set(handles.miSpotWeightEqual, 'checked', 'off');
+handles.spotWeight = 'intensity';
+guidata(hObject, handles);
+% --------------------------------------------------------------------
+function miSpotWeightEqual_Callback(hObject, eventdata, handles)
+% hObject    handle to miSpotWeightEqual (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+set(hObject, 'checked', 'on')
+set(handles.miSpotWeightIntensity, 'checked', 'off');
+handles.spotWeight = 'equal';
 guidata(hObject, handles);

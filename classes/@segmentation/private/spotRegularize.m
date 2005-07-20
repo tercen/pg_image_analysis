@@ -30,6 +30,10 @@ classifier = s.classifier;
             s.spots(i,j).binSpot(L == nObject) = 1;
         else
             s.spots(i,j).isSpot = 0;
+            s.spots(i,j).Diameter = 0;
+            s.spots(i,j).AspectRatio = 0;
+            s.spots(i,j).Centroid = 0;
+            s.spots(i,j).FormFactor = 0;
         end
 
         % 2. get metrics

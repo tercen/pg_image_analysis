@@ -1,4 +1,4 @@
-function [Igrid, Isegment] = gridImage(I, oPP, ppMode, rSize)
+function [Igrid, Isegment] = gridImage(I, oPP, ppMode, rSize, spotWeight)
 
 switch ppMode
     case 'none'
@@ -13,7 +13,11 @@ switch ppMode
         Isegment = Igrid;
         Igrid = imresize(Igrid, rSize);
 end
-Igrid = histeq(Igrid);
+
+switch spotWeight
+    case 'equal'
+        Igrid = histeq(Igrid);
+end
 
         
    

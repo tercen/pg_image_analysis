@@ -30,10 +30,10 @@ else
             q(i,j).outlierMethod        = 'none';
             q(i,j).medianBackground = [];
             q(i,j).meanBackground = [];
-            q(i,j).backgroundPercentiles = [0.01, 0.99];
+            q(i,j).backgroundPercentiles = [0, 1];
             q(i,j).medianSignal = [];
             q(i,j).meanSignal = [];
-            q(i,j).signalPercentiles = [0.1, 0.98];
+            q(i,j).signalPercentiles = [0, 1];
             q(i,j).ignoredPixels = [];
             q(i,j).backgroundDiameter = 4;
             
