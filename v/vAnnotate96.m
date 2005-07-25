@@ -1,11 +1,15 @@
-function [v, annFields, msg] = vAnnotate96(v, annFile);
+function [v, annFields, msg] = vAnnotate96(v, annFile)
+%function [v, annFields, msg] = vAnnotate96(v, annFile)
 msg = [];
 [a, msg]  = vReadAnnotation(annFile);
-annFields = fieldnames(a);
-annFields = annFields(3:end);
 if isempty(a)
     return;
 end
+
+
+annFields = fieldnames(a);
+annFields = annFields(3:end);
+
 aFields = fieldnames(a);
 iCol = strmatch('Col', aFields, 'exact');
 iRow = strmatch('Row', aFields, 'exact');
