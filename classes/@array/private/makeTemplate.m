@@ -4,6 +4,8 @@ refMask          = g.mask;
 spotPitch        = g.spotPitch;
 spotDiameter     = g.spotSize;
 axRot            = g.rotation;
+x0               = g.xOffset;
+y0               = g.yOffset;
 
 mp = round(imageSize)/2;
 
@@ -15,7 +17,7 @@ spot = uint8(getnhood(se));
 [s1, s2] = size(spot);
 template = uint8(zeros(imageSize(1), imageSize(2), length(axRot)));
 for iRot=1:length(axRot)
-    [x,y] = gridCoordinates(mp, refMask, spotPitch, axRot(iRot));
+    [x,y] = gridCoordinates(mp, refMask, spotPitch, axRot(iRot), x0, y0);
     xyLu = [round(x),round(y)] - repmat(round([s1,s2]/2), nSpots,1);
     xyRl = xyLu  + repmat([s1,s2] - 1, nSpots,1);
 

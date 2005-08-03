@@ -2,7 +2,7 @@ function varargout = vSetGlobalStats(g, v, strID, qType, bOutput);
 % function vSetGlobalStats(v, clID, qType, <bOutput>)
 
 if nargin < 4
-    bOutput = 0;
+    bOutput = false;
 end
 uID = vGetUniqueID(v, 'ID');
 iMatch = strmatch(strID, uID);
@@ -11,8 +11,13 @@ clID = uID(iMatch);
      error('GlobalStats:IDNotFound', '%s', ['ID not found: ', strID]);
  end
  
-refMaps = vArrange(v, 'ID', clID, qType);
+[refMaps, msg] = vArrange(v, 'ID', clID, qType, 'Maps');
+if msg ~= 0
+    error('GlobalStats:vArrange', '%s', msg);
+end
 
+    
+mRefMaps = mean(refMaps,3);
 [s1, s2, s3] = size(refMaps);
 mIndex1 = vArrange(v, 'ID', clID(1), 'Index1');
 mIndex2 = vArrange(v, 'ID', clID(1), 'Index2');
@@ -31,7 +36,7 @@ for i=1:(s1*s2)
         rIn(j) = i;
     end
 end
-[localT, localCV, globalCVAll, globalCVFiltered, nFiltered] = getGlobalStats(g, vIn, bOutput, strID);
+[localT, localCV, globalCVAll, globalCVFiltered, nFiltered, hFig] = getGlobalStats(g, vIn,bOutput, strID);
 % remap
 for i=1:length(localT)
     vLocalT(rIn(i)) = localT(i);
@@ -62,6 +67,12 @@ if (g.bGlobalMetrics)
     varargout{2} = vGen;
 end
 
+% add plate overview to output graph
+if (hFig)
+    figure(hFig);
+    subplot(2,2,4);
+    imagesc(mRefMaps);
+end
 
 
 

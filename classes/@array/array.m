@@ -21,9 +21,21 @@ function g = array(varargin)
 % mask: nRows x nCols matrix where nRows and nCols give the dimensions of
 % the array. mask(i,j) must be set to 1 if position [i,j] in the array is a grid
 % reference, otherwise 0.
+%
 % spotPitch: scalar, set to pitch of the spots in the array in pixels
+%
 % spotSize: scalar, set to approximate diameter of the spots in the array in pixels
+%
+% xOffset, yOffset nRows  x nCols matrix containing y,x (respectively) offsets from ideal
+% in units spotPitch:
+%   xOffset(i,j) = -0.5 means x coordinate of point X 0.5 a pitch to the
+%   left. 
+%   When xOffset, or yOffset are left empty the grid will dft to
+%   zeros(nRows, nCols);
+% 
 % rotation: vector, (dft: 0) , use to set the possible rotations in degrees of the array to be probed.
+%
+%
 %(note, the more rotations, the slower the grid finding)
 % method: string, one method currently supported (dft: 'correlation2D')
 % EXAMPLE:
@@ -52,11 +64,14 @@ if length(varargin) == 1
 end
 
 g.mask           = [];
+g.xOffset        = [];
+g.yOffset        = [];
 g.spotPitch      = [];
 g.spotSize       = [];
 g.rotation       =  0;
 g.method         = 'correlation2D';
 g.private        = struct([]);
+
 
 g = class(g, 'array');
 if length(varargin) > 1

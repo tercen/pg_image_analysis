@@ -555,7 +555,7 @@ switch handles.gridMode
             [c, iSort] = sort(c);
             I = I(:,:,iSort);
             expNames = expNames(iSort);
-            [Igrid, Isegment] = gridImage(I(:,:,1), handles.oP, handles.prepMode, rSize);
+            [Igrid, Isegment] = gridImage(I(:,:,1), handles.oP, handles.prepMode, rSize, handles.spotWeight);
             if isequal(handles.segMode, 'adapt')
                 Isegment = [];
             end
@@ -579,15 +579,18 @@ end
 
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
-set(gcf, 'pointer', 'arrow');
+
 strTime = num2str(etime(clock, time));
 %disp([currentArray.id, ':', strTime]);
 stString = ['Ready (',strTime,'s)'];
 set(handles.stStatus, 'String', stString);
+set(gcf, 'pointer', 'arrow');
 if handles.bShow
-    hp = presenter(I,oQ,c);
-    set(hp, 'name', currentArray.id);
+     hp = presenter(I,oQ,c);
+     set(hp, 'name', currentArray.id);
+     drawnow
 end
+
 % Export
 strBase = [currentList(i).W, '_', currentList(i).F, '_', currentList(i).T];
 resBase = [handles.iniPars.dataDir,'\', handles.iniPars.resDir, '\', strBase];
@@ -603,6 +606,7 @@ else
 end
 
 exportWell(expNames, resBase, expMode, c, oQ, bImages, bQuant);
+
 % --------------------------------------------------------------------
 
 clear oQ

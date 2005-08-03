@@ -21,6 +21,7 @@ for row = 1:mx1
             n = n + 1;
             for j=1:length(clAnnotation)
                 condition{n,j} = v(iWell(1)).(clAnnotation{j});
+               
             end
             for j = 1:length(iWell)
                 iSpot = strmatch(v(iWell(j)).ID, spotID);
@@ -29,8 +30,15 @@ for row = 1:mx1
         end
     end
 end
-[condition(:,1), iSort] = sort(condition(:,1));
-condition(:,2:end) = condition(iSort, 2:end); 
+try
+    [condition(:,1), iSort] = sort(condition(:,1));
+     condition(:,2:end) = condition(iSort, 2:end);
+catch
+    c = cell2mat(condition(:,1));
+    [c, iSort] = sort(c);
+    condition = condition(iSort,:);
+end
+
 M = M(:, iSort);
 % EOF
         

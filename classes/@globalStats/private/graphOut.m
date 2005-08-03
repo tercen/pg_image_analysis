@@ -1,5 +1,5 @@
-function graphOut(r,sr, iOut, strID);
-figure(99)
+function hFig = graphOut(r,sr, iOut, strID);
+hFig = figure;
 
 set(gcf, 'Name', ['Global QC using: ', strID]);
 subplot(2,1,1)
@@ -7,6 +7,7 @@ hold off
 errorbar(r, sr, 'k.-')
 hold on
 plot(find(iOut), r(iOut), 'r.');
+ax0;
 subplot(2,2,3)
 hold off
 x = [0:0.1:2];

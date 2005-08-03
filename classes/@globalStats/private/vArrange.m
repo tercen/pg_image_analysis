@@ -69,8 +69,10 @@ switch optOut
    case('AVT')
         Map = mean(Map, 3)';
         Map = reshape(Map, s1*s2, 1);
+    case('Maps')
+        % do nothing
     otherwise
-        Message = ['Warning: unkown option for optOut, referting to default: Maps'];
+        error('Unknown option for optOut');
 end
 
         

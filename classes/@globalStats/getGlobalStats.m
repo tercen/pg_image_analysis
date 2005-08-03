@@ -1,4 +1,4 @@
-function [localT, localCV, globalCVAll, globalCVFiltered, nFiltered] = getGlobalStats(g,data, bOutput, strID)
+function [localT, localCV, globalCVAll, globalCVFiltered, nFiltered, hFig] = getGlobalStats(g,data, bOutput, strID)
 %[localT, localCV, globalCVAll, globalCVFiltered] = getGlobalStats(g, data, bOutput)
 % data: (NxM) matrix containing reference data from N wells using M intra
 % well multiples
@@ -47,7 +47,9 @@ localT      = (mData - mFiltered)/sFiltered;
 localCV     = sData./mData;
 
 if bOutput
-    graphOut(mData, sData, iOut, strID);
+    hFig = graphOut(mData, sData, iOut, strID);
+else
+    hFig = 0;
 end
 
 

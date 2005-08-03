@@ -61,7 +61,7 @@ switch g.method
         
         [mx, iRot] = templateCorrelation(I, private.fftTemplate);
         rot = g.rotation(iRot);
-        [cx, cy, ix,iy] = gridCoordinates(mx, ones(size(g.mask)), g.spotPitch, rot);
+        [cx, cy, ix,iy] = gridCoordinates(mx, ones(size(g.mask)), g.spotPitch, rot, g.xOffset, g.yOffset);
         x = -ones(size(g.mask));
         for i=1:length(cx)
             x(ix(i), iy(i)) = cx(i)-2;
