@@ -20,7 +20,6 @@ yi(end,:) = yi(end-1,:);
 
 xi  = xi + 0.5*dx;
 yi =  yi + 0.5*dy;
-
 % relative background coordinates
 se = strel('disk', round(oq.backgroundDiameter/2));
 disk = getnhood(se);

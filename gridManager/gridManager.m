@@ -64,6 +64,7 @@ iniPars.yResize = 256;
 iniPars.gridRefMarker = '#';
 iniPars.dataSearchFilter = '*.tif*';
 iniPars.dataForceStructure = 1;
+iniPars.imageResultsExtension = 'pgr';
 handles.iniPars = getparsfromfile(handles.iniFile, iniPars);
 handles.list = [];
 handles.selectedWell = [];
@@ -79,7 +80,7 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.4';
+handles.version = 'alpha.5';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.segMode = 'fixed';
@@ -193,23 +194,27 @@ guidata(hObject, handles);
             end
 
 
-            % instrument specific parameters
+           
             % take image resize into account!
             rSize = [handles.iniPars.xResize, handles.iniPars.yResize];
             rPitch     = pars.spotPitch * (rSize./imSize);
             rSpotSize  = pars.spotSize * mean(rSize./imSize);
 
-
+            % Set array object , preprocessing object and segmentation
+            % object with instrument specific parameters.
             handles.oArray = set(handles.oArray, 'spotPitch', rPitch, 'spotSize', rSpotSize);
             axRot = [pars.minRot:pars.dRot:pars.maxRot];
             handles.oArray = set(handles.oArray, 'rotation', axRot);
             handles.oP = set(handles.oP, 'nCircle',pars.nCircle, 'nLargeDisk', pars.nLargeDisk, 'nSmallDisk', pars.nSmallDisk, 'nBlurr', pars.nBlurr );
+            
             handles.oS = segmentation();
             cfr = get(handles.oS, 'classifier');
             cfr.minDiameter = pars.minDiameter;
             cfr.maxDiameter = pars.maxDiameter;
-            handles.oS = set(handles.oS, 'classifier', cfr, 'dftSpotDiameter', pars.dftSpot);
+            handles.oS = set(handles.oS, 'filtLargeDisk', pars.minDiameter, 'filtSmallDisk', pars.nSmallDisk, ...
+                                       'classifier', cfr, 'dftSpotDiameter', pars.dftSpot);
             
+                                       
             %%% initialilzie exposure time popup
             uT = vGetUniqueID(list, 'T');
             set(handles.puIntegrationTime, 'String', uT);
@@ -516,12 +521,12 @@ time = clock;
 switch handles.gridMode
 
     case 'kinLast'
-      try 
+%       try 
             expMode = 'kinetics';
             for i = 1:nImages
                    pump  = char(currentList(i).P);
                    c(i) = str2num(pump(2:end));
-                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], 'txt');
+                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], handles.iniPars.imageResultsExtension);
                    expNames(i) = cellstr(str); 
             end
             [c, iSort] = sort(c);
@@ -532,16 +537,16 @@ switch handles.gridMode
                 Isegment = [];
             end
             
-            [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
+            [x,y,oQ, handles.oArray] = gridKineticsDevelopment(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
-      catch
-          set(gcf, 'pointer', 'arrow');
-          drawnow;
-          errordlg(lasterr);
-            
-           return;
-       end
+%       catch
+%           set(gcf, 'pointer', 'arrow');
+%           drawnow;
+%           errordlg(lasterr);
+%             
+%            return;
+%        end
         
         case 'kinFirst'
           try 

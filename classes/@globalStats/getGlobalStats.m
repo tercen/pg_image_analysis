@@ -17,8 +17,8 @@ if nargin < 4
     strID = 'unknown';
 end
 
-
 [s1,s2] = size(data);
+
 for i=1:s2
     m = mean(data(:,i));
     if m ~= 0
@@ -39,6 +39,7 @@ globalCVAll = std(mData)/mean(mData);
 
 
 iOut = findOutliersRW(mData, g.odSigmaFac, g.odEpsilon);
+%iOut = RWoutlierDetection(mData, g.pOut);
 mFiltered = mean(mData(~iOut));
 nFiltered = length(mData(~iOut));
 sFiltered = std(mData(~iOut));

@@ -12,6 +12,9 @@ clID = uID(iMatch);
  end
  
 [refMaps, msg] = vArrange(v, 'ID', clID, qType, 'Maps');
+bw = repmat(g.badWells,[1,1,size(refMaps,3)]);
+refMaps(bw) = -0.01;
+
 if msg ~= 0
     error('GlobalStats:vArrange', '%s', msg);
 end

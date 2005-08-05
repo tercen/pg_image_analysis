@@ -24,7 +24,9 @@ if ~isempty(oQ)
             else
                 hBound(i,j) = plot(bound(:,2) , bound(:,1), 'k');
             end
+            
         end
     end
+ 
     hold off
 end

@@ -11,7 +11,7 @@ for i=1:2:length(pArgin)
     switch prop
         case 'odSigmaFac'
             if isnumeric(val)
-                g.odSigmaFac = val
+                g.odSigmaFac = val;
             else
                 bInvalid = 1;
             end
@@ -39,6 +39,20 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
+        case 'badWells'
+            if islogical(val)
+                g.badWells = val;
+            else
+                bInvalid = 1;
+            end
+        case 'pOut'
+            if val >= 0 & val <= 1
+                g.pOut = val;
+            else
+                bInvalid = 1;
+            end
+            
+                
             
         otherwise
             error(['Invalid property: ', prop]);

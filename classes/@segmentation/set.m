@@ -12,6 +12,8 @@ for i=1:2:length(pArgin)
         case 'method'
             if isequal(val, 'threshold1')
                s.method = val;
+            elseif isequal(val, 'FilterThreshold')
+                s.method = val;
             else
                 bInvalid = 1;
             end
@@ -39,11 +41,19 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-            
-                
-            
-        
-        otherwise
+        case 'filtSmallDisk'
+            if isnumeric(val)
+                s.filtSmallDisk = val;
+            else
+                bInvalid = 1;
+            end
+        case 'filtLargeDisk'
+            if isnumeric(val)
+                s.filtLargeDisk = val;
+            else
+                bInvalid = 1;
+            end
+         otherwise
             error(['Invalid property: ', prop]);
     end
     if bInvalid

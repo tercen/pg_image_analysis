@@ -1,7 +1,7 @@
 spotPitch>17.7
 spotSize>10
 dftSpot>12
-minDiameter>10
+minDiameter>8
 maxDiameter>15
 minRot>-2
 maxRot>2
