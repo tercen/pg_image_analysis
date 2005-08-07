@@ -15,8 +15,7 @@ end
 s.rotation       =  0;
 s.method         = 'threshold1';
 s.areaSize       = [];
-s.filtSmallDisk = [];
-s.filtLargeDisk = [];
+s.nFilterDisk   = [];
 s.dftSpotDiameter    = 12;
 classifier.minDiameter          = 10;
 classifier.maxDiameter          = 15;

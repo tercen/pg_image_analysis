@@ -22,7 +22,7 @@ function varargout = presenter(varargin)
 
 % Edit the above text to modify the response to help presenter
 
-% Last Modified by GUIDE v2.5 30-May-2005 16:35:33
+% Last Modified by GUIDE v2.5 05-Aug-2005 21:47:42
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -63,21 +63,45 @@ else
     handles.xSeries = 1:size(handles.I,3);
 end
 
-
-
-
-
-% show images
 focus = [1,1];
 xFocus = size(handles.I,3);
-[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oQ(:,:,xFocus), handles.I(:,:,xFocus));
+If = handles.I(:,:,xFocus);
+handles.displayRange = double([0, max(If(:))]);
+
+
+% Set the display range slider to the appropriate value
+% set(handles.cmDisplayRange, 'Visible', 'on');
+handles.displayRange = double([0, max(If(:))]);
+imType = class(If);
+switch imType
+    case 'uint8'
+        set(handles.cmDisplayRange8Bit, 'checked', 'on');
+        set(handles.cmDisplayRange12Bit, 'checked', 'off');
+        set(handles.cmDisplayRange16Bit, 'checked', 'off');
+        handles.fullRange = 2^8;
+    case 'uint16'
+         set(handles.cmDisplayRange8Bit, 'checked', 'off');
+        set(handles.cmDisplayRange12Bit, 'checked', 'off');
+        set(handles.cmDisplayRange16Bit, 'checked', 'on');
+        handles.fullRange = 2^16;
+end
+dVal = handles.displayRange(2)/handles.fullRange;
+set(handles.slDisplayRange, 'Value' ,dVal);
+
+% show images
+[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oQ(:,:,xFocus), If, handles.fullRange);
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
-handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), xFocus, handles.xSeries);
+[handles.hFocusPlot, handles.hSpot] = focalSpot(hAx, If, handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:),  ... 
+                                handles.hSpots(end, end), handles.oQ(end, end,:), xFocus, handles.xSeries, handles.fullRange);
 
 handles.focus       = focus;
 handles.xFocus      = xFocus;
 
 
+d = get(handles.hImage, 'CData');
+set(handles.hImage, 'CData',d/dVal); 
+d = get(handles.hSpot, 'CData');
+set(handles.hSpot, 'CData',d/dVal); 
 % Update handles structure
 guidata(hObject, handles);
 
@@ -134,8 +158,13 @@ L = (dx.^2 + dy.^2);
 iOld = handles.focus(1);
 jOld = handles.focus(2);
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
-handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus) , handles.hSpots(iFocus, jFocus), handles.oQ(iFocus, jFocus, :), handles.hSpots(iOld, jOld), handles.oQ(iOld, jOld), handles.xFocus, handles.xSeries);
+[handles.hFocusPlo, handles.hSpot] = focalSpot(hAx, handles.I(:,:,handles.xFocus) , handles.hSpots(iFocus, jFocus), handles.oQ(iFocus, jFocus, :), handles.hSpots(iOld, jOld), handles.oQ(iOld, jOld), handles.xFocus, handles.xSeries, handles.fullRange);
 handles.focus = [iFocus, jFocus];
+dVal = get(handles.slDisplayRange, 'Value');
+ 
+d = get(handles.hSpot, 'CData');
+set(handles.hSpot, 'CData',d/dVal); 
+
 
 guidata(hObject, handles);
 
@@ -149,7 +178,12 @@ hOldFocus = handles.hSpots(iOld, jOld);
 qNew = handles.oQ(iNew, jNew,:);
 
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
-handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus), hObject, qNew, hOldFocus, qOld, handles.xFocus, handles.xSeries);
+[handles.hFocusPlot, handles.hSpot] = focalSpot(hAx, handles.I(:,:,handles.xFocus), hObject, qNew, hOldFocus, qOld, handles.xFocus, handles.xSeries, handles.fullRange);
+dVal = get(handles.slDisplayRange, 'Value');
+
+d = get(handles.hSpot, 'CData');
+set(handles.hSpot, 'CData',d/dVal); 
+
 handles.focus = [iNew, jNew];
 guidata(hObject, handles);
 
@@ -158,24 +192,30 @@ delete(handles.hFocusPlot);
 xPoint = get(handles.axQuantification,'CurrentPoint');
 xPoint = xPoint(1,1) * ones(size(handles.xSeries));
 [mdx,handles.xFocus] = min(abs(xPoint - handles.xSeries));
-[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oQ(:,:,handles.xFocus), handles.I(:,:,handles.xFocus));
+[handles.hImage, handles.hSpots] = showImage(handles.axImage, handles.oQ(:,:,handles.xFocus), handles.I(:,:,handles.xFocus), handles.fullRange);
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
 focus = handles.focus;
-handles.hFocusPlot = focalSpot(hAx, handles.I(:,:,handles.xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), handles.xFocus, handles.xSeries);
+[handles.hFocusPlot, handles.hSpot] = focalSpot(hAx, handles.I(:,:,handles.xFocus), handles.hSpots(focus(1), focus(2)), handles.oQ(focus(1),focus(2),:), handles.hSpots(end, end), handles.oQ(end, end,:), handles.xFocus, handles.xSeries, handles.fullRange);
+dVal = get(handles.slDisplayRange, 'Value');
+d = get(handles.hImage, 'CData');
+set(handles.hImage, 'CData',d/dVal); 
+d = get(handles.hSpot, 'CData');
+set(handles.hSpot, 'CData',d/dVal); 
+
 guidata(handles.axQuantification, handles);
 
-function [hImage, hSpots] = showImage(hAxis, oQ, I,focus, dr);
 
-if nargin < 4
-    dr = [];
-end
+function [hImage, hSpots] = showImage(hAxis, oQ, I, fullRange);
+
+
 axes(hAxis);
-[hImage, hSpots] =show(oQ, I,dr);
+I = double(I)/fullRange;
+[hImage, hSpots] =show(oQ, I,[0,1]);
 
 %set(hImage, 'ButtonDownFcn', 'presenter(''image_Callback'',gcbo,[],guidata(gcbo))');
 set(hSpots, 'ButtonDownFcn', 'presenter(''spot_Callback'',gcbo,[],guidata(gcbo))');
 
-function hFocusPlot = focalSpot(hAx, I, hNewFocus, qNew, hOldFocus, qOld, xFocus, xSeries);
+function [hFocusPlot, hFocusImage] = focalSpot(hAx, I, hNewFocus, qNew, hOldFocus, qOld, xFocus, xSeries, fullRange);
 
 axes(hAx(1));
 if get(qOld(xFocus), 'isSpot');
@@ -201,7 +241,8 @@ axes(hAx(3))
 cLu = get(qNew(xFocus), 'cLu');
 x = cLu(1):cLu(1) + size(bin,1) - 1;
 y = cLu(2):cLu(2) + size(bin,2) - 2;
-imshow(I(x,y), []);
+Ispot = double(I(x,y))/fullRange;
+hFocusImage = imshow(Ispot, [0,1]);
 colormap(gca, 'jet');
 hold on
 B = bwboundaries(bin);
@@ -254,4 +295,78 @@ else
 end
 id = get(qNew(1), 'ID');
 title(id, 'interpreter', 'none', 'fontsize', 8);
+
+
+
+% --- Executes on slider movement.
+function slDisplayRange_Callback(hObject, eventdata, handles)
+% hObject    handle to slDisplayRange (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'Value') returns position of slider
+%        get(hObject,'Min') and get(hObject,'Max') to determine range of slider
+val = get(hObject, 'Value');
+
+% undo the old scaling
+oldVal  =  (handles.displayRange(2)/handles.fullRange);
+d = get(handles.hImage, 'CData');
+set(handles.hImage, 'CData', d*(oldVal/val));
+d = get(handles.hSpot, 'CData');
+set(handles.hSpot, 'CData', d*(oldVal/val));
+
+
+handles.displayRange(2) = val * handles.fullRange;
+guidata(hObject, handles);
+
+% --- Executes during object creation, after setting all properties.
+function slDisplayRange_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to slDisplayRange (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: slider controls usually have a light gray background.
+if isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor',[.9 .9 .9]);
+end
+
+
+
+
+% --------------------------------------------------------------------
+function cmDisplayRange_Callback(hObject, eventdata, handles)
+% hObject    handle to cmDisplayRange (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+% --------------------------------------------------------------------
+function cmDisplayRange8Bit_Callback(hObject, eventdata, handles)
+% hObject    handle to cmDisplayRange8Bit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.cmDisplayRange8Bit, 'checked', 'on');
+set(handles.cmDisplayRange12Bit, 'checked', 'off');
+set(handles.cmDisplayRange16Bit, 'checked', 'off');
+handles.fullRange = 2^8;
+
+% --------------------------------------------------------------------
+function cmDisplayRange12Bit_Callback(hObject, eventdata, handles)
+% hObject    handle to cmDisplayRange12Bit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.cmDisplayRange8Bit, 'checked', 'off');
+set(handles.cmDisplayRange12Bit, 'checked', 'on');
+set(handles.cmDisplayRange16Bit, 'checked', 'off');
+handles.fullRange = 2^12;
+
+% --------------------------------------------------------------------
+function cmDisplayRange16Bit_Callback(hObject, eventdata, handles)
+% hObject    handle to cmDisplayRange16Bit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(handles.cmDisplayRange8Bit, 'checked', 'off');
+set(handles.cmDisplayRange12Bit, 'checked', 'off');
+set(handles.cmDisplayRange16Bit, 'checked', 'on');
+handles.fullRange = 2^16;
 

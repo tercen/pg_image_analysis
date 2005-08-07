@@ -41,15 +41,10 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-        case 'filtSmallDisk'
+      
+        case 'nFilterDisk'
             if isnumeric(val)
-                s.filtSmallDisk = val;
-            else
-                bInvalid = 1;
-            end
-        case 'filtLargeDisk'
-            if isnumeric(val)
-                s.filtLargeDisk = val;
+                s.nFilterDisk = val;
             else
                 bInvalid = 1;
             end

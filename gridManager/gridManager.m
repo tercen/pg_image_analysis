@@ -211,7 +211,7 @@ guidata(hObject, handles);
             cfr = get(handles.oS, 'classifier');
             cfr.minDiameter = pars.minDiameter;
             cfr.maxDiameter = pars.maxDiameter;
-            handles.oS = set(handles.oS, 'filtLargeDisk', pars.minDiameter, 'filtSmallDisk', pars.nSmallDisk, ...
+            handles.oS = set(handles.oS, 'nFilterDisk', pars.minDiameter, ...
                                        'classifier', cfr, 'dftSpotDiameter', pars.dftSpot);
             
                                        
@@ -537,7 +537,7 @@ switch handles.gridMode
                 Isegment = [];
             end
             
-            [x,y,oQ, handles.oArray] = gridKineticsDevelopment(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
+            [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
            
             
 %       catch

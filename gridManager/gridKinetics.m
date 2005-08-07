@@ -17,7 +17,7 @@ y(y>size(I,2)) = size(I,2);
 rPitch =get(oArray, 'spotPitch');
 spotPitch = rPitch(1) * (size(I,1)/rSize(1));
 
-oS = set(oS,'areaSize', spotPitch+2);
+oS = set(oS,'areaSize', spotPitch+2, 'method', 'FilterThreshold');
 if ~bAdapt
     oS = segment(oS, Isegment, x,y);
 end

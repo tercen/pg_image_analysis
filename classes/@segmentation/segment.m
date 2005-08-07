@@ -24,15 +24,13 @@ switch s.method
         if isempty(s.areaSize)
             error('areaSize parameter has not been set');
         end
-        if isempty(s.filtSmallDisk)
-            error('filtSmallDisk parameter has not been set');
-        end
-        if isempty(s.filtLargeDisk)
-            error('filtLargeDisk parameter has not been set');
+     
+        if isempty(s.nFilterDisk)
+            error('nFilterDisk parameter has not been set');
         end
         
         
-        s.spots = segFilterThr(I, cx, cy, s.areaSize, s.filtSmallDisk, s.filtLargeDisk, mFull);
+        s.spots = segFilterThr(I, cx, cy, s.areaSize, s.nFilterDisk, mFull);
 end
 
 s = spotRegularize(s);
