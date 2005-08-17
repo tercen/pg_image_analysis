@@ -7,21 +7,35 @@ if nargin == 0 | ~ischar(strModel)
     f.strFitFunctionName = [];
     f.strIniFunctionName = [];
     f.jacFlag = 0;
-    
-else
-    Func = funcDef();
-    [clList{1:length(Func)}] = deal(Func.strModelName);
-    iMatch = strmatch(strModel, clList);
-    if ~isempty(iMatch)
-        f = Func(iMatch);
-    else
-        f.strModelName  = [];
-        f.strModelDescription = [];
-        f.clParameter   = [];
-        f.strFitFunctionName = [];
-        f.strIniFunctionName = [];
-        f.jacFlag = 0;
+    f = class(f, 'fitFunction');
+    return
+end
+
+Func = funcDef();
+if isequal(strModel, 'select')
+    h = selectGuim(Func);
+    waitfor(h, 'Visible');
+    try
+        handles= guidata(h);
+        if ~isempty(handles.iModel)
+            strModel = Func(handles.iModel).strModelName;
+        end
+        delete(h);
+    catch
+        % nothing selected
     end
-    
+end
+[clList{1:length(Func)}] = deal(Func.strModelName);
+iMatch = strmatch(strModel, clList);
+if ~isempty(iMatch)
+    f = Func(iMatch);
+else
+    f.strModelName  = [];
+    f.strModelDescription = [];
+    f.clParameter   = [];
+    f.strFitFunctionName = [];
+    f.strIniFunctionName = [];
+    f.jacFlag = 0;
 end
 f = class(f, 'fitFunction');
+

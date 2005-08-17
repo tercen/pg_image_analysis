@@ -45,7 +45,7 @@ Func(3).jacFlag                 = 1;
 
 % logIC50, variable slope, offset
 Func(4).strModelName            = 'logIC50_1';
-Func(4).strModelDescription     = 'logIC50, Ymax to Y0, variable slope';
+Func(4).strModelDescription     = 'logIC50, Ymax to Y0, variable slope. Assumes log10 x-axis';
 
 Func(4).clParameter{1}          = 'Y0';
 Func(4).clParameter{2}          = 'Ymax';
@@ -60,7 +60,7 @@ Func(4).jacFlag                 = 1;
 
 %
 Func(5).strModelName            = 'logIC50_2';
-Func(5).strModelDescription     = 'logIC50, Ymax to 0, variable slope';
+Func(5).strModelDescription     = 'logIC50, Ymax to 0, variable slope. Assumes log10 x-axis';
 
 Func(5).clParameter{1}          = 'Ymax';
 Func(5).clParameter{2}          = 'logIC50';
@@ -74,7 +74,7 @@ Func(5).jacFlag                 = 1;
 
 %
 Func(6).strModelName            = 'logIC50_3';
-Func(6).strModelDescription     = 'logIC50, Ymax to Y0, fixed slope';
+Func(6).strModelDescription     = 'logIC50, Ymax to Y0, fixed slope. Assumes log10 x-axis';
 
 Func(6).clParameter{1}          = 'Y0';
 Func(6).clParameter{2}          = 'Ymax';
@@ -88,7 +88,7 @@ Func(6).jacFlag                 = 1;
 
 %
 Func(7).strModelName           = 'logIC50_4';
-Func(7).strModelDescription    = 'logIC50, Ymax to 0, fixed slope';
+Func(7).strModelDescription    = 'logIC50, Ymax to 0, fixed slope. Assumes log10 x-axis';
 
 Func(7).clParameter{1}         = 'Ymax';
 Func(7).clParameter{2}         = 'logIC50';
@@ -98,7 +98,7 @@ Func(7).strIniFunctionName      = 'ifLogIC50_4';
 %#function cfLogIC50_4
 %#function ifLogIC50_4
 Func(8).strModelName            = 'logEC50_1';
-Func(8).strModelDescription     = 'logEC50, Ymin to Ymax';
+Func(8).strModelDescription     = 'logEC50, Ymin to Ymax. Assumes log10 x-axis';
 
 Func(8).clParameter{1}          = 'Ymin';
 Func(8).clParameter{2}          = 'Ymax';

@@ -8,7 +8,7 @@ end
     
 f = fitFunction(varIn);
 if isempty(get(f, 'strModelName'))
-    error([varIn, ' is not an available model for use with pgFit objects']);
+    error([varIn, ' is not an available model for use the pgFit class']);
 end
 p.modelName = varIn;
 p.modelObj  = f;

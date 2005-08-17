@@ -22,12 +22,23 @@ while(1)
         
         dVal = str2num(char(clData(i)));
         strField = char(clHdr(i));
-        if ~isempty(dVal)
-            a(n).(strField) = dVal; 
-        else
-            a(n).(strField) = char(clData(i));
+        try
+            if ~isempty(dVal)
+                a(n).(strField) = dVal; 
+            else
+                a(n).(strField) = char(clData(i));
+            end
+        catch    
+            ifStr = 'Invalid field name';
+            if strncmp(ifStr, lasterr, length(ifStr))
+                disp('Annotation field names cannot contain spaces or special symbols (@#+-& etc)'); 
+                error(lasterr)
+            end
+                
         end
-    end
+        
+
+     end
 end
 
     
