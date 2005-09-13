@@ -28,6 +28,7 @@ for i=1:length(series)
     hIn = plot(x(~out), y(~out), '.');
     hold on
     set(hIn, 'color', [0.8, 0.8, 0.8])
+    vAx = axis;
     hOut = plot(x(out), y(out), 'rx');
     hFit = plot(xFit, yFit);
     set(hFit, 'color', 'k', 'linewidth', 2);
@@ -46,11 +47,18 @@ for i=1:length(series)
         yAv = yAv(~iAv);
         outAv = outAv(~iAv);
     end
+
+    % filter out entries with no data points left.
+    iPoints = N~= 0;
+    Y = Y(iPoints);
+    X = X(iPoints);
+    N = N(iPoints);
+    S = S(iPoints);
     avFit = getCurve(oF, X, pRes);
-    R2 = calcR(avFit, Y');
+    R2 = CalcR(avFit, Y');
     hAv = errorbar(X, Y, S./sqrt(N), '.');
     set(hAv, 'color', 'k', 'markersize', 20)
-
+    axis(vAx);
     strTitle = [series(i).spotID, ' : ', series(i).annotation];   
     title(strTitle, 'interpreter', 'none');
     set(gcf, 'color', 'w')
