@@ -27,7 +27,9 @@ if iDim == 1
     yData = yData';
     yFit = yFit';
 end
-R2 = CalcR(yFit, yData);
+%R2 = CalcR(yFit, yData);
+R2 = corrcoef(yData, yFit);
+R2 = R2(1,2);
 aX2 = sum((yFit-yData).^2);
 iZero = yData == 0;
 rX2 = sum(((yFit(~iZero)-yData(~iZero))./yData(~iZero)).^2);
