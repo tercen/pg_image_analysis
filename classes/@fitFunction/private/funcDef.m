@@ -40,8 +40,8 @@ Func(3).clParameter{3}          = 'k';
 Func(3).strFitFunctionName      = 'cfExpAss';
 Func(3).strIniFunctionName      = 'ifExpAss';
 Func(3).jacFlag                 = 1;
-%#function cfExpAss;
-%#function ifExpAss;
+%#function cfExpAss
+%#function ifExpAss
 
 % logIC50, variable slope, offset
 Func(4).strModelName            = 'logIC50_1';
@@ -95,20 +95,42 @@ Func(7).clParameter{2}         = 'logIC50';
 
 Func(7).strFitFunctionName      = 'cfLogIC50_4';
 Func(7).strIniFunctionName      = 'ifLogIC50_4';
+Func(7).jacFlag                 = 1;
 %#function cfLogIC50_4
 %#function ifLogIC50_4
 Func(8).strModelName            = 'logEC50_1';
-Func(8).strModelDescription     = 'logEC50, Ymin to Ymax. Assumes log10 x-axis';
+Func(8).strModelDescription     = 'logEC50, Ymin to Ymax, variable slope. Assumes log10 x-axis';
 
 Func(8).clParameter{1}          = 'Ymin';
 Func(8).clParameter{2}          = 'Ymax';
 Func(8).clParameter{3}          = 'logEC50';
+Func(8).clParameter{4}          = 'hs';
 
 Func(8).strFitFunctionName      = 'cfLogEC50_1';
 Func(8).strIniFunctionName      = 'ifLogEC50_1';
-Func(8).jacFlag                 = 1;
+Func(8).jacFlag                 = 0;
 %#function cfLogEC50_1
 %#function ifLogEC50_1
+Func(9).strModelName            = 'logEC50_2';
+Func(9).strModelDescription     = 'logEC50, Ymin to 0, variable slope. Assumes log10 x-axis';
 
+Func(9).clParameter{1}          = 'Ymin';
+Func(9).clParameter{2}          = 'Ymax';
+Func(9).clParameter{3}          = 'hs';
 
+Func(9).strFitFunctionName      = 'cfLogEC50_2';
+Func(9).strIniFunctionName      = 'ifLogEC50_2';
+Func(9).jacFlag                 = 0;
+%#function cfLogEC50_2
+%#function ifLogEC50_2
+Func(10).strModelName           = 'logEC50_4';
+Func(10).strModelDescription    = 'logEC50, Ymax to 0, fixed slope. Assumes log10 x-axis';
 
+Func(10).clParameter{1}         = 'Ymax';
+Func(10).clParameter{2}         = 'logIC50';
+
+Func(10).strFitFunctionName      = 'cfLogEC50_4';
+Func(10).strIniFunctionName      = 'ifLogEC50_4';
+Func(10).jacFlag                 = 0;
+%#function cfLogEC50_4
+%#function ifLogEC50_4
