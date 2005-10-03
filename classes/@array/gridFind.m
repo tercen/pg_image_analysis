@@ -17,12 +17,22 @@ function [x,y, rot, g] = gridFind(g, I)
 % method: 'correlation2D', uses 2D template correlation to find the
 % location of the grid.
 
-fNames  = fieldnames(g);
-% check if all required settings have been set
-for i=1:length(fNames)
-    if isempty(g.(fNames{i})) & ~isequal(fNames{i}, 'private')
-        error(['Grid object has unset value for parameter: ', fNames{i}]); 
-    end
+% check if required parameters have been set
+if isempty(g.mask)
+    error('Parameter ''mask'' has not been set.');
+end
+if isempty(g.spotPitch)
+    error('Parameter ''spotPitch'' has not been set.');
+end
+if isempty(g.spotSize)
+    error('Parameter ''spotSize'' has not been set.');
+end
+
+if ~isempty(g.xOffset) & size(g.xOffset) ~= size(g.mask)
+    error('Dimensions of parameter ''xOffset'' must be the same as that of parameter ''mask''.');
+end
+if ~isempty(g.yOffset) & size(g.yOffset) ~= size(g.mask)
+    error('Dimensions of parameter ''yOffset'' must be the same as that of parameter ''mask''.');
 end
 
 private = g.private;

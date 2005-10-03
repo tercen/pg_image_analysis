@@ -103,7 +103,5 @@ for i=1:length(ID)
     g.xOffset(row(i), col(i)) = xOff(i);
     g.yOffset(row(i), col(i)) = yOff(i);
 end
-
-
 % return ID's as well
-% TO DO: position offsets
+
