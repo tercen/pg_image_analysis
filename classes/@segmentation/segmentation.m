@@ -17,6 +17,7 @@ s.method         = 'threshold1';
 s.areaSize       = [];
 s.nFilterDisk   = [];
 s.dftSpotDiameter    = 12;
+s.pixFlexibility     = 1;
 classifier.minDiameter          = 10;
 classifier.maxDiameter          = 15;
 classifier.minThrEff            = 0.7;

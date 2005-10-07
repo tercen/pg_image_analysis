@@ -1,3 +1,3 @@
-function image = loadImageFromFile(imagePath)
+function image = loadimagefromfile(imagePath)
 image = imread(imagePath);
 % Eof

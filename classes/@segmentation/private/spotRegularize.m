@@ -21,8 +21,28 @@ classifier = s.classifier;
 
         L = bwlabel(s.spots(i,j).binSpot);
         sHok = size(s.spots(i,j).binSpot);
-        mp = round(sHok/2);
-        nObject = L(mp(1), mp(2));
+        mp = round(sHok/2);   
+        
+        
+        % check whether the object found is within pixFlexibility from
+        % ideal position
+        if s.pixFlexibility <= 1
+            nObject = L(mp(1), mp(2));
+        else
+            se = strel('disk' , s.pixFlexibility-1);
+            disk = getnhood(se);
+            mpDisk = size(disk)/2;
+            [xDisk, yDisk] = find(disk);
+            c  =round( [xDisk, yDisk] - repmat(mpDisk,length(xDisk),1) + repmat(mp,length(xDisk),1) );
+            lc = sub2ind(size(L), c(:,1), c(:,2));
+            nObject = any(L(lc));
+            
+            
+            
+        end
+        
+        
+        
         s.spots(i,j).isSpot = 1;
 
         if nObject

@@ -22,7 +22,8 @@ function g = array(varargin)
 % the array. mask(i,j) must be set to 1 if position [i,j] in the array is a grid
 % reference, otherwise 0.
 %
-% spotPitch: scalar, set to pitch of the spots in the array in pixels
+% spotPitch: 2 element vector, set to xPitch and yPitch of the spots in the array in pixels
+%           If xPitch == yPitch spotPitch may be set a a scalar.
 %
 % spotSize: scalar, set to approximate diameter of the spots in the array in pixels
 %

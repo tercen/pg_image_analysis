@@ -48,8 +48,17 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-         otherwise
+        case 'pixFlexibility'
+            if isnumeric(val)
+                s.pixFlexibility = val;
+            else
+                bInvalid = 1;
+            end
+            
+        otherwise
             error(['Invalid property: ', prop]);
+    
+        
     end
     if bInvalid
         error(['Invalid value for :',prop]);
