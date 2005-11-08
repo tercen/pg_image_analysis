@@ -7,6 +7,10 @@ if length(varargin) == 1
     if isa(bIn, 'spotQuantification');
         oq = bIn;
         return;
+    elseif isstruct(bIn);
+        oq = class(bIn, 'spotQuantification');
+        return;
+    
     else
         error(['5th argument must be a spotQuantification object']);
     end
@@ -27,7 +31,7 @@ else
             q(i,j).cy = cy(i,j);
          
             q(i,j).backgroundMethod     = 'interleaved';
-            q(i,j).outlierMethod        = 'none';
+            q(i,j).oOutlier         = [];
             q(i,j).medianBackground = [];
             q(i,j).meanBackground = [];
             q(i,j).backgroundPercentiles = [0, 1];

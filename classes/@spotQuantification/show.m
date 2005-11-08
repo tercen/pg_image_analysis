@@ -14,6 +14,16 @@ if ~isempty(oQ)
     hBound = [];
     for i=1:nRows
         for j=1:nCols
+            if any(oQ(i,j).ignoredPixels(:))
+                L = bwlabel(oQ(i,j).ignoredPixels);
+                B = bwboundaries(L);
+                for k = 1:length(B)
+                    bound = B{k} + repmat(cLu, size(B{k},1),1) - 1;
+                    hb = plot(bound(:,2), bound(:,1));
+                    set(hb, 'color', [0.8,0.8,0.8]);
+                end
+            end
+         
             B = bwboundaries(double(oQ(i,j).binSpot));
             %b = findBoundaries(double(oQ(i,j).binSpot));
             cLu = oQ(i,j).cLu;
@@ -24,9 +34,8 @@ if ~isempty(oQ)
             else
                 hBound(i,j) = plot(bound(:,2) , bound(:,1), 'k');
             end
-            
+        
         end
-    end
- 
+    end   
     hold off
 end

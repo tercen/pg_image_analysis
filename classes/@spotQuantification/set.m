@@ -17,12 +17,14 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-        case 'outlierMethod'
-            if isequal(val, 'outlierMethod')
-                q.outlierMethod = val;
+        case 'oOutlier'
+            if isa(val, 'outlier')
+                q.oOutlier = val;
+    
             else
                 bInvalid = 1;
             end
+                          
         case 'quantitationMetric'
             if isequal(val, 'mean')
                 q.quantitationMetric = 'mean';
