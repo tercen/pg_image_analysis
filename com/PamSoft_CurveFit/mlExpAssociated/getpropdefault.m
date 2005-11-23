@@ -7,6 +7,9 @@ global xTolerance
 global xToleranceMode
 global maxIterations
 global xOffset
+global xOffset_auto
+global xVini
+global xVini_auto
 global Y0_initial
 global Y0_auto
 global Y0_lower

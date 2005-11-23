@@ -7,6 +7,9 @@ global xTolerance
 global xToleranceMode
 global maxIterations
 global xOffset
+global xOffset_auto
+global xVini
+global xVini_auto
 global Y0_initial
 global Y0_auto
 global Y0_lower
@@ -19,6 +22,7 @@ global k_initial
 global k_auto
 global k_lower
 global k_upper
-qNames = {'Y0', 'Yspan', 'k', 'Y0 standard error', 'Yspan standard error', 'k standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr'};
+
+qNames = {'Y0', 'Yspan', 'k', 'Y0 standard error', 'Yspan standard error', 'k standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr', 'Vini'};
 
 qNames = qNames';

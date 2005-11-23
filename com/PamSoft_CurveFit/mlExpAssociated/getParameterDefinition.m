@@ -6,11 +6,15 @@ function pdef = getParameterDefinition()
 % global xTolerance
 % global xToleranceMode
 % global maxIterations
+% global xOffset
+% global xOffset_auto
+% global xVini
+% global xVini_auto
 % global Y0_initial
 % global Y0_auto
 % global Y0_lower
 % global Y0_upper
-% global Yspan
+% global Yspan_initial
 % global Yspan_auto
 % global Yspan_lower
 % global Yspan_upper
@@ -90,7 +94,19 @@ pdef(18).dft     = 0;
 
 pdef(19).name    = 'xTolerance';
 pdef(19).dft     = 0.01;
-% EOF
+
 pdef(20).name   = 'xOffset';
 pdef(20).dft     = 0.0;
 
+pdef(21).name   = 'xOffset_auto';
+pdef(21).dft    = uint8(1);
+pdef(21).enumVal    = uint8([0,1]);
+pdef(21).enumMap = {'no', 'yes'};
+
+pdef(22).name   = 'xVini';
+pdef(22).dft    = 2.0;
+
+pdef(23).name  = 'xVini_auto';
+pdef(23).dft    = uint8(1);
+pdef(23).enumVal = uint8([0,1]);
+pdef(23).enumMap = {'no', 'yes'};

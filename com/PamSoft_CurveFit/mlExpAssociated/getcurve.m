@@ -7,6 +7,9 @@ global xTolerance
 global xToleranceMode
 global maxIterations
 global xOffset
+global xOffset_auto
+global xVini
+global xVini_auto
 global Y0_initial
 global Y0_auto
 global Y0_lower
@@ -56,7 +59,11 @@ end
 
 oF = fitFunction(modelID);
 
-f = getCurve(oF, xIn, par);
+if xOffset_auto
+    xOffset = xIn(1);
+end
+
+f = getCurve(oF, xIn - xOffset, par);
 if (bTranspose)
     f = f';
 end
