@@ -79,6 +79,7 @@ pLower  = [Y0_lower, Yspan_lower, k_lower]';
 pUpper =  [Y0_upper, Yspan_upper, k_upper]';
 % if pOver, override user input with auto values 
 % and set other parameters
+pOver = logical(pOver);
 pIni(pOver) = p(pOver);
 oP = set(oP, 'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
                'errorMethod', strErrorMode, ...
