@@ -8,6 +8,11 @@ if length(varargin) == 1
         s = get(s);
         s.spots = [];
         return;
+    elseif isstruct(bIn);
+        dummy = segmentation();
+        s = class(bIn, 'segmentation');
+        return;
+    
     else
         error(['cannot create a segmentation object from an object of class: ', isa(bIn)]);
     end

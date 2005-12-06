@@ -20,6 +20,7 @@ switch s.method
             error('areaSize parameter has not been set');
         end
         s.spots = segThr1(I, cx, cy, s.areaSize, mFull);
+        s = spotRegularize(s);
     case 'FilterThreshold'
         if isempty(s.areaSize)
             error('areaSize parameter has not been set');
@@ -28,9 +29,9 @@ switch s.method
         if isempty(s.nFilterDisk)
             error('nFilterDisk parameter has not been set');
         end
-        
-        
         s.spots = segFilterThr(I, cx, cy, s.areaSize, s.nFilterDisk, mFull);
+        s = spotRegularize(s, true);
+    case 'test'
+       s.spots = segFilterThr2(I, cx, cy, s.areaSize, s.nFilterDisk, mFull);
+       s = spotRegularize(s);       
 end
-
-s = spotRegularize(s);

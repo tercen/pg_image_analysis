@@ -14,6 +14,9 @@ for i=1:2:length(pArgin)
                s.method = val;
             elseif isequal(val, 'FilterThreshold')
                 s.method = val;
+            elseif isequal(val, 'test')
+                s.method = val;
+            
             else
                 bInvalid = 1;
             end
