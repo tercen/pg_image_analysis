@@ -17,7 +17,7 @@ for i = 1:nRows
         yRl = min(yRl, size(I,2));
         
         Ispot = I(xLu:xRl, yLu:yRl);
-        Ispot = (mFull/max(Ispot(1:numel(Ispot)))) * Ispot;
+        Ispot = (mFull/max(Ispot(:)) ) * Ispot;
         
         [level, eps] = graythresh(Ispot);
         spots(i,j).cLu = [xLu, yLu];

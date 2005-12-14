@@ -12,7 +12,7 @@ fprintf(fid, '%s\t%f\n', 'Background Upper Percentile', q(1,1).backgroundPercent
 fprintf(fid, '%s\t%d\n', 'Background Cell Diameter', q(1,1).backgroundDiameter); 
 fprintf(fid, '%s\t%f\n', 'Signal Lower Percentile', q(1,1).signalPercentiles(1));
 fprintf(fid, '%s\t%f\n', 'Signal Upper Percentile', q(1,1).signalPercentiles(2));
-fprintf(fid, '%s\t%s\n', 'Outlier Method', q(1,1).outlierMethod);
+fprintf(fid, '%s\t%s\n', 'oOutlier', q(1,1).oOutlier);
 fprintf(fid, '%s\n', '</General>');
 fprintf(fid, '%s\n', '<Spots>');
 [nRows, nCols] = size(q);

@@ -20,7 +20,7 @@ for i = 1:nRows
         Ispot = imerode(Ispot, se);
         Ispot = imdilate(Ispot, se);
         
-        Ispot = (mFull/max(Ispot(1:numel(Ispot)))) * Ispot;
+        Ispot = ( mFull/max(Ispot(:)) ) * Ispot;
         
         [level, eps] = graythresh(Ispot);
         spots(i,j).cLu = [xLu, yLu];

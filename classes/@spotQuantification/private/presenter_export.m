@@ -56,12 +56,9 @@ function presenter_export_OpeningFcn(hObject, eventdata, handles, varargin)
 handles.output = hObject;
 handles.I = varargin{1};
 handles.oQ = varargin{2};
+handles.xSeries = varargin{3};
 
-if length(varargin) == 3
-    handles.xSeries = varargin{3};
-else
-    handles.xSeries = 1:size(handles.I,3);
-end
+
 
 focus = [1,1];
 xFocus = size(handles.I,3);
@@ -1418,7 +1415,7 @@ function varargout = gui_mainfcn(gui_State, varargin)
 %      instance to run (singleton)".
 
 %   Copyright 1984-2004 The MathWorks, Inc.
-%   $Revision: 1.1 $ $Date: 2005/11/07 20:07:35 $
+%   $Revision: 1.2 $ $Date: 2005/12/14 15:08:23 $
 
 gui_StateFields =  {'gui_Name'
                     'gui_Singleton'
