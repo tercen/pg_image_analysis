@@ -10,8 +10,6 @@ for i=1:2:length(pArgin)
     val =  pArgin{i+1};
     switch prop
         case 'method'
-            if isequal(val, 'threshold1')
-               s.method = val;
             elseif isequal(val, 'FilterThreshold')
                 s.method = val;
             elseif isequal(val, 'test')
@@ -20,40 +18,18 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-        case 'rotation'
-            if isnumeric(val) & length(val) == 1
-                s.rotation = val;
-            else
-                bInvalid = 1;
-            end
+       
         case 'areaSize'
               if isnumeric(val) & length(val) == 1
                 s.areaSize  = val;
             else
                 bInvalid = 1;
               end
-        case 'classifier'
-            if isstruct(val)
-                s.classifier = val;
-            else
-                bInvalid = 1;
-            end
-        case 'dftSpotDiameter'
-            if isnumeric(val)
-                s.dftSpotDiameter = val;
-            else
-                bInvalid = 1;
-            end
-      
+  
+     
         case 'nFilterDisk'
             if isnumeric(val)
                 s.nFilterDisk = val;
-            else
-                bInvalid = 1;
-            end
-        case 'pixFlexibility'
-            if isnumeric(val)
-                s.pixFlexibility = val;
             else
                 bInvalid = 1;
             end
