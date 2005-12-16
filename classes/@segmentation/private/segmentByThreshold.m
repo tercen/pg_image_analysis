@@ -1,9 +1,9 @@
 function outSeg = segmentByThreshold(oS, I, cx, cy, rotation)
 [nRows, nCols] = size(cx);
 % infer the average spotpitch from cx and cy
-xPitch = diff(cx');xPitch = mean(xPitch(:));
-yPitch = diff(cy);yPitch = mean(yPitch(:));
-spotPitch = mean(xPitch, yPitch);
+xPitch = diff(cx);xPitch = mean(xPitch(:));
+yPitch = diff(cy');yPitch = mean(yPitch(:));
+spotPitch = mean([xPitch, yPitch]);
 % then the left upper coordinates and right lower coordinates
 xLu = uint16(cx - spotPitch);
 yLu = uint16(cy - spotPitch);
@@ -22,7 +22,7 @@ I = I(xLu(1,1):xRl(end,end), yLu(1,1):yRl(end,end));
 cxLu = xLu - xLu(1,1) + 1; cyLu = yLu - yLu(1,1) + 1;
 
 % apply morphological filtering if required.
-if os.nFilterDisk >= 1
+if oS.nFilterDisk >= 1
     se = strel('disk', round(oS.nFilterDisk/2));
     I  = imerode(I, se);
     I  = imdilate(I, se);    
@@ -38,14 +38,15 @@ else
 end
 
 % apply local thresholding
-pixAreaSize = os.areaSize * spotPitch;
-pixOff = round(min(spotPitch -0.5*pixAreaSize,0));
+pixAreaSize = oS.areaSize * spotPitch;
+pixOff = round(max(spotPitch -0.5*pixAreaSize,0));
+spotPitch = round(spotPitch);
 
 for i  = 1:nRows
     for j = 1:nCols
         % store the results in nRows, nCols array of segmentation objects
         outSeg(i,j) = oS;
-        Ilocal = I(xLu(i,j):xRl(i,j),yLu(i,j):yRl(i,j));
+        Ilocal = I(cxLu(i,j):cxLu(i,j) + 2*spotPitch,cyLu(i,j):cyLu(i,j) + 2*spotPitch);
         % center in the local image to find the threshold level. 
         Iinitial = Ilocal(pixOff:end-pixOff, pixOff:end-pixOff);
         mFull = bitRange/max(Iinitial(:));
@@ -54,6 +55,7 @@ for i  = 1:nRows
         % apply threshold to ythe full local image
         outSeg(i,j).binSpot  = im2bw(mFull * Ilocal, thr);
         outSeg(i,j).thrEff  = eff;
+        outSeg(i,j).cLu = [xLu(i,j), yLu(i,j)];
     end
 end
 

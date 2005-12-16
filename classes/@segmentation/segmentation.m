@@ -18,9 +18,10 @@ if length(varargin) == 1
     end
 end
 
-s.method         = 'threshold1';
+s.method         = 'FilterThreshold';
 s.areaSize       = 1;
 s.nFilterDisk    = 0;
+s.cLu       = [];
 s.binSpot   = [];
 s.thrEff    = [];
 

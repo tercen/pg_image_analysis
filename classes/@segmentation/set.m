@@ -10,8 +10,11 @@ for i=1:2:length(pArgin)
     val =  pArgin{i+1};
     switch prop
         case 'method'
-            elseif isequal(val, 'FilterThreshold')
+            if isequal(val, 'FilterThreshold')
                 s.method = val;
+            elseif isequal(val, 'Edge');
+                s.method = val;
+            
             elseif isequal(val, 'test')
                 s.method = val;
             
@@ -20,11 +23,11 @@ for i=1:2:length(pArgin)
             end
        
         case 'areaSize'
-              if isnumeric(val) & length(val) == 1
+            if isnumeric(val) & length(val) == 1
                 s.areaSize  = val;
             else
                 bInvalid = 1;
-              end
+            end
   
      
         case 'nFilterDisk'
@@ -33,7 +36,29 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
+
+        case 'thrEff'
+            if  isnumeric(val)
+                s.thrEff = val;
+            else
+                bInvalid = 1;
+            end
             
+        case 'cLu'
+            if isnumeric(val)
+                s.cLu = val;
+            else
+                bInvalid = 1;
+            end
+            
+            
+        case 'binSpot';
+            if isnumeric(val)
+                s.binSpot = val;
+            else
+                bInvalid = 1;
+            end
+
         otherwise
             error(['Invalid property: ', prop]);
     

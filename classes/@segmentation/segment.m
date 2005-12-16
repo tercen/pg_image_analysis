@@ -1,4 +1,4 @@
-function s = segment(s, I, cx, cy, rotation);
+function sOut = segment(s, I, cx, cy, rotation);
 % s = segment(s, I, cx, cy, rotation)
 if size(cx) ~= size(cy)
     error('The number of x coordinates must be equal to the number of y coordinates');
@@ -15,9 +15,10 @@ end
 switch s.method
 
     case 'FilterThreshold'
-   
-        s.spots = segFilterThr(I, cx, cy, s.areaSize, s.nFilterDisk, mFull);
-        s = spotRegularize(s, true);
+        sOut = segmentByThreshold(s, I, cx, cy, rotation);
+    case 'Edge'
+        sOut = segmentByEdge(s, I, cx, cy, rotation);
+    
     case 'test'
        s.spots = segFilterThr2(I, cx, cy, s.areaSize, s.nFilterDisk, mFull);
        s = spotRegularize(s);       
