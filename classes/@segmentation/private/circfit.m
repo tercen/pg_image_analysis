@@ -17,12 +17,14 @@ function   [xc,yc,R,a] = circfit(x,y, w)
 
    x=x(:); y=y(:);
    if nargin == 2 
-       w = ones(length(x));
+       w = ones(size(x));
    end
    
    A = [x y ones(size(x))];
-   b = [-(x.^2+y.^2)]
+   b = [-(x.^2+y.^2)];
    [a, cn] = linsolve([w,w,w].*A,w.*b , struct('RECT',true));
    xc = -.5*a(1);
    yc = -.5*a(2);
    R  =  sqrt((a(1)^2+a(2)^2)/4-a(3));
+   
+   

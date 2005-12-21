@@ -52,9 +52,9 @@ for i  = 1:nRows
         mFull = bitRange/max(Iinitial(:));
         Iinitial = Iinitial * mFull;
         [thr, eff] = graythresh(Iinitial);
-        % apply threshold to ythe full local image
+        % apply threshold to the full local image
         outSeg(i,j).binSpot  = im2bw(mFull * Ilocal, thr);
-        outSeg(i,j).thrEff  = eff;
+        outSeg(i,j).methodOutput.thrEff = eff;
         outSeg(i,j).cLu = [xLu(i,j), yLu(i,j)];
     end
 end

@@ -18,12 +18,12 @@ if length(varargin) == 1
     end
 end
 
-s.method         = 'FilterThreshold';
+s.method         = 'Threshold';
+s.methodOutput   = [];
 s.areaSize       = 1;
 s.nFilterDisk    = 0;
 s.cLu       = [];
 s.binSpot   = [];
-s.thrEff    = [];
 
 s = class(s, 'segmentation');
 if length(varargin) > 1

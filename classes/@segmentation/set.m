@@ -10,7 +10,7 @@ for i=1:2:length(pArgin)
     val =  pArgin{i+1};
     switch prop
         case 'method'
-            if isequal(val, 'FilterThreshold')
+            if isequal(val, 'Threshold')
                 s.method = val;
             elseif isequal(val, 'Edge');
                 s.method = val;

@@ -49,12 +49,8 @@ y = spotPitch(2)*(iy-mean(1:nCols)) + spotPitch(2) * iY0;
 teta = (2*pi/360) * rotation;
 R = [cos(teta), -sin(teta);
     sin(teta), cos(teta)];
-
-for i=1:length(x)
-    v = R*[x(i);y(i)];
-    x(i) = v(1);
-    y(i) = v(2);
-end
+v = (R * [x';y'])';
+x = v(:,1); y = v(:,2);
 
 % center around midpoint of array in image or template
 x = mp(1) + x + 1;

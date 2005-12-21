@@ -14,7 +14,7 @@ end
 
 switch s.method
 
-    case 'FilterThreshold'
+    case 'Threshold'
         sOut = segmentByThreshold(s, I, cx, cy, rotation);
     case 'Edge'
         sOut = segmentByEdge(s, I, cx, cy, rotation);
