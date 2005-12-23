@@ -25,7 +25,7 @@ if oS.nFilterDisk >= 1
     I  = imerode(I, se);
     I  = imdilate(I, se);
 end
-Iedge = edge(I(imxLu:imxRl,imyLu:imyRl), 'canny', [0, 0.01]);
+Iedge = edge(I(imxLu:imxRl,imyLu:imyRl), 'canny', oS.edgeSensitivity);
 I = false(size(I));
 I(imxLu:imxRl, imyLu:imyRl) = Iedge;
 % start segmentation loop
@@ -77,10 +77,11 @@ for i  = 1:nRows
         if spotFound            
             outSeg(i,j).methodOutput.spotMidpoint = [x0, y0];
             outSeg(i,j).methodOutput.spotRadius = r;
-            [xFit, yFit] = circle(x0,y0,r, round(2*pi*r));
+            [xFit, yFit] = circle(x0,y0,r,round(pi*r)/2);
             [xc,yc] = find(~Ilocal);
-            in = inpolygon(xc,yc, xFit, yFit);
+            [in, on] = inpolygon(xc,yc, xFit, yFit);
             Ilocal(in) = true;
+            
         else
             outSeg(i,j).methodOutput = []; 
         end
