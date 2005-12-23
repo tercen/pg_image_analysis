@@ -1,4 +1,4 @@
-function outSeg = segmentByThreshold(oS, I, cx, cy, rotation)
+function outSeg = segmentByEdge(oS, I, cx, cy, rotation)
 [nRows, nCols] = size(cx);
 % infer the average spotpitch from cx and cy
 xPitch = diff(cx);xPitch = mean(xPitch(:));
@@ -14,8 +14,6 @@ xLu(xLu<1) = 1;
 yLu(yLu<1) = 1;
 xRl(xRl > size(I,1)) = size(I,1);
 yRl(yRl > size(I,2)) = size(I,2);
-
-
 % reduce image size
 imxLu = max(1,xLu(1,1) - spotPitch); imyLu = max(1, yLu(1,1)-spotPitch);
 imxRl = min(size(I,1), xRl(end,end) + spotPitch); imyRl = min(size(I,2), yRl(end,end) + spotPitch);
@@ -30,7 +28,6 @@ end
 Iedge = edge(I(imxLu:imxRl,imyLu:imyRl), 'canny', [0, 0.01]);
 I = false(size(I));
 I(imxLu:imxRl, imyLu:imyRl) = Iedge;
-
 % start segmentation loop
 pixAreaSize = oS.areaSize * spotPitch;
 pixOff = round(max(spotPitch -0.5*pixAreaSize,0));
@@ -43,7 +40,9 @@ for i  = 1:nRows
         xLocal = round(xLu(i,j) + [0, 2*spotPitch]);
         yLocal = round(yLu(i,j) + [0, 2*spotPitch]);
         % do while delta larget than sqrt(2) 
-        while delta > sqrt(2)
+        deltaIter = 0;
+        while delta > sqrt(2) & deltaIter < 3  
+            deltaIter = deltaIter + 1;
             Ilocal = I(xLocal(1):xLocal(2),yLocal(1):yLocal(2));
             % center in the local image, keep the center part only.
             Iinitial = Ilocal(pixOff:end-pixOff, pixOff:end-pixOff);
@@ -74,16 +73,18 @@ for i  = 1:nRows
             xLocal = round(xLocal + mpOffset(1));
             yLocal = round(yLocal + mpOffset(2));    
         end
-       
-        if spotFound
-            outSeg(i,j).binSpot = Ilocal;
+        Ilocal = false(size(Ilocal));
+        if spotFound            
             outSeg(i,j).methodOutput.spotMidpoint = [x0, y0];
             outSeg(i,j).methodOutput.spotRadius = r;
-            
+            [xFit, yFit] = circle(x0,y0,r, round(2*pi*r));
+            [xc,yc] = find(~Ilocal);
+            in = inpolygon(xc,yc, xFit, yFit);
+            Ilocal(in) = true;
         else
-            outSeg(i,j).binSpot = false(size(Ilocal));
             outSeg(i,j).methodOutput = []; 
         end
+        outSeg(i,j).binSpot = Ilocal;
     end
 end
 
