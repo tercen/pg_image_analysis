@@ -1,4 +1,4 @@
-function oq = spotQuantification(s, I, cx, cy, varargin);
+function oq = spotQuantification(varargin);
 
 
 if length(varargin) == 1
@@ -10,55 +10,25 @@ if length(varargin) == 1
     elseif isstruct(bIn);
         oq = class(bIn, 'spotQuantification');
         return;
-    
-    else
-        error(['5th argument must be a spotQuantification object']);
     end
-else
-
-    spots = get(s, 'spots');
-    [nRows, nCols] = size(spots);
-    for i=1:nRows
-        for j=1:nCols
-            q(i,j) = spots(i,j);
-        end
-    end
-    
-    for i=1:nRows
-        for j=1:nCols            
-            q(i,j).ID = [];
-            q(i,j).cx = cx(i,j);
-            q(i,j).cy = cy(i,j);
-         
-            q(i,j).backgroundMethod     = 'interleaved';
-            q(i,j).oOutlier         = [];
-            q(i,j).medianBackground = [];
-            q(i,j).meanBackground = [];
-            q(i,j).backgroundPercentiles = [0, 1];
-            q(i,j).medianSignal = [];
-            q(i,j).meanSignal = [];
-            q(i,j).signalPercentiles = [0, 1];
-            q(i,j).ignoredPixels = [];
-            q(i,j).backgroundDiameter = 4;
-            
-            %oq(i,j) = class(q(i,j), 'spotQuantification');
-            %if length(varargin) > 1
-             %   oq(i,j) = set(oq(i,j), varargin{:});
-            %end
-        end
-
-    end
-
-    oq = class(q, 'spotQuantification');
-     for i=1:nRows
-        for j=1:nCols            
-            if length(varargin) > 1
-               oq(i,j) = set(oq(i,j), varargin{:});
-               
-            end
-        end
-
-     end
-    
 end
-oq = quantify(oq, I, cx, cy);
+
+oq.ID = [];
+oq.cx = [];
+oq.cy = [];
+oq.rotation = [];
+oq.backgroundMethod = 'localCorner';
+oq.oOutlier = [];
+oq.oSegmentation = [];
+oq.oProperties = [];
+oq.medianBackground = [];
+oq.meanBackground = [];
+oq.medianSignal = [];
+oq.meanSignal = [];
+oq.ignoredPixels = [];
+oq.backgroundDiameter = 4;
+
+oq = class(oq, 'spotQuantification');
+oq = set(oq, varargin{:});
+
+

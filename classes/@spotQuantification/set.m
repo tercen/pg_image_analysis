@@ -12,7 +12,7 @@ for i=1:2:length(pArgin)
         case 'ID'
             q.ID = val;       
         case 'backgroundMethod'
-            if isequal(val, 'interleaved')
+            if isequal(val, 'localCorner')
                q.backgroundMethod = val;
             else
                 bInvalid = 1;
@@ -24,40 +24,26 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-                          
-        case 'quantitationMetric'
-            if isequal(val, 'mean')
-                q.quantitationMetric = 'mean';
-            elseif isequal(val,'median')
-                q.quantitationMetric = 'median';
+        case 'oSegmentation'
+            if isa(val, 'segmentation')
+                 q(i,j).oSegmentation = val;
             else
-                bInvalid = 1;
+                bInvalid = true;
             end
-        case 'background'
-            if isnumeric(val) && length(val) == 1
-                q.background = val;
+        case oProperties
+            if isa(val, 'spotProperties')
+                q.oProperties = val;
             else
-                bInvalid = 1;
+                bInvalid = true;
             end
-        case 'backgroundPercentiles'
-            if isnumeric(val) && min(size(val)) == 1 && max(size(val)) == 2
-                q.backgroundPercentiles = val;
+
+        case 'rotation'
+            if isnumeric(val) & numel(val) == 1
+                q.rotation = val;
             else
-                bInvalid = 1;
+                bInvalid = true;
             end
-        case 'signal'
-            if isnumeric(val) && length(val) == 1
-                q.signal = val;
-            else
-                bInvalid = 1;
-            end
-                
-          case 'signalPercentiles'
-            if isnumeric(val) && min(size(val)) == 1 && max(size(val)) == 2
-                q.signalPercentiles = val;
-            else
-                bInvalid = 1;
-            end
+    
         case 'backgroundDiameter'
             if isnumeric(val) && length(val) == 1
                 q.backgroundDiameter = val;
