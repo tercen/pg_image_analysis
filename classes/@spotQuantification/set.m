@@ -26,7 +26,7 @@ for i=1:2:length(pArgin)
             end
         case 'oSegmentation'
             if isa(val, 'segmentation')
-                 q(i,j).oSegmentation = val;
+                 q.oSegmentation = val;
             else
                 bInvalid = true;
             end

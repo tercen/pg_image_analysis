@@ -22,8 +22,11 @@ s.method         = 'Threshold';
 s.methodOutput   = [];
 s.areaSize       = 1;
 s.nFilterDisk    = 0;
-s.cLu       = [];
-s.binSpot   = [];
+s.edgeSensitivity   = [0, 0.005];
+s.cLu           = [];
+s.mp0          = [];
+s.bsSize     = [];
+s.bsTrue     = [];
 
 s = class(s, 'segmentation');
 if length(varargin) > 1

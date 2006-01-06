@@ -50,10 +50,15 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-            
+        case 'edgeSensitivity'
+            if isnumeric(val) & numel(val) == 2
+                s.edgeSensitivity = val;
+            else
+                bInvalid = true;
+            end
             
         case 'binSpot';
-            if isnumeric(val)
+            if isnumeric(val)||islogical(val)
                 s.binSpot = val;
             else
                 bInvalid = 1;

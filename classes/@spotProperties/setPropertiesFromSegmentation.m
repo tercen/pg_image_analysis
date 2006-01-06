@@ -1,4 +1,4 @@
-function spOut = setPropertiesFromSegmentation(sp, oS, xGrid, yGrid)
+function spOut = setPropertiesFromSegmentation(sp, oS)
 [nRows, nCols] = size(oS);
 
 segMethod = get(oS(1), 'method');
@@ -24,7 +24,7 @@ switch segMethod
                 
 end
 
-spOut = setPositionOffset(spOut, oS, xGrid, yGrid);
+spOut = setPositionOffset(spOut, oS);
 %EXIT ---------------------
 
 function spOut = cpSeg2spOut(sp, oS)
@@ -86,14 +86,15 @@ for i=1:nRows
     end
 end
 
-function sp = setPositionOffset(sp, oS, x, y);
+function sp = setPositionOffset(sp, os);
 [nRows, nCols] = size(sp);
 for i=1:nRows
     for j=1:nCols
         if ~isempty(sp(i,j).position)
-            cLu = get(oS(i,j), 'cLu');
-            p0 = [x(i,j), y(i,j)];
-            sp(i,j).positionOffset =  p0 - (cLu + sp(i,j).position-1);
+            mp0 = get(os(i,j), 'mp0');
+            cLu = get(os(i,j), 'cLu');
+            sp(i,j).positionOffset =  mp0 - (cLu + sp(i,j).position-1);
+            sp(i,j).positionDelta   = norm(sp(i,j).positionOffset);
         end
     end
 end

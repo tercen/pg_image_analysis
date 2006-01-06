@@ -1,5 +1,8 @@
-function sOut = segment(s, I, cx, cy, rotation);
-% s = segment(s, I, cx, cy, rotation)
+function sOut = segment(s, I, cx, cy, rotation, parameters);
+% s = segment(s, I, cx, cy, rotation, varargin)
+% if method is edge: parameters must be the edgeSensitivity
+% if method is threshold parameters is pixFlexibility
+
 if size(cx) ~= size(cy)
     error('The number of x coordinates must be equal to the number of y coordinates');
 end
@@ -15,6 +18,7 @@ end
 switch s.method
 
     case 'Threshold'
+    
         sOut = segmentByThreshold(s, I, cx, cy, rotation);
     case 'Edge'
         sOut = segmentByEdge(s, I, cx, cy, rotation);

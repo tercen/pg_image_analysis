@@ -36,14 +36,16 @@ for i  = 1:nRows
     for j = 1:nCols
         % store the results in nRows, nCols array of segmentation objects
         outSeg(i,j) = oS;
+        outSeg(i,j).mp0 = [cx(i,j), cy(i,j)];
         delta = 2;
         xLocal = round(xLu(i,j) + [0, 2*spotPitch]);
         yLocal = round(yLu(i,j) + [0, 2*spotPitch]);
         % do while delta larget than sqrt(2) 
         deltaIter = 0;
         while delta > sqrt(2) & deltaIter < 3  
-            deltaIter = deltaIter + 1;
+            deltaIter = deltaIter + 1;            
             Ilocal = I(xLocal(1):xLocal(2),yLocal(1):yLocal(2));
+        
             % center in the local image, keep the center part only.
             Iinitial = Ilocal(pixOff:end-pixOff, pixOff:end-pixOff);
             Ilocal = false(size(Ilocal));
@@ -71,7 +73,9 @@ for i  = 1:nRows
             % shift area according to mpOffset for next iteration,
             % the loop terminates if delta converges to a low value.
             xLocal = round(xLocal + mpOffset(1));
+            xLocal(1) = max(xLocal(1),1); xLocal(2) = max(xLocal(2),xLocal(1) + 1); 
             yLocal = round(yLocal + mpOffset(2));    
+            yLocal(1) = max(yLocal(1),1); yLocal(2) = max(yLocal(2), yLocal(1) + 1);
         end
         Ilocal = false(size(Ilocal));
         if spotFound            
@@ -85,7 +89,9 @@ for i  = 1:nRows
         else
             outSeg(i,j).methodOutput = []; 
         end
-        outSeg(i,j).binSpot = Ilocal;
+
+        outSeg(i,j).bsSize    = size(Ilocal);
+        outSeg(i,j).bsTrue    = uint16(find(Ilocal));
     end
 end
 

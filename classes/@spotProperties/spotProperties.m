@@ -22,6 +22,7 @@ sp.diameter         = [];
 sp.aspectRatio      = [];
 sp.position         = [];
 sp.positionOffset   = [];
+sp.positionDelta    = [];
 
 sp = class(sp,'spotProperties');
 % EOF

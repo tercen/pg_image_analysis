@@ -10,7 +10,10 @@ if nargin == 1
 else
     
     for i=1:length(clNames)
-        if isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
+        if isequal(strField, 'binSpot')
+            value = getBinSpot(s);
+            return
+        elseif isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
             value = s.(clNames{i});
             return
         end

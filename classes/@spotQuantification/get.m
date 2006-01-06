@@ -10,7 +10,13 @@ if nargin == 1
 else
     
     for i=1:length(clNames)
-        if isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
+        if isequal(strField, 'backgroundMask')
+            value = getBackgroundMask(p);
+            return
+        elseif isequal(strField, 'ignoredMask')
+            value = getIgnoredMask(p);  
+            return
+        elseif isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
             value = p.(clNames{i});
             return
         end

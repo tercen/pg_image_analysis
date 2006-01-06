@@ -1,4 +1,4 @@
-function oq = setSet(q0, oSeg, oProps, cx, cy)
+function oq = setSet(q0, oSeg, oProps)
 [nRows, nCols] = size(oSeg);
 for i=1:nRows
     for j=1:nCols
@@ -9,11 +9,12 @@ for i=1:nRows
         if ~isempty(oProps)
             oq(i,j).oProperties = oProps(i,j);
         end
-        if ~isempty(cx)
-            oq(i,j).cx = cx(i,j);
+  
+        if ~isempty(oq(i,j).oSegmentation)
+            oq(i,j) = setBackgroundMask(oq(i,j));    
+            
         end
-        if ~isempty(cy)
-            oq(i,j).cy = cy(i,j);
-        end
+        
     end
 end
+
