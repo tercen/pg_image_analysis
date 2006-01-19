@@ -1,8 +1,13 @@
-function oq = setSet(q0, oSeg, oProps)
+function oq = setSet(q0, oSeg, oProps, clID)
 [nRows, nCols] = size(oSeg);
 for i=1:nRows
     for j=1:nCols
-        oq(i,j) = q0;
+        if numel(q0) == 1
+            oq(i,j) = q0;
+        else
+            oq(i,j) = q0(i,j);
+        end
+        
         if ~isempty(oSeg)
             oq(i,j).oSegmentation = oSeg(i,j);
         end
@@ -13,6 +18,10 @@ for i=1:nRows
         if ~isempty(oq(i,j).oSegmentation)
             oq(i,j) = setBackgroundMask(oq(i,j));    
             
+        end
+        
+        if ~isempty(clID)
+            oq(i,j).ID = clID{i,j};
         end
         
     end

@@ -21,6 +21,7 @@ oProps = reshape(oProps,r,c); oProps = struct(oProps);
 [res(1:r, 1:c).Diameter]            = deal(oProps.diameter);
 [res(1:r, 1:c).Shape_Factor]        = deal(oProps.formFactor);
 [res(1:r, 1:c).Aspect_Ratio]        = deal(oProps.aspectRatio);
+[res(1:r, 1:c).nChiSqr ]            = deal(oProps.nChiSqr);
 oSeg = [oq(:).oSegmentation];
 oSeg = reshape(oSeg,r,c); oSeg = struct(oSeg);
 dummy = getposition(oProps, oSeg);
@@ -28,6 +29,7 @@ dummy = getposition(oProps, oSeg);
 [res(1:r, 1:c).Y_Position]  = deal(dummy.Y_Position);
 [res(1:r, 1:c).X_Offset]    = deal(dummy.X_Offset);
 [res(1:r, 1:c).Y_Offset]    = deal(dummy.Y_Offset);
+
 [res(1:r, 1:c).Empty_Spot]  = deal(oq.isEmpty);
 [res(1:r, 1:c).Bad_Spot]    = deal(oq.isBad);
 [res(1:r, 1:c).Replaced_Spot] = deal(oq.isReplaced);

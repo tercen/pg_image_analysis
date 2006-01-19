@@ -19,6 +19,7 @@ for i=1:nRows
         if any(bwSignal(:))
             sLocal = size(bwSignal);
             cLu = get(oq(i,j).oSegmentation, 'cLu');
+            cLu = round(cLu);
             try
                 imLocal = I(cLu(1):cLu(1)+ sLocal(1) -1, cLu(2): cLu(2) + sLocal(2) -1);
             catch

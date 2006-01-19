@@ -2,40 +2,28 @@ function [hImage, hBound] = show(oQ, I, dr)
 if nargin < 3
     dr = [];
 end
-
-
 hImage = imshow(I, dr);
 hBound = [];
 colormap(gca, 'jet');
+szArray = size(oQ);
 if ~isempty(oQ)
     hold on
-
-    [nRows, nCols] = size(oQ);
+    oQ = oQ(:);
     hBound = [];
-    for i=1:nRows
-        for j=1:nCols
-            if any(oQ(i,j).ignoredPixels(:))
-                L = bwlabel(oQ(i,j).ignoredPixels);
-                B = bwboundaries(L);
-                for k = 1:length(B)
-                    bound = B{k} + repmat(cLu, size(B{k},1),1) - 1;
-                    hb = plot(bound(:,2), bound(:,1));
-                    set(hb, 'color', [0.8,0.8,0.8]);
-                end
-            end
-         
-            B = bwboundaries(double(oQ(i,j).binSpot));
-            %b = findBoundaries(double(oQ(i,j).binSpot));
-            cLu = oQ(i,j).cLu;
-            bound = B{1} + repmat(cLu, size(B{1},1),1) - 1;
-            %bound = b + repmat(cLu, size(b,1),1) - 1;
-            if oQ(i,j).isSpot
-                hBound(i,j) = plot(bound(:,2) , bound(:,1), 'w');
+    for i=1:length(oQ)
+            
+            cLu = get(oQ(i).oSegmentation, 'cLu');
+            [x,y] = getOutline(oQ(i).oSegmentation);
+            if oQ(i).isEmpty
+                cStr = 'k';
+            elseif oQ(i).isBad
+                cStr = 'r';
             else
-                hBound(i,j) = plot(bound(:,2) , bound(:,1), 'k');
+                cStr = 'w';
             end
-        
-        end
-    end   
+            [n,m] = ind2sub(szArray,i); 
+            hBound(n,m) = plot(y + cLu(2)-1, x + cLu(1)-1, cStr);
+    end
+     
     hold off
 end
