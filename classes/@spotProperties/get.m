@@ -2,20 +2,20 @@ function value = get(p, strField)
 
 clNames = fieldnames(p);
 if nargin == 1
-    for i=1:length(clNames)
-        if ~isequal(clNames{i}, 'private')
-            value.(clNames{i}) = p.(clNames{i});
-        end
-    end    
+    value = struct(p);
+    if isfield(value, 'private')
+        value = rmfield(value, 'private');
+    end
 else
-    
     for i=1:length(clNames)
         if isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
-            value = p.(clNames{i});
+            [n, m] = size(p);
+            value = [p(:).(clNames{i})];
+            value = reshape(value, n,m);
             return
         end
 
     end
-    error([strField, ' is not a valid and public spotProperties property']);
+    error([strField, ' is not a valid and public spotQuantification property']);
 end
     

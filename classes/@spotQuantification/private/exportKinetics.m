@@ -17,6 +17,7 @@ fprintf(fidsigmbg   ,'%s\t', '@cycles');
 for i=1:nRows
     for j=1:nCols
         spotID = get(q(i,j), 'ID');
+        spotID = char(spotID);
         id = [spotID,'_(',num2str(i),':',num2str(j),')'];
         fprintf(fidsig, '%s\t', id);
         fprintf(fidbg, '%s\t', id);

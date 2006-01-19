@@ -21,6 +21,11 @@ end
 s.method         = 'Threshold';
 s.methodOutput   = [];
 s.areaSize       = 1;
+% if the spotPitch property has not been set the segmentation algo 
+% attempts to calculate the spotPitch from the x and y inputs
+% Works only if x(i,j) and y(i,j) are the x and y coordinates of spots
+% with index (i,j) in the grid.
+s.spotPitch      = [];
 s.nFilterDisk    = 0;
 s.edgeSensitivity   = [0, 0.005];
 s.cLu           = [];

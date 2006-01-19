@@ -23,3 +23,4 @@ cLu(cLu<1) = 1;
 s.cLu = cLu;
 s.methodOutput.spotMidpoint = mp;
 s.methodOutput.spotRadius = r;
+s.methodOutput.nChiSqr = -1;

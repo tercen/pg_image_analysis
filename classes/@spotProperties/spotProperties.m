@@ -23,7 +23,7 @@ sp.aspectRatio      = [];
 sp.position         = [];
 sp.positionOffset   = [];
 sp.positionDelta    = [];
-
+sp.nChiSqr          = -1;
 sp = class(sp,'spotProperties');
 % EOF
 

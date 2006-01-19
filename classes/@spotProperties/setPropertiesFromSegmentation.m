@@ -15,7 +15,7 @@ switch segMethod
             % matrix, and call regionprops only 1 time.
             [L, rcIndex] = bs2label(oS);
             metrics = regionprops(L,'MajorAxisLength', 'MinorAxisLength', 'Perimeter', 'Area');
-            spOut = mapMetrics2spOut(sp, metrics, rcIndex)
+            spOut = mapMetrics2spOut(sp, metrics, rcIndex);
             % map spotPosition:
             for i=1:numel(oS)
                 mo = get(oS(i), 'methodOutput');
@@ -38,6 +38,7 @@ for i=1:nRows
             spOut(i,j).aspectRatio = 1; % fit is always round;
             spOut(i,j).diameter = 2 * mo.spotRadius;
             spOut(i,j).position = mo.spotMidpoint;            
+            spOut(i,j).nChiSqr  = mo.nChiSqr;
         end
     end
 end

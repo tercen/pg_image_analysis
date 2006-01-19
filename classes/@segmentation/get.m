@@ -2,11 +2,10 @@ function value = get(s, strField)
 
 clNames = fieldnames(s);
 if nargin == 1
-    for i=1:length(clNames)
-        if ~isequal(clNames{i}, 'private')
-            value.(clNames{i}) = s.(clNames{i});
-        end
-    end    
+    value = struct(s);
+    if isfield(value, 'private')
+        value = rmfield(value, 'private');
+    end
 else
     
     for i=1:length(clNames)
@@ -14,7 +13,10 @@ else
             value = getBinSpot(s);
             return
         elseif isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
-            value = s.(clNames{i});
+            [n, m] = size(s);
+            [value{1:n, 1:m}]  = deal(s.(clNames{i}));
+            value = cell2mat(value);
+          
             return
         end
 
