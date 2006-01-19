@@ -72,6 +72,9 @@ switch class(I)
         Ipp = uint16(Ipp);
 end
 
-
+switch p.contrast
+    case 'equalize'
+        Ipp = histeq(Ipp);
+end
 
 %EOF

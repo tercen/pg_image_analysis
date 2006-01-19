@@ -1,4 +1,4 @@
-function [x,y, rot, g] = gridFind(g, I)
+function [x,y, rot, g, mx] = gridFind(g, I)
 % array.gridFind
 % function [x,y,rot,oArrayOut] = gridFind(oArray, I)
 % IN:

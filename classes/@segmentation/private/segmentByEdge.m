@@ -1,9 +1,15 @@
 function outSeg = segmentByEdge(oS, I, cx, cy, rotation)
 [nRows, nCols] = size(cx);
-% infer the average spotpitch from cx and cy
-xPitch = diff(cx);xPitch = mean(xPitch(:));
-yPitch = diff(cy');yPitch = mean(yPitch(:));
-spotPitch = mean([xPitch, yPitch]);
+
+if isempty(oS.spotPitch)
+    % infer the average spotpitch from cx and cy
+    xPitch = diff(cx);xPitch = mean(xPitch(:));
+    yPitch = diff(cy');yPitch = mean(yPitch(:));
+    spotPitch = mean([xPitch, yPitch]);
+else
+    spotPitch = oS.spotPitch;
+end
+
 % then the left upper coordinates and right lower coordinates
 xLu = round(cx - spotPitch);
 yLu = round(cy - spotPitch);
@@ -65,7 +71,7 @@ for i  = 1:nRows
             end
             
             % fit a circle to the foreground pixles
-            [x0, y0, r] = robCircFit(x,y);
+            [x0, y0, r, nChiSqr] = robCircFit(x,y);
             % calculate the difference between area midpoint and fitted midpoint 
             mpOffset = [x0, y0]- areaMidpoint;
             delta = norm(mpOffset);        
@@ -81,6 +87,7 @@ for i  = 1:nRows
         if spotFound            
             outSeg(i,j).methodOutput.spotMidpoint = [x0, y0];
             outSeg(i,j).methodOutput.spotRadius = r;
+            outSeg(i,j).methodOutput.nChiSqr = nChiSqr;
             [xFit, yFit] = circle(x0,y0,r,round(pi*r)/2);
             [xc,yc] = find(~Ilocal);
             [in, on] = inpolygon(xc,yc, xFit, yFit);

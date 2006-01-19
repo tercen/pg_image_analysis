@@ -1,4 +1,4 @@
-function   [xc,yc,R,a] = circfit(x,y, w)
+function   [xc,yc,R,nChiSqr, a] = circfit(x,y, w)
 %
 %   [xc yx R] = circfit(x,y)
 %
@@ -26,5 +26,7 @@ function   [xc,yc,R,a] = circfit(x,y, w)
    xc = -.5*a(1);
    yc = -.5*a(2);
    R  =  sqrt((a(1)^2+a(2)^2)/4-a(3));
+  
+   nChiSqr = sum( (w.*(b-A*a)).^2) / (size(A,1) - size(A,2));
    
    

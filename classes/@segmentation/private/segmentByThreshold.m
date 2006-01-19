@@ -1,9 +1,14 @@
 function outSeg = segmentByThreshold(oS, I, cx, cy, rotation)
 [nRows, nCols] = size(cx);
-% infer the average spotpitch from cx and cy
-xPitch = diff(cx);xPitch = mean(xPitch(:));
-yPitch = diff(cy');yPitch = mean(yPitch(:));
-spotPitch = mean([xPitch, yPitch]);
+if isempty(oS.spotPitch)
+    % infer the average spotpitch from cx and cy
+    xPitch = diff(cx);xPitch = mean(xPitch(:));
+    yPitch = diff(cy');yPitch = mean(yPitch(:));
+    spotPitch = mean([xPitch, yPitch]);
+else
+    spotPitch = oS.spotPitch
+end
+
 % then the left upper coordinates and right lower coordinates
 xLu = round(cx - spotPitch-1);
 yLu = round(cy - spotPitch-1);

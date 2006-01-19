@@ -16,6 +16,7 @@ p.nSmallDisk    = 3;
 p.nLargeDisk    = 9;
 p.nCircle       = 280;
 p.nBlurr        = 60;
+p.contrast      = 'linear';
 
 p = class(p, 'preProcess');
 
