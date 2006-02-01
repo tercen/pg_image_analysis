@@ -155,7 +155,7 @@ pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'qntSpotID';
-pdef(end).dft   = {'empty'};
+pdef(end).dft   = [];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %

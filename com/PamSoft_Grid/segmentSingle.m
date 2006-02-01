@@ -29,7 +29,7 @@ global qntOutlierMeasure
 global stateQuantification
 
 % read in the required image
-I = imread(imagePath);
+I = imread(char(imagePath));
 % check if parameter set, otherwise refer to defaults
 pdef = getProperties();
 for i=1:length(pdef) 
