@@ -6,22 +6,22 @@ global errorMode
 global xTolerance
 global xToleranceMode
 global maxIterations
-global xOffset
-global xOffset_auto
-global xVini
-global xVini_auto
 global Y0_initial
 global Y0_auto
 global Y0_lower
 global Y0_upper
-global Yspan_initial
-global Yspan_auto
-global Yspan_lower
-global Yspan_upper
-global k_initial
-global k_auto
-global k_lower
-global k_upper
+global Ymax_initial
+global Ymax_auto
+global Ymax_lower
+global Ymax_upper
+global logEC50_initial
+global logEC50_auto
+global logEC50_lower
+global logEC50_upper
+global hs_initial
+global hs_auto
+global hs_lower
+global hs_upper
 
 modelID = getModelID();
 x = double(xData);
@@ -72,30 +72,23 @@ end
 oP = pgFit(modelID);
 % get auto values for iniPars
 oF = get(oP, 'modelObj');
+xOffset = 0;
 p  = getInitialParameters(oF,xIn - xOffset, y);
-pIni    = [Y0_initial, Yspan_initial, k_initial]';
-pOver   = [Y0_auto, Yspan_auto, k_auto]';
-pLower  = [Y0_lower, Yspan_lower, k_lower]';
-pUpper =  [Y0_upper, Yspan_upper, k_upper]';
+pIni    = [Y0_initial, Ymax_initial, logEC50_initial, hs_initial]';
+pOver   = [Y0_auto, Ymax_auto, logEC50_auto, hs_auto]';
+pLower  = [Y0_lower, Ymax_lower, logEC50_lower, hs_lower]';
+pUpper =  [Y0_upper, Ymax_upper, logEC50_upper, hs_upper]';
 % if pOver, override user input with auto values 
-% and set other parameters
+%and set other parameters
 pOver = logical(pOver);
 pIni(pOver) = p(pOver);
-oP = set(oP, 'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
+oP = set(oP    ,'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
                'errorMethod', strErrorMode, ...
                'TolMode', strTolMode, ...
                'fitMethod', strFitMode, ...
                'TolX', xTolerance, ...
                'robTune', robTune, ...
                'maxIterations', maxIterations);
-
-% set xOffset
-if xOffset_auto
-    xOffset = xIn(1);
-end
-if xVini_auto
-    xVini = xIn(1);
-end
 
 
 [pOut,pStdError, wOut] = computeFit(oP, xIn - xOffset,y);
@@ -104,7 +97,7 @@ R2 = corrcoef(f,y); R2 = R2(2,1);
 aChiSqr = sum( (f-y).^2);
 iOut = y == 0;
 rChiSqr = sum( ( f(~iOut)-y(~iOut) )./y(~iOut).^2) ;
-Vini = getDerivative(oF, xVini - xOffset, pOut);
+
 
 
 
@@ -116,7 +109,6 @@ quantitationTypes = [pOut;
                      R2;
                      aChiSqr;
                     rChiSqr;
-                    Vini;
                     ];
       
 confidenceTypes = wOut;
