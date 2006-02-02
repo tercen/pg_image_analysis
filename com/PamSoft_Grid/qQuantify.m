@@ -84,7 +84,8 @@ if size(gridRow,2) > size(gridRow,1)
     gridRow = gridRow';
     gridCol = gridCol';
 end
-
 stateQuantification = qOut;
-
+% permute qtypes from: DesignElement-QuantitationType-BioAssay 
+% to : BioAssay-DesignElement-QuantitationType
+qTypes = permute(qTypes, [3,1,2]);
 
