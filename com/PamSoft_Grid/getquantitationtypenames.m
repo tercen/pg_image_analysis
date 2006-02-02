@@ -57,3 +57,4 @@ qNames =    {   'Mean_Signal', 'Median_Signal', 'Std_Signal', ...
                 'X_Offset', 'Y_Offset', 'Empty_Spot', 'Bad_Spot', 'Replaced_Spot'};
                 
                 
+qNames = qNames';

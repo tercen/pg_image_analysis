@@ -44,15 +44,10 @@ pdef(3).dft     = 0.17;
 pdef(3).enumVal = [];
 pdef(3).enumMap = [];
 %
-pdef(4).name    = 'prpSmallDisk';
-pdef(4).dft     = 0.17;
+pdef(4).name    = 'prpCircleDiameter';
+pdef(4).dft     = 30;
 pdef(4).enumVal = [];
 pdef(4).enumMap = [];
-%
-pdef(5).name    = 'prpCircleDiameter';
-pdef(5).dft     = 30;
-pdef(5).enumVal = [];
-pdef(5).enumMap = [];
 %
 pdef(end+1).name = 'prpCircleBlurr';
 pdef(end).dft   = 0.3;
@@ -85,16 +80,6 @@ pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'grdXOffset';
-pdef(end).dft   = [];
-pdef(end).enumVal = [];
-pdef(end).enumMap = [];
-%
-pdef(end+1).name = 'grdYOffset';
-pdef(end).dft   = [];
-pdef(end).enumVal = [];
-pdef(end).enumMap = [];
-%
-pdef(end+1).name = 'grdYOffset';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
@@ -149,11 +134,6 @@ pdef(end).dft   = 0.35;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-pdef(end+1).name = 'sqcMaxPositionOffset';
-pdef(end).dft   = 0.35;
-pdef(end).enumVal = [];
-pdef(end).enumMap = [];
-%
 pdef(end+1).name = 'qntSpotID';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
@@ -181,8 +161,8 @@ pdef(end).enumMap = {'none', 'iqrBased'};
 %
 pdef(end+1).name = 'qntOutlierMeasure';
 pdef(end).dft   = 1.75;
-pdef(end).enumVal = 0;
-pdef(end).enumMap = 0;
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
 
 
 
