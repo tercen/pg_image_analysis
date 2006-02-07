@@ -1,4 +1,4 @@
-function [qTypes, gridRow, gridCol] = analyzecycleseries(imagePath)
+function [qTypes, array2Index] = analyzecycleseries(imagePath)
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
@@ -124,9 +124,9 @@ settings.resize             = prpResize;
 
 [stateQuantification, oArray] = gridCycleSeries(I, oPrep, oArray, oS0, oQ0, qntSpotID, settings);
 for i=1:nImages
-    qTypes(:,:,i) = makeQTypes(stateQuantification(:,:,i));
+    [qTypes(:,:,i), array2Index] = makeQTypes(stateQuantification(:,:,i));
 end
-[gridRow, gridCol] = find(ones(size(grdMask)));
+
 
 
 % permute qTypes from: DesignElement-QuantitationType-BioAssay 

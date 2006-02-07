@@ -1,4 +1,4 @@
-function  [qTypes, gridRow, gridCol] = qQuantify(imagePath)
+function  [qTypes, array2Index] = qQuantify(imagePath)
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
@@ -77,13 +77,10 @@ for i=1:nImages
     qOut(:,:,i) =quantify(stateQuantification(:,:,nQ0), I(:,:,i));
 end
 for i=1:nImages
-    qTypes(:,:,i) = makeQTypes(qOut(:,:,i));
+    [qTypes(:,:,i), array2Index] = makeQTypes(qOut(:,:,i));
 end
 [gridRow, gridCol] = find(ones(size(qOut(:,:,1))));
-if size(gridRow,2) > size(gridRow,1)
-    gridRow = gridRow';
-    gridCol = gridCol';
-end
+
 stateQuantification = qOut;
 % permute qtypes from: DesignElement-QuantitationType-BioAssay 
 % to : BioAssay-DesignElement-QuantitationType
