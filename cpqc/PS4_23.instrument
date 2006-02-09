@@ -1,0 +1,12 @@
+spotPitch>31.4
+spotSize>18
+dftSpot>20
+minDiameter>15
+maxDiameter>30
+minRot>-2
+maxRot>2
+dRot>0.25
+nSmallDisk>6
+nLargeDisk>15
+nCircle>1000 
+nBlurr>100
