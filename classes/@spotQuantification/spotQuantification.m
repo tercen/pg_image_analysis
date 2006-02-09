@@ -14,6 +14,7 @@ oq.ID = [];
 oq.rotation = [];
 oq.backgroundMethod = 'localCorner';
 oq.backgroundDiameter = 4;
+oq.saturationLimit = 2^16 -1 ;
 oq.oOutlier = [];
 oq.oSegmentation = [];
 oq.oProperties = [];

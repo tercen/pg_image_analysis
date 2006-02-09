@@ -106,11 +106,6 @@ iOut = y == 0;
 rChiSqr = sum( ( f(~iOut)-y(~iOut) )./y(~iOut).^2) ;
 Vini = getDerivative(oF, xVini - xOffset, pOut);
 
-
-
-
-
-
 quantitationTypes = [pOut;
                      pStdError;
                      R2;

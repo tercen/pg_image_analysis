@@ -16,6 +16,6 @@ switch s.method
     
         sOut = segmentByThreshold(s, I, cx, cy, rotation);
     case 'Edge'
-        sOut = segmentByEdge(s, I, cx, cy, rotation);
+        sOut = segmentByEdge2(s, I, cx, cy, rotation);
      
 end
