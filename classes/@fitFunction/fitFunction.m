@@ -6,6 +6,7 @@ if nargin == 0 | ~ischar(strModel)
     f.clParameter   = [];
     f.strFitFunctionName = [];
     f.strIniFunctionName = [];
+    f.strDerFunctionName = [];
     f.jacFlag = 0;
     f = class(f, 'fitFunction');
     return
@@ -35,6 +36,7 @@ else
     f.clParameter   = [];
     f.strFitFunctionName = [];
     f.strIniFunctionName = [];
+    f.strDerFunctionName = [];
     f.jacFlag = 0;
 end
 f = class(f, 'fitFunction');

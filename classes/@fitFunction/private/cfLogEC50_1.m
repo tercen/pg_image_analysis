@@ -13,7 +13,7 @@ varargout{1} = Y;
 if nargout == 1
    
     return
-else %nargout == 2
+elseif nargout == 2
     c = log(10);
     J = [ones(length(x),1), A, - c*Ymax*h*(A.^2).*U, -c*Ymax*(x-logEC50).*(A.^2).*U];
     varargout{2} = J;

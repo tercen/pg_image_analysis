@@ -12,6 +12,7 @@ Func(1).clParameter{2}          = 'IC50';
 Func(1).strFitFunctionName      = 'cfIC50s';
 %#function cfIC50s
 Func(1).strIniFunctionName      = 'ifIC50s';
+Func(1).strDerFunctionName      = [];
 %#function ifIC50s
 Func(1).jacFlag                 = 1;
 
@@ -39,7 +40,12 @@ Func(3).clParameter{3}          = 'k';
 
 Func(3).strFitFunctionName      = 'cfExpAss';
 Func(3).strIniFunctionName      = 'ifExpAss';
+Func(3).strDerFunctionName      = 'derExpAss';
+
 Func(3).jacFlag                 = 1;
+
+
+%#function derExpAss
 %#function cfExpAss
 %#function ifExpAss
 
