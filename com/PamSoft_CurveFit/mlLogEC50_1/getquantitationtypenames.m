@@ -1,3 +1,4 @@
+function qNames = getQuantitationTypeNames()
 global xScale
 global fitMode
 global robTune
@@ -22,6 +23,6 @@ global hs_auto
 global hs_lower
 global hs_upper
 
-qNames = {'Y0', 'Ymax', 'logEC50','Hill Slope', 'Y0 standard error', 'Ymax standard error',  'logEC50 standard error','Hill Slope standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr'};
+qNames = {'Y0', 'Ymax', 'logIC50','hs', 'Y0 standard error', 'Ymax standard error', 'logIC50 standard error','hs standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr'};
 
 qNames = qNames';

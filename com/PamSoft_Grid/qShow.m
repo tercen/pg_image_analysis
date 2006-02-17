@@ -50,6 +50,10 @@ global qntSaturationLimit
 global qntBackgroundMethod
 global stateQuantification
 
+if ~iscell(imagePath)
+    imagePath = cellstr(imagePath);
+end
+
 n = 0;
 for i=1:length(imagePath)
    if ~isempty(imagePath(i))

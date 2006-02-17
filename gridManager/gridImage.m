@@ -19,6 +19,8 @@ switch spotWeight
         Igrid = histeq(Igrid);
 end
 
+end
+
         
    
         

@@ -2,6 +2,9 @@ function res = getResult(oq)
 [r,c] = size(oq);
 oq = struct(oq);
 [res(1:r,1:c).ID]                    = deal(oq.ID);
+smb = getSigmBg(oq);
+[res(1:r, 1:c).Mean_SigmBg]         = deal(smb.meansmb);
+[res(1:r, 1:c).Median_SigmBg]       = deal(smb.mediansmb);
 [res(1:r,1:c).Mean_Signal]           = deal(oq.meanSignal);
 [res(1:r, 1:c).Median_Signal]        = deal(oq.medianSignal);
 [res(1:r, 1:c).Std_Signal]           = deal(oq.stdSignal);
@@ -53,8 +56,8 @@ function shelp = getposition(op, os)
 for i=1:r
     for j =1:c
         if ~isempty(op(i,j).position)
-            shelp(i,j).X_Position = op(i,j).position(1) + os(i,j).cLu(1);
-            shelp(i,j).Y_Position = op(i,j).position(2) + os(i,j).cLu(2);
+            shelp(i,j).X_Position = op(i,j).position(1) + os(i,j).cLu(1) - 1;
+            shelp(i,j).Y_Position = op(i,j).position(2) + os(i,j).cLu(2) - 1;
         else
             shelp(i,j).X_Position = [];
             shelp(i,j).Y_Position = [];
@@ -66,5 +69,15 @@ for i=1:r
             shelp(i,j).X_Offset = [];
             shelp(i,j).Y_Offset = [];
         end
+    end
+end
+
+function out = getSigmBg(oq)
+
+[nRows, nCols] = size(oq);
+for i =1:nRows
+    for j =1:nCols
+        out(i,j).meansmb     = oq(i,j).meanSignal - oq(i,j).meanBackground;
+        out(i,j).mediansmb   = oq(i,j).medianSignal - oq(i,j).medianBackground;
     end
 end

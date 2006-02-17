@@ -9,7 +9,7 @@ switch segMethod
     otherwise
             % get properties from segmentation.binSpot
             
-            % The matlab regionprops funrtion has a large performance
+            % The matlab regionprops function has a large performance
             % overhead.
             % Therefore: combine all binary spots into a single label
             % matrix, and call regionprops only 1 time.

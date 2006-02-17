@@ -186,7 +186,9 @@ set(handles.hSpot, 'CData',d/dVal);
 
 handles.focus = [iNew, jNew];
 guidata(hObject, handles);
-
+iStr = [num2str(iNew),':', num2str(jNew)];
+axes(handles.axImage);
+title(iStr);
 function plot_Callback(hObject, eventData, handles)
 delete(handles.hFocusPlot);
 xPoint = get(handles.axQuantification,'CurrentPoint');
@@ -216,44 +218,22 @@ I = double(I)/fullRange;
 set(hSpots, 'ButtonDownFcn', 'presenter(''spot_Callback'',gcbo,[],guidata(gcbo))');
 
 function [hFocusPlot, hFocusImage] = focalSpot(hAx, I, hNewFocus, qNew, hOldFocus, qOld, xFocus, xSeries, fullRange);
-
 axes(hAx(1));
-if get(qOld(xFocus), 'isSpot');
-    set(hOldFocus,'color', 'w', 'linewidth', 0.5);
+if get(qOld(xFocus), 'isEmpty');
+    set(hOldFocus,'color', 'k', 'linewidth', 0.5);
+elseif get(qOld(xFocus), 'isBad');
+    set(hOldFocus, 'color', 'r', 'linewidth', 0.5);
 else
-    set(hOldFocus, 'color', 'k', 'linewidth', 0.5);
+    set(hOldFocus, 'color', 'w', 'linewidth', 0.5);
 end
-
 set(hNewFocus, 'color', 'm', 'linewidth', 2);
-
-axes(hAx(2))
-bin = get(qNew(xFocus), 'binSpot');
-ignored = get(qNew(xFocus), 'ignoredPixels');
-segview = double(bin);
-
-[iIgnored, jIgnored] = find(ignored == 1);
-segview(iIgnored, jIgnored) = 0.5;
-
-imshow(segview);
-colormap(gca, 'jet');
-
+axes(hAx(2));
+showBinary(qNew(xFocus));
+pos2 = get(hAx(2), 'position');
 axes(hAx(3))
-cLu = get(qNew(xFocus), 'cLu');
-x = cLu(1):cLu(1) + size(bin,1) - 1;
-y = cLu(2):cLu(2) + size(bin,2) - 2;
-Ispot = double(I(x,y))/fullRange;
-hFocusImage = imshow(Ispot, [0,1]);
-colormap(gca, 'jet');
-hold on
-B = bwboundaries(bin);
-bound = cell2mat(B);
-
-isSpot = get(qNew(xFocus), 'isSpot');
-if isSpot
-        plot(bound(:,2) , bound(:,1), 'w');
-else
-        plot(bound(:,2) , bound(:,1), 'k');
-end
+hFocusImage = showOutline(qNew(xFocus), I, fullRange);
+pos3 = get(hAx(3), 'position');
+set(hAx(3), 'position', [pos3(1), pos3(2), pos2(3), pos2(4)]);
 axes(hAx(4));
 hold off
 

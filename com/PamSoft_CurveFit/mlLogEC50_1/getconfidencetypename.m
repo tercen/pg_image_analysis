@@ -18,4 +18,8 @@ global logEC50_initial
 global logEC50_auto
 global logEC50_lower
 global logEC50_upper
+global hs_initial
+global hs_auto
+global hs_lower
+global hs_upper
 cTypeName = 'datum weight';

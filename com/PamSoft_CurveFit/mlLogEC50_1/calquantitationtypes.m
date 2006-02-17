@@ -72,17 +72,16 @@ end
 oP = pgFit(modelID);
 % get auto values for iniPars
 oF = get(oP, 'modelObj');
-xOffset = 0;
-p  = getInitialParameters(oF,xIn - xOffset, y);
-pIni    = [Y0_initial, Ymax_initial, logEC50_initial, hs_initial]';
-pOver   = [Y0_auto, Ymax_auto, logEC50_auto, hs_auto]';
-pLower  = [Y0_lower, Ymax_lower, logEC50_lower, hs_lower]';
-pUpper =  [Y0_upper, Ymax_upper, logEC50_upper, hs_upper]';
+p  = getInitialParameters(oF,x, y);
+pIni    = [Y0_initial, Ymax_initial, logIC50_initial, hs_initial]';
+pOver   = [Y0_auto, Ymax_auto, logIC50_auto, hs_auto]';
+pLower  = [Y0_lower, Ymax_lower, logIC50_lower, hs_lower]';
+pUpper =  [Y0_upper, Ymax_upper, logIC50_upper, hs_upper]';
 % if pOver, override user input with auto values 
 %and set other parameters
 pOver = logical(pOver);
 pIni(pOver) = p(pOver);
-oP = set(oP    ,'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
+oP = set(oP, 'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
                'errorMethod', strErrorMode, ...
                'TolMode', strTolMode, ...
                'fitMethod', strFitMode, ...
@@ -90,7 +89,7 @@ oP = set(oP    ,'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
                'robTune', robTune, ...
                'maxIterations', maxIterations);
 
-
+xOffset = 0;
 [pOut,pStdError, wOut] = computeFit(oP, xIn - xOffset,y);
 f = getCurve(oF, xIn - xOffset, pOut);
 R2 = corrcoef(f,y); R2 = R2(2,1);

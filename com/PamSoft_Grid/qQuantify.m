@@ -28,6 +28,10 @@ global qntOutlierMethod
 global qntOutlierMeasure
 global stateQuantification
 
+if ~iscell(imagePath)
+    imagePath = cellstr(imagePath);
+end
+
 nImages = length(imagePath);
 if isempty(stateQuantification)
     error('Segmentation has not been set');
@@ -37,7 +41,6 @@ nq = size(stateQuantification,3);
 if nq ~= 1 & nq ~= nImages
     error('With the current object state this method expects ',num2str(nq),' images');
 end
-
 nRead = 0;
 for i=1:nImages
     if ~isempty(imagePath(i));

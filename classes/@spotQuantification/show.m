@@ -13,6 +13,7 @@ if ~isempty(oQ)
     for i=1:length(oQ)
             
             cLu = get(oQ(i).oSegmentation, 'cLu');
+            cLu = round(cLu);
             [x,y] = getOutline(oQ(i).oSegmentation);
             if oQ(i).isEmpty
                 cStr = 'k';

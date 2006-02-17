@@ -1,7 +1,5 @@
-function oq = quantify(oq, I, saturationLimit)
-if nargin < 3
-    saturationLimit = (2^16)-1;
-end
+function oq = quantify(oq, I)
+
 [nRows, nCols] = size(oq);
 for i=1:nRows
     for j = 1:nCols
@@ -66,7 +64,7 @@ for i=1:nRows
             % distributions (here: sigPix)
             oq(i,j).pSignal = test2r(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'n');
             nPix = length(sigPix(~iOutSignal));
-            oq(i,j).signalSaturation = length(find(sigPix(~iOutSignal) >= saturationLimit))/nPix;    
+            oq(i,j).signalSaturation = length(find(sigPix(~iOutSignal) >= oq(i,j).saturationLimit))/nPix;    
         end
         %%%%%%%%%%%%%%
     end

@@ -18,7 +18,11 @@ global logEC50_initial
 global logEC50_auto
 global logEC50_lower
 global logEC50_upper
+global hs_initial
+global hs_auto
+global hs_lower
+global hs_upper
 strPrefix   = 'cfec1';
-strCaption  = 'Curve Fitting: logEC50, fixed slope.';
+strCaption  = 'Curve Fitting: logEC50, variable slope.';
 
 

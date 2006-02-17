@@ -1,4 +1,6 @@
 function [x,y,oQ, oArray] = gridKinetics(I, Igrid, Isegment, oArray, oS, rSize, clID)
+%oS = set(oS, 'pixFlexibility', 2);
+
 if ~isempty(Isegment)
     bAdapt = false;
 else

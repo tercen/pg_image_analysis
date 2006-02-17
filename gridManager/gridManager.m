@@ -22,7 +22,7 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 11-Jul-2005 15:17:55
+% Last Modified by GUIDE v2.5 02-Feb-2006 18:51:44
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -52,7 +52,7 @@ function gridManager_OpeningFcn(hObject, eventdata, handles, varargin)
 % handles    structure with handles and user data (see GUIDATA)
 % varargin   command line arguments to gridManager (see VARARGIN)
 
-handles.iniFile = 'gridManager.ini';
+handles.iniFile = 'PamGrid7.ini';
 
 iniPars.dataDir = 'C:\';
 iniPars.imagesDir = 'C:\';
@@ -64,7 +64,32 @@ iniPars.yResize = 256;
 iniPars.gridRefMarker = '#';
 iniPars.dataSearchFilter = '*.tif*';
 iniPars.dataForceStructure = 1;
+
+iniPars.minRot = -2;
+iniPars.maxRot = 2;
+iniPars.dRot = 0.25;
+
 iniPars.imageResultsExtension = 'pgr';
+iniPars.segEdgeLowSensitivity = 0;
+iniPars.segEdgeHighSensitivity = 0.005;
+iniPars.segAreaSize = 0.7;
+
+iniPars.spotSize = 0.66;
+iniPars.minDiameter = 0.45;
+iniPars.maxDiameter = 0.85;
+iniPars.minFormFactor = 0.7;
+iniPars.maxAspectRatio = 1.4;
+iniPars.maxOffset= 0.35;
+
+iniPars.ppSmallDisk = 0.17;
+iniPars.ppLargeDisk = 0.51;
+iniPars.ppCircle = 30;
+iniPars.ppBlurr = 0.3;
+
+iniPars.qBackgroundMethod = 'localCorner';
+iniPars.outlierMethod = 'iqrBased';
+iniPars.outlierMetric = 1.75;
+
 handles.iniPars = getparsfromfile(handles.iniFile, iniPars);
 handles.list = [];
 handles.selectedWell = [];
@@ -75,20 +100,26 @@ handles.oArray = [];
 handles.template = [];
 handles.oArray = array();
 handles.oP      = preProcess();
+handles.segmentationMethod = 'Edge';
+set(handles.miSegmentationEdge', 'checked', 'on');
+
+
 
 set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.5';
+handles.version = 'alpha.7.1b';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
-handles.segMode = 'fixed';
-handles.spotWeight = 'equal';
+handles.seriesMode = 'fixed';
+handles.spotWeight = 'equalize';
 
 miFixedSegmentation_Callback(handles.miFixedSegmentation, [], handles);
 strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
 set(handles.miFilter, 'Label', strLabel);
+
+
 guidata(hObject, handles);
 
 % UIWAIT makes gridManager wait for user response (see UIRESUME)
@@ -117,6 +148,7 @@ function pbThis_Callback(hObject, eventdata, handles)
 
 handles.bShow = 1;
 handles = analyze(hObject, handles);
+set(handles.miExportCurrent, 'Enable', 'on');
 guidata(hObject, handles);
 
 
@@ -141,11 +173,28 @@ for i=1:nRows
             handles.selectedWell = [i,j];
             handles = analyze(hObject, handles);
             drawnow
+            % export data if required
+            if isequal(get(handles.miExportImages, 'checked'), 'on')
+                bImages = 1;
+            else
+                bImages = 0;
+            end
+            if isequal(get(handles.miExportQuantified, 'checked'), 'on')
+                bQuant = 1;
+            else
+                bQuant = 0;
+            end
+
+            exportWell(handles.expNames, handles.resBase, handles.expMode, handles.cAxis, handles.qImage, bImages, bQuant);
+        
         end
     end
 end
-set(hObject, 'enable', 'on');
 
+
+
+
+set(hObject, 'enable', 'on');
 
 
 guidata(hObject, handles);
@@ -192,29 +241,34 @@ guidata(hObject, handles);
                     return;
                 end
             end
+            
 
-
-           
-            % take image resize into account!
-            rSize = [handles.iniPars.xResize, handles.iniPars.yResize];
-            rPitch     = pars.spotPitch * (rSize./imSize);
-            rSpotSize  = pars.spotSize * mean(rSize./imSize);
-
-            % Set array object , preprocessing object and segmentation
+           % Set array object , preprocessing object and segmentation
             % object with instrument specific parameters.
-            handles.oArray = set(handles.oArray, 'spotPitch', rPitch, 'spotSize', rSpotSize);
-            axRot = [pars.minRot:pars.dRot:pars.maxRot];
-            handles.oArray = set(handles.oArray, 'rotation', axRot);
-            handles.oP = set(handles.oP, 'nCircle',pars.nCircle, 'nLargeDisk', pars.nLargeDisk, 'nSmallDisk', pars.nSmallDisk, 'nBlurr', pars.nBlurr );
+            spotPitch = pars.spotPitch;
+            inipars = handles.iniPars;
+            axRot = [inipars.minRot:inipars.dRot:inipars.maxRot];
+            handles.oArray = set(handles.oArray, 'spotPitch', spotPitch, ...
+                                                 'spotSize', inipars.spotSize * spotPitch, ...
+                                                 'rotation', axRot);
+                                             
+            handles.oP = set(handles.oP, 'nCircle',spotPitch * inipars.ppCircle, ...
+                                          'nLargeDisk', spotPitch * inipars.ppLargeDisk, ...
+                                          'nSmallDisk', spotPitch* inipars.ppSmallDisk, ...
+                                          'nBlurr', spotPitch * inipars.ppBlurr );
             
-            handles.oS = segmentation();
-            cfr = get(handles.oS, 'classifier');
-            cfr.minDiameter = pars.minDiameter;
-            cfr.maxDiameter = pars.maxDiameter;
-            handles.oS = set(handles.oS, 'nFilterDisk', pars.minDiameter, ...
-                                       'classifier', cfr, 'dftSpotDiameter', pars.dftSpot);
+        
             
-                                       
+            es = [inipars.segEdgeLowSensitivity, inipars.segEdgeHighSensitivity];
+            handles.oS = segmentation('areaSize', inipars.segAreaSize, ...
+                                      'edgeSensitivity', es);
+       
+            oOut = outlier('method', inipars.outlierMethod , ...   
+                           'measure', inipars.outlierMetric);
+                       
+            handles.oQ = spotQuantification('backgroundMethod', inipars.qBackgroundMethod, ...
+                                            'oOutlier', oOut);
+                                                                          
             %%% initialilzie exposure time popup
             uT = vGetUniqueID(list, 'T');
             set(handles.puIntegrationTime, 'String', uT);
@@ -235,7 +289,7 @@ guidata(hObject, handles);
             if ~exist(strDir, 'dir')
                 mkdir(handles.iniPars.dataDir, handles.iniPars.resDir);
             end
-
+            set(handles.miExportCurrent, 'Enable', 'off');
         end
 
         guidata(hObject, handles);
@@ -245,16 +299,11 @@ function miData_Callback(hObject, eventdata, handles)
 % hObject    handle to miData (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
 % --------------------------------------------------------------------
 function miGrid_Callback(hObject, eventdata, handles)
 % hObject    handle to miGrid (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-
-
 
 % --------------------------------------------------------------------
 function miQuantification_Callback(hObject, eventdata, handles)
@@ -262,13 +311,12 @@ function miQuantification_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-
 % --------------------------------------------------------------------
 function miAbout_Callback(hObject, eventdata, handles)
 % hObject    handle to miAbout (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-str = ['gridManager ', handles.version, ' (c)2005 PamGene International BV']; 
+str = ['PamGrid ', handles.version, ' (c)2005 PamGene International BV']; 
 helpdlg(str, 'About ...');
 function well_Callback(hObject, eventData, handles)
 wells = handles.arrays;
@@ -439,8 +487,6 @@ set(handles.miKinLast, 'checked', 'off');
 set(handles.miEndPoint, 'checked', 'off');
 set(handles.miKinFirst, 'checked', 'off');
 
-
-
 % --------------------------------------------------------------------
 function miLoadTemplate_Callback(hObject, eventdata, handles)
 % hObject    handle to miLoadTemplate (see GCBO)
@@ -450,15 +496,20 @@ curDir = pwd;
 if exist(handles.iniPars.templateDir)
     cd(handles.iniPars.templateDir);
 end
-    
+
+
 [fName, pathName] = uigetfile('*.txt', 'Please, select a template file');
 cd(curDir);
 if fName
     handles.iniPars.templateDir = pathName;
     handles.template = fName;
-
-    [handles.oArray, handles.clID] = fromFile(handles.oArray, [pathName, '\', fName], handles.iniPars.gridRefMarker);
-    
+    handles.oArray = set(handles.oArray, 'mask', [],'xOffset', [],'yOffset', []);
+    try
+        [handles.oArray, handles.clID] = fromFile(handles.oArray, [pathName, '\', fName], handles.iniPars.gridRefMarker);
+    catch
+        errordlg(lasterr, 'Error while loading template file');
+        return
+    end
     if ~isempty(handles.selectedWell)
         set(handles.pbAll, 'enable', 'on');
         set(handles.pbThis, 'enable', 'on');
@@ -467,7 +518,9 @@ if fName
 end
 
 guidata(hObject, handles);
-    
+
+
+
 function handles = analyze(hObject, handles);
 
 set(gcf, 'pointer', 'watch');
@@ -479,21 +532,19 @@ drawnow
 % W
 currentArray = handles.arrays(handles.selectedWell(1), handles.selectedWell(2));
 [wellList{1:length(handles.list)}] = deal(handles.list.W);
-iCurrentWell = strmatch(currentArray.id, wellList); 
+iCurrentWell = strmatch(currentArray.id, char(wellList)); 
 currentList = handles.list(iCurrentWell);
-
 % F
 val =   get(handles.puFilter, 'value');
 clFilter =   get(handles.puFilter, 'String');
 [filterList{1:length(currentList)}] = deal(currentList.F);
-iCurrentFilter = strmatch(clFilter{val}, filterList);
+iCurrentFilter = strmatch(clFilter{val}, filterList, 'exact');
 currentList = currentList(iCurrentFilter);
-
 % T
 val  = get(handles.puIntegrationTime, 'value');
 clTime  = get(handles.puIntegrationTime, 'String');
 [timeList{1:length(currentList)}] =  deal(currentList.T);
-iCurrentTime = strmatch(clTime{val}, timeList);
+iCurrentTime = strmatch(clTime{val}, timeList, 'exact');
 currentList = currentList(iCurrentTime);
 
 nImages = length(currentList);
@@ -513,75 +564,23 @@ catch
     return
 end
 drawnow;
+
 time = clock;
-
-
-
-
-switch handles.gridMode
-
-    case 'kinLast'
-%       try 
-            expMode = 'kinetics';
-            for i = 1:nImages
-                   pump  = char(currentList(i).P);
-                   c(i) = str2num(pump(2:end));
-                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], handles.iniPars.imageResultsExtension);
-                   expNames(i) = cellstr(str); 
-            end
-            [c, iSort] = sort(c);
-            I = I(:,:,iSort);
-            expNames = expNames(iSort);
-            [Igrid, Isegment] = gridImage(I(:,:,nImages), handles.oP, handles.prepMode, rSize, handles.spotWeight);
-            if isequal(handles.segMode, 'adapt')
-                Isegment = [];
-            end
-            
-            [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
-           
-            
-%       catch
-%           set(gcf, 'pointer', 'arrow');
-%           drawnow;
-%           errordlg(lasterr);
-%             
-%            return;
-%        end
-        
-        case 'kinFirst'
-          try 
-            expMode = 'kinetics';
-            for i = 1:nImages
-                   pump  = char(currentList(i).P);
-                   c(i) = str2num(pump(2:end));
-                   str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], 'pgr');
-                   expNames(i) = cellstr(str); 
-            end
-            [c, iSort] = sort(c);
-            I = I(:,:,iSort);
-            expNames = expNames(iSort);
-            [Igrid, Isegment] = gridImage(I(:,:,1), handles.oP, handles.prepMode, rSize, handles.spotWeight);
-            if isequal(handles.segMode, 'adapt')
-                Isegment = [];
-            end
-            
-            [x,y,oQ, handles.oArray] = gridKinetics(I, Igrid, Isegment, handles.oArray, handles.oS, rSize, handles.clID);
-           
-            
-          catch
-
-              set(gcf, 'pointer', 'arrow');
-              drawnow;
-              errordlg(lasterr);
-            
-           return;
-       end
-
-
+for i = 1:nImages
+     pump  = char(currentList(i).P);
+     c(i) = str2num(pump(2:end));
+     str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], handles.iniPars.imageResultsExtension);
+     expNames(i) = cellstr(str); 
 end
-
-%qSave(oQ, currentArray.strResultFile);
-
+[c, iSort] = sort(c);
+I = I(:,:,iSort);
+expNames = expNames(iSort);
+try
+    handles = gridCycleSeries(handles, I);
+catch
+     errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+     return
+end
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
 
@@ -591,7 +590,7 @@ stString = ['Ready (',strTime,'s)'];
 set(handles.stStatus, 'String', stString);
 set(gcf, 'pointer', 'arrow');
 if handles.bShow
-     hp = presenter(I,oQ,c);
+     hp = showInteractive(handles.qImage, I);
      set(hp, 'name', currentArray.id);
      drawnow
 end
@@ -599,23 +598,12 @@ end
 % Export
 strBase = [currentList(i).W, '_', currentList(i).F, '_', currentList(i).T];
 resBase = [handles.iniPars.dataDir,'\', handles.iniPars.resDir, '\', strBase];
-if isequal(get(handles.miExportImages, 'checked'), 'on')
-    bImages = 1;
-else
-    bImages = 0;
-end
-if isequal(get(handles.miExportQuantified, 'checked'), 'on')
-    bQuant = 1;
-else
-    bQuant = 0;
-end
-
-exportWell(expNames, resBase, expMode, c, oQ, bImages, bQuant);
+handles.resBase = resBase;
+handles.expNames = expNames;
+handles.expMode = 'kinetics';
+handles.cAxis = c;
 
 % --------------------------------------------------------------------
-
-clear oQ
-
 function miUpdate_Callback(hObject, eventdata, handles)
 % hObject    handle to miUpdate (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -629,13 +617,17 @@ end
 
 
 function exportWell(imNames, aggrName, aggrMode, aggrAxis, oQ, bImages, bSeries)
-if bImages
-    export(oQ, 'images', imNames);
-end
-if bSeries
-    export(oQ, aggrMode, aggrName,aggrAxis);
-end
-
+    
+    try
+        if bImages
+            export(oQ, 'images', imNames);
+        end
+        if bSeries
+            export(oQ, aggrMode, aggrName,aggrAxis);
+        end
+    catch
+        errordlg(lasterr, 'Error while exporting data');
+    end
 % --------------------------------------------------------------------
 function miExport_Callback(hObject, eventdata, handles)
 % hObject    handle to miExport (see GCBO)
@@ -805,7 +797,7 @@ function miFixedSegmentation_Callback(hObject, eventdata, handles)
 
 set(hObject, 'checked', 'on');
 set(handles.miAdaptSegmentation, 'checked', 'off')
-handles.segMode = 'fixed';
+handles.seriesMode = 'fixed';
 guidata(hObject, handles);
 % --------------------------------------------------------------------
 function miAdaptSegmentation_Callback(hObject, eventdata, handles)
@@ -815,7 +807,7 @@ function miAdaptSegmentation_Callback(hObject, eventdata, handles)
 
 set(hObject, 'checked', 'on');
 set(handles.miFixedSegmentation, 'checked', 'off')
-handles.segMode = 'adapt';
+handles.seriesMode = 'adapt';
 guidata(hObject, handles);
 
 
@@ -834,7 +826,7 @@ function miSpotWeightIntensity_Callback(hObject, eventdata, handles)
 
 set(hObject, 'checked', 'on')
 set(handles.miSpotWeightEqual, 'checked', 'off');
-handles.spotWeight = 'intensity';
+handles.spotWeight = 'linear';
 guidata(hObject, handles);
 % --------------------------------------------------------------------
 function miSpotWeightEqual_Callback(hObject, eventdata, handles)
@@ -844,5 +836,92 @@ function miSpotWeightEqual_Callback(hObject, eventdata, handles)
 
 set(hObject, 'checked', 'on')
 set(handles.miSpotWeightIntensity, 'checked', 'off');
-handles.spotWeight = 'equal';
+handles.spotWeight = 'equalize';
 guidata(hObject, handles);
+
+
+% --------------------------------------------------------------------
+function miExportCurrent_Callback(hObject, eventdata, handles)
+% hObject    handle to miExportCurrent (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(gcf, 'pointer', 'watch');
+drawnow;
+
+if isequal(get(handles.miExportImages, 'checked'), 'on')
+    bImages = 1;
+else
+    bImages = 0;
+end
+if isequal(get(handles.miExportQuantified, 'checked'), 'on')
+    bQuant = 1;
+else
+    bQuant = 0;
+end
+
+if ~bQuant & ~bImages
+    errordlg('No Export Options switched on: saved nothing!', 'Export Current');
+end
+
+    
+exportWell(handles.expNames, handles.resBase, handles.expMode, handles.cAxis, handles.qImage, bImages, bQuant);
+
+set(gcf, 'pointer', 'arrow');
+drawnow;
+
+
+% --------------------------------------------------------------------
+function miSegMethod_Callback(hObject, eventdata, handles)
+% hObject    handle to miSegMethod (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+
+
+
+% --------------------------------------------------------------------
+function miSegmentationEdge_Callback(hObject, eventdata, handles)
+% hObject    handle to miSegmentationEdge (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(hObject, 'checked', 'on');
+set(handles.miSegmentationThreshold, 'checked', 'off');
+handles.segmentationMethod = 'Edge';
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function miSegmentationThreshold_Callback(hObject, eventdata, handles)
+% hObject    handle to miSegmentationThreshold (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(hObject, 'checked', 'on');
+set(handles.miSegmentationEdge, 'checked', 'off');
+handles.segmentationMethod = 'Threshold';
+guidata(hObject, handles);
+
+
+
+
+
+% --------------------------------------------------------------------
+function miParEdit_Callback(hObject, eventdata, handles)
+% hObject    handle to miParEdit (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+try 
+    
+    dos(['notepad ',handles.iniFile]);
+catch
+    errordlg(lasterr, 'Could not open parameter file');
+    return
+end
+handles.iniPars = getparsfromfile(handles.iniFile, handles.iniPars);
+guidata(hObject, handles);
+
+% --------------------------------------------------------------------
+function miParameters_Callback(hObject, eventdata, handles)
+% hObject    handle to miParameters (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+

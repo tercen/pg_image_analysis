@@ -27,6 +27,12 @@ global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
 global stateQuantification
+
+if ~iscell(imagePath)
+    imagePath = cellstr(imagePath);
+end
+
+
 % check if parameter set, otherwise refer to defaults
 pdef = getProperties();
 for i=1:length(pdef) 
@@ -94,6 +100,8 @@ oQ0 = spotQuantification('backgroundMethod', strQntBackgroundMethod, ...
                      
 % read in the images 
 nRead = 0;
+
+
 for i=1:length(imagePath)
     if ~isempty(imagePath(i))
         nRead = nRead + 1;

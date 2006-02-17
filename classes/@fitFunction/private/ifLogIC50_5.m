@@ -1,4 +1,4 @@
-function [p0, pLow, pHigh] = ifLogIC50_2(X,Y)
+function [p0, pLow, pHigh] = ifLogIC50_5(X,Y)
 
     D = sortrows([X,Y],1);
     X = D(:,1);
@@ -11,7 +11,7 @@ function [p0, pLow, pHigh] = ifLogIC50_2(X,Y)
 
     
     p0 = p0';
-    pLow = [1e-7, -1e8, -1e8];
-    pHigh = [1e8 , -1e-7, -1e-7];
+    pLow = [-1e8, -1e8];
+    pHigh = [-1e-7, -1e-7];
     
     

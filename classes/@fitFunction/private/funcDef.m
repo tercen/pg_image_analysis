@@ -114,7 +114,7 @@ Func(8).clParameter{4}          = 'hs';
 
 Func(8).strFitFunctionName      = 'cfLogEC50_1';
 Func(8).strIniFunctionName      = 'ifLogEC50_1';
-Func(8).jacFlag                 = 0;
+Func(8).jacFlag                 = 1;
 %#function cfLogEC50_1
 %#function ifLogEC50_1
 Func(9).strModelName            = 'logEC50_2';
@@ -140,3 +140,25 @@ Func(10).strIniFunctionName      = 'ifLogEC50_4';
 Func(10).jacFlag                 = 0;
 %#function cfLogEC50_4
 %#function ifLogEC50_4
+
+Func(11).strModelName           = 'logIC50_5';
+Func(11).strModelDescription    = 'logIC50, 1 to 0, variable slope';
+
+Func(11).clParameter            = {'logIC50', 'hs'};
+
+Func(11).strFitFunctionName     = 'cfLogIC50_5';
+Func(11).strIniFunctionName     = 'ifLogIC50_5';
+Func(11).jacFlag                = 1;
+%#function cfLogIC50_5
+%#function ifLogIC50_5
+
+Func(12).strModelName           = 'logIC50_6';
+Func(12).strModelDescription    = 'logIC50, 1 to 0, fixed slope';
+
+Func(12).clParameter            = {'logIC50'};
+
+Func(12).strFitFunctionName     = 'cfLogIC50_6';
+Func(12).strIniFunctionName     = 'ifLogIC50_6';
+Func(12).jacFlag                = 1;
+%#function cfLogIC50_6
+%#function ifLogIC50_6
