@@ -15,8 +15,9 @@ else
             value = getIgnoredMask(p);  
             return
         elseif isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
-            [n, m] = size(p);
-            [value{1:n, 1:m}]  = deal(p.(clNames{i}));
+            %[n, m] = size(p);
+            [value{1:length(p(:))}]  = deal(p(:).(clNames{i}));
+            value = reshape(value, size(p));
             if isnumeric(p(1).(clNames{i})) |  islogical(p(1).(clNames{i}))
                 value = cell2mat(value);
             end    

@@ -1,4 +1,4 @@
-function [qTypes, wOut] = calQuantitationTypes(xData, yData)
+function [quantitationTypes, confidenceTypes] = calQuantitationTypes(xData, yData)
 global xScale
 global fitMode
 global robTune
@@ -6,7 +6,6 @@ global errorMode
 global xTolerance
 global xToleranceMode
 global maxIterations
-global xOffset
 global Y0_initial
 global Y0_auto
 global Y0_lower
@@ -23,7 +22,6 @@ global hs_initial
 global hs_auto
 global hs_lower
 global hs_upper
-
 
 modelID = getModelID();
 x = double(xData);
@@ -80,7 +78,8 @@ pOver   = [Y0_auto, Ymax_auto, logIC50_auto, hs_auto]';
 pLower  = [Y0_lower, Ymax_lower, logIC50_lower, hs_lower]';
 pUpper =  [Y0_upper, Ymax_upper, logIC50_upper, hs_upper]';
 % if pOver, override user input with auto values 
-% and set other parameters
+%and set other parameters
+pOver = logical(pOver);
 pIni(pOver) = p(pOver);
 oP = set(oP, 'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
                'errorMethod', strErrorMode, ...
@@ -89,18 +88,26 @@ oP = set(oP, 'lbPars', pLower, 'ubPars', pUpper, 'iniPars', pIni, ...
                'TolX', xTolerance, ...
                'robTune', robTune, ...
                'maxIterations', maxIterations);
-           
+
+xOffset = 0;
 [pOut,pStdError, wOut] = computeFit(oP, xIn - xOffset,y);
-f = getCurve(oF, xIn, pOut);
+f = getCurve(oF, xIn - xOffset, pOut);
 R2 = corrcoef(f,y); R2 = R2(2,1);
 aChiSqr = sum( (f-y).^2);
 iOut = y == 0;
 rChiSqr = sum( ( f(~iOut)-y(~iOut) )./y(~iOut).^2) ;
 
-qTypes = [pOut;
-          pStdError;
-          R2;
-          aChiSqr;
-          rChiSqr];
+
+
+
+
+
+
+quantitationTypes = [pOut;
+                     pStdError;
+                     R2;
+                     aChiSqr;
+                    rChiSqr;
+                    ];
       
-      
+confidenceTypes = wOut;

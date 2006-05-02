@@ -27,7 +27,7 @@ if isequal(strModel, 'select')
     end
 end
 [clList{1:length(Func)}] = deal(Func.strModelName);
-iMatch = strmatch(strModel, clList);
+iMatch = strmatch(strModel, clList, 'exact');
 if ~isempty(iMatch)
     f = Func(iMatch);
 else

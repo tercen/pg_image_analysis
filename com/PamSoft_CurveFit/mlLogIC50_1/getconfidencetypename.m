@@ -1,4 +1,4 @@
-function [val, map] = getPropEnumeration(parName)
+function cTypeName = getconfidencetypename
 global xScale
 global fitMode
 global robTune
@@ -22,16 +22,4 @@ global hs_initial
 global hs_auto
 global hs_lower
 global hs_upper
-
-pdef = getParameterDefinition();
-[pnames{1:length(pdef)}] = deal(pdef.name);
-iMatch = strmatch(parName, pnames, 'exact');
-if ~isempty(iMatch) && ~isempty(pdef(iMatch).enumVal)
-    val = pdef(iMatch).enumVal;
-    map = pdef(iMatch).enumMap;
-else
-    val = [];
-    map = '';
-end
- 
-        
+cTypeName = 'datum weight';

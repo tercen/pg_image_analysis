@@ -55,6 +55,8 @@ for i=1:2:length(pArgin)
                 p.contrast = val;
             elseif isequal(val, 'equalize')
                 p.contrast = val;
+            elseif isequal(val, 'co-equalize')
+                p.contrast = val;
             else
                 bInvalid = 1;
             end

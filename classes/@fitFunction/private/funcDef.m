@@ -87,7 +87,7 @@ Func(6).clParameter{2}          = 'Ymax';
 Func(6).clParameter{3}          = 'logIC50';
 
 Func(6).strFitFunctionName      = 'cfLogIC50_3';
-Func(6).strIniFunctionName       = 'ifLogIC50_3';
+Func(6).strIniFunctionName      = 'ifLogIC50_3';
 Func(6).jacFlag                 = 1;
 %#function cfLogIC50_3
 %#function ifLogIC50_3
@@ -162,3 +162,31 @@ Func(12).strIniFunctionName     = 'ifLogIC50_6';
 Func(12).jacFlag                = 1;
 %#function cfLogIC50_6
 %#function ifLogIC50_6
+% logIC50, variable slope, offset
+Func(13).strModelName            = 'logIC50_1bw';
+Func(13).strModelDescription     = 'logIC50, Ymax to Y0, variable slope, suitable for both ways. Assumes log10 x-axis';
+
+Func(13).clParameter{1}          = 'Y0';
+Func(13).clParameter{2}          = 'Ymax';
+Func(13).clParameter{3}          = 'logIC50';
+Func(13).clParameter{4}          = 'hs';
+
+Func(13).strFitFunctionName      = 'cfLogIC50';
+Func(13).strIniFunctionName      = 'ifLogIC50bw';
+Func(13).jacFlag                 = 1;
+%#function cfLogIC50
+%#function ifLogIC50bw
+
+%
+Func(14).strModelName            = 'logIC50_3bw';
+Func(14).strModelDescription     = 'logIC50, both ways, Ymax to Y0, fixed slope. Assumes log10 x-axis';
+
+Func(14).clParameter{1}          = 'Y0';
+Func(14).clParameter{2}          = 'Ymax';
+Func(14).clParameter{3}          = 'logIC50';
+
+Func(14).strFitFunctionName         = 'cfLogIC50_3';
+Func(14).strIniFunctionName       = 'ifLogIC50_3bw';
+Func(14).jacFlag                 = 1;
+%#function cfLogIC50_3
+%#function ifLogIC50_3bw

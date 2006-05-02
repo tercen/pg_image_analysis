@@ -6,7 +6,6 @@ global errorMode
 global xTolerance
 global xToleranceMode
 global maxIterations
-global xOffset
 global Y0_initial
 global Y0_auto
 global Y0_lower
@@ -23,8 +22,7 @@ global hs_initial
 global hs_auto
 global hs_lower
 global hs_upper
-qNames = {'Y0', 'Ymax', 'logIC50', 'hs', ... 
-          'Y0 standard error', 'Ymax standard error', 'logIC50 standard error','hs standard error', ...
-          'R2', 'absolute ChiSqr', 'relative ChiSqr'};
+
+qNames = {'Y0', 'Ymax', 'logIC50','hs', 'Y0 standard error', 'Ymax standard error', 'logIC50 standard error','hs standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr'};
 
 qNames = qNames';

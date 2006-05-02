@@ -4,7 +4,7 @@ function oq = quantify(oq, I)
 for i=1:nRows
     for j = 1:nCols
         if isempty(oq(i,j).iBackground)
-            oq(i,j).iMask = setBackgroundMask(oq(i,j));
+            oq(i,j) = setBackgroundMask(oq(i,j));
         end
         if isempty(oq(i,j).oOutlier)
             bOut = false;

@@ -1,4 +1,4 @@
-function d = getList(d)
+function [d,list] = getList(d)
 
 switch d.instrument
     case 'detect';

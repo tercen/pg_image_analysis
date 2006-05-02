@@ -65,14 +65,22 @@ fLine = strread(fgetl(fid), '%s', 'delimiter', '\t')';
 n = 1;
 while(1)
     strLine = fgetl(fid);
+    
     if strLine == -1
         break;
     end
+    strLine = deblank(strLine);
     if ~isempty(strLine)
         try
-            [row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');
+            [lRow, lCol, strID, lxOff, lyOff]  = strread(strLine,'%f%f%s%f%f', 'delimiter', '\t');
+            row(n) = lRow;
+            col(n) = lCol;
+            xOff(n) = lxOff;
+            yOff(n) = lyOff;
+             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
-            error(['Error reading template file: ', fName]);
+            eStr = [lasterr,' On line ',num2str(n),': ',strLine];
+            error(eStr, 'error reading template file');
         end
         ID(n) = cellstr(strID);
         n= n+ 1;
