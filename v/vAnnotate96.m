@@ -1,6 +1,7 @@
 function [v, annFields, msg] = vAnnotate96(v, annFile)
 %function [v, annFields, msg] = vAnnotate96(v, annFile)
 msg = [];
+annFields = {};
 [a, msg]  = vReadAnnotation(annFile);
 if isempty(a)
     return;
@@ -27,6 +28,9 @@ for i=1:length(v)
             x = find( [1:length(aFields)] ~= iRow & [1:length(aFields)] ~= iCol);
             for n = 1:length(x)
                 strField = aFields{x(n)};
+                if ischar(a(j).(strField))
+                    a(j).strField = deblank(a(j).(strField));
+                end
                 v(i).(strField) = a(j).(strField);
             end
             break

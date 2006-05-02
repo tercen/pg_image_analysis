@@ -1,5 +1,4 @@
-function [M, condition, spotID] = v2mat(v, metric, clAnnotation, badWell);
-% function [M, condition, spotID] = v2mat(v, metric, clAnnotation,
+function [M, condition, spotID, index] = v2mat(v, metric, clAnnotation, badWell);
 % badWell);
 [index1{1:length(v)}] = deal(v.Index1);
 [index2{1:length(v)}] = deal(v.Index2);
@@ -19,6 +18,7 @@ for row = 1:mx1
         iWell = find(index1 == row & index2 == col);
         if ~isempty(iWell) && ~badWell(row, col)
             n = n + 1;
+            index(n,:) = [row, col];
             for j=1:length(clAnnotation)
                 condition{n,j} = v(iWell(1)).(clAnnotation{j});
                
@@ -37,6 +37,7 @@ catch
     c = cell2mat(condition(:,1));
     [c, iSort] = sort(c);
     condition = condition(iSort,:);
+    index = index(iSort,:);
 end
 
 M = M(:, iSort);

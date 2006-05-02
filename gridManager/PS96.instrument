@@ -1,12 +1,2 @@
 spotPitch>17.7
-spotSize>10
-dftSpot>12
-minDiameter>8
-maxDiameter>15
-minRot>-2
-maxRot>2
-dRot>0.25
-nSmallDisk>3
-nLargeDisk>9
-nCircle>500
-nBlurr>5
+saturationLimit>65535

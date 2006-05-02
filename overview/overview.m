@@ -130,12 +130,19 @@ if ischar(dDir)
     
     if isequal(handles.IniPars.instrument, 'PS96')
         fList = setDataPS96(dDir, handles.IniPars.filter);
-    elseif isequal(handles.IniPars.instrument, 'production');
+    elseif isequal(handles.IniPars.instrument, 'pimOpts');
         fList = setDataPimOpts(dDir, handles.IniPars.filter);     
-        % cyclematch is nou use here so set it for all indices in the list:
+        % cyclematch is not used here so set it for all indices in the list:
         handles.cycleMatch      = [1:length(fList)];
         handles.iCycleMatch     = 1;
+    elseif isequal(handles.IniPars.instrument, 'qcSystem')
+        fList = setDataQCSystem(dDir, handles.IniPars.filter);
+        % cyclematch is not used here so set it for all indices in the
+        % list:
+        handles.cycleMatch = [1:length(fList)];
+        handles.iCycleMatch = 1;
     
+        
     else
         uiwait(errordlg(['Undefined instrument: ',handles.IniPars.instrument]));
     end  
@@ -186,7 +193,50 @@ else
     fList = [];
     uiwait(errordlg('No ImageResults found!', ''));
 end
-    
+
+function fList = setDataQCSystem(dDir , filter)
+fFound = filehound2(dDir, filter);
+nMatch = 0;
+fList = [];
+for i=1:length(fFound)
+    iIndices = regexp(fFound(i).fName, '_\d\d_\d\d');
+
+    if ~isempty(iIndices)
+        strIndices = fFound(i).fName(iIndices(1):end);
+        nChip = str2num(strIndices(2:3));
+        nArray = str2num(strIndices(5:6));
+        mwCol = nChip;
+
+        if mwCol > 12
+            mwRow = 4 + nArray;
+            mwCol = mwCol -12;
+        else
+            mwRow = nArray;
+        end
+        if mwRow >= 1 && mwRow <= 8 && mwCol >=1 && mwCol<=12
+            nMatch = nMatch + 1;
+            fList(nMatch).imagePath = fullfile(fFound(i).fPath, fFound(i).fName);
+            fList(nMatch).mwCol = mwCol;
+            fList(nMatch).mwRow = mwRow;
+            fList(nMatch).strArray = fFound(i).fName;
+        end
+    end
+end
+
+nFound = length(fList);
+set(findobj('Tag', 'txStatus'),'String', ['Found ',num2str(nFound), ' Images in: ', dDir]);
+if nFound
+    set(findobj('Tag', 'pbNext'), 'enable', 'on');
+    set(findobj('Tag','pbPrevious'), 'enable', 'on');
+    set(findobj('Tag','pbAoi'), 'enable', 'on');
+    set(findobj('Tag','pbGo'), 'enable', 'on');
+else
+    set(findobj('Tag', 'pbNext'), 'enable', 'off');
+    set(findobj('Tag','pbPrevious'), 'enable', 'off');
+    set(findobj('Tag','pbAoi'), 'enable', 'off');
+    set(findobj('Tag','pbGo'), 'enable', 'off');
+end
+
 function fList = setDataPimOpts(dDir, filter)
 fFound = filehound2(dDir, filter, 0);
 nMatch = 0;
@@ -429,7 +479,7 @@ if isequal(handles.IniPars.instrument, 'PS96');
         pCycles = pCycles(val);
         nOverviews  = length(pCycles);
         [pList{1:nImages}] = deal(fList.strPumpCycle);
-elseif isequal(handles.IniPars.instrument, 'production');
+else    
         nOverviews = 1;
 end
 
@@ -447,8 +497,11 @@ ovDir = [handles.IniPars.initialDir, '\_Overviews'];
 for i=1:nOverviews
     if isequal(handles.IniPars.instrument, 'PS96');
           iMatch = strmatch(pCycles{nOverviews - i + 1}, pList);
-    elseif isequal(handles.IniPars.instrument, 'production');
+    elseif isequal(handles.IniPars.instrument, 'qcSystem');
+        
           iMatch = [1:length(fList)];
+    elseif isequal(handles.IniPars.instrument, 'pimOpts');
+         iMatch  = [1:length(fList)];
     end
     
     
@@ -467,7 +520,10 @@ for i=1:nOverviews
         overviewImage(ceil([iRow:iRow+sI(1)-1]), ceil([iCol:iCol+sI(2)-1])) = I;
     end
 
-    overviewImage = imdivide(overviewImage, 2^16/2^8);
+    
+    if isequal(handles.IniPars.instrument, 'PS96')
+        overviewImage = imdivide(overviewImage, 2^16/2^8);
+    end
     overviewImage = uint8(overviewImage);
 
     if i ==1
@@ -482,7 +538,9 @@ for i=1:nOverviews
     
     if isequal(handles.IniPars.instrument, 'PS96')
         ovName = ['overview',pCycles{nOverviews-i+1},'.jpg'];
-    elseif isequal(handles.IniPars.instrument, 'production')
+    elseif isequal(handles.IniPars.instrument, 'qcSystem')
+        ovName = ['overview.jpg'];
+    elseif isequal(handles.IniPars.instrument, 'pimOpts')
         ovName = ['overview.jpg'];
     end
         

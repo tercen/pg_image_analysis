@@ -3,6 +3,8 @@ g = globalStats();
 while(1)
     sOut = inputdlg('Please Set the Reference ID', 'Global QC', 1, cellstr(refID));
     if isempty(sOut)
+        vGen = [];
+        refID = [];
         break;
     else
          try
@@ -11,7 +13,7 @@ while(1)
              break;
          catch
              [msg, errid] = lasterr;
-             if ~isequal(errid, 'GlobalStats:IDNotFound')
+            if ~isequal(errid, 'GlobalStats:IDNotFound')
                  error(msg);
              else
                  uiwait(errordlg(['ID not found: ', sOut], 'Error'));

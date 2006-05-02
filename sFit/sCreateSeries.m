@@ -3,10 +3,13 @@ function series = sCreateSeries(v, spots, aGroup, aSeries, qType)
 [clID{1:length(v)}] = deal(v.ID); 
 
 % remove the intra well replicate info from the spot IDs
-iPosMarker = cell2mat(regexp(spots, '\_(\d+:\d+\)'));
+
 for i= 1:length(spots)
+    iPosMarker =regexp(spots{i}, '\_(\d+:\d+\)');
+    iPosMarker = iPosMarker(end);
+    
     str = spots{i};
-    spots{i} = str(1:iPosMarker(i)-1);
+    spots{i} = str(1:iPosMarker-1);
 end
 spots = clGetUniqueID(spots);
 series = struct([]);

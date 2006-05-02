@@ -59,3 +59,4 @@ while(1)
 
 end
 importedFields = clHdr(bImport);
+fclose(fid);

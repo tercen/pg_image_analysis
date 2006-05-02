@@ -128,7 +128,7 @@ end
 
 handles.hPlot = [];
 handles.stModels = stModels;
-handles.versionStr  = 'CurveFitHT v1.74';
+handles.versionStr  = 'CurveFitHT v1.76';
 
 cfFitOpts.offsetX   = 0;
 cfFitOpts.offsetY   = 0;
@@ -679,16 +679,16 @@ end
 
 if get(hFitAllButton, 'UserData') ~= -1
     % now recalculate the wChiSqr based on all residuals
-    
-    
-    
+
     clLog{length(clLog)+1} = cellstr('logEnd');
     vGen = vGeneral(handles, cSet, cfOpts);
     
     bDoQC = get(findobj('Tag', 'miDoQc'), 'Checked');
     if isequal(bDoQC, 'on')
         [vAll, vGenEntries, strRefID]= cfGlobalQC(vAll, handles.iniPars.strRefID);
-        handles.iniPars.strRefID = strRefID;
+        if ~isempty(strRefID)
+            handles.iniPars.strRefID = strRefID;
+        end
         if ~isempty(vGenEntries)
             clNames = fieldnames(vGenEntries);
             for n = 1:length(clNames)
@@ -789,7 +789,7 @@ for i = 1:nData
     aChiSqr     = sum(absRes(:,i).^2);
 
     % make results vector for this fit
-    v(i).ID = Settings.clCurrentID(i);
+    v(i).ID = Settings.clCurrentID{i};
     v(i).QcFlag = '';
     [r,c] = fname2rc(dataname,sInstrument);
     if ~isempty(r) &~isempty(c)
@@ -1102,7 +1102,7 @@ function enableGui(strEnable)
 set(findobj('Tag','puUseX'), 'Enable', strEnable);
 set(findobj('Tag','puEndLevel'), 'Enable', strEnable);
 set(findobj('Tag','puDerivative'), 'Enable', strEnable);
-set(findobj('Tag','puModel'), 'Enable', strEnable);
+%set(findobj('Tag','puModel'), 'Enable', strEnable);
 set(findobj('Tag','mFile'), 'Enable', strEnable);
 set(findobj('Tag','mPreferences'), 'Enable', strEnable);
 set(findobj('Tag','pbNext'), 'Enable', strEnable);

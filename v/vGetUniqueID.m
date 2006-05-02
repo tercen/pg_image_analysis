@@ -1,4 +1,4 @@
-function [clID, msg] = vGetUniqueID(v, fName)
+function [clID, msg, labels] = vGetUniqueID(v, fName)
 % clID = vGetUniqueID(v, fName)
 % return the unique values in structure v, field fName
 
@@ -12,4 +12,4 @@ if isempty(strmatch(fName, names, 'exact'))
 end
 
 [clList{1:length(v)}] = deal(v.(fName));
-clID = clGetUniqueID(clList);
+[clID, labels] = clGetUniqueID(clList);

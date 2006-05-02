@@ -22,7 +22,7 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 02-Feb-2006 18:51:44
+% Last Modified by GUIDE v2.5 24-Apr-2006 10:41:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -109,11 +109,11 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.7.1b';
+handles.version = 'alpha.7.2 uc';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.seriesMode = 'fixed';
-handles.spotWeight = 'equalize';
+handles.spotWeight = 'co-equalize';
 
 miFixedSegmentation_Callback(handles.miFixedSegmentation, [], handles);
 strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
@@ -246,6 +246,7 @@ guidata(hObject, handles);
            % Set array object , preprocessing object and segmentation
             % object with instrument specific parameters.
             spotPitch = pars.spotPitch;
+            satLimit = pars.saturationLimit;
             inipars = handles.iniPars;
             axRot = [inipars.minRot:inipars.dRot:inipars.maxRot];
             handles.oArray = set(handles.oArray, 'spotPitch', spotPitch, ...
@@ -267,7 +268,8 @@ guidata(hObject, handles);
                            'measure', inipars.outlierMetric);
                        
             handles.oQ = spotQuantification('backgroundMethod', inipars.qBackgroundMethod, ...
-                                            'oOutlier', oOut);
+                                            'oOutlier', oOut, ...
+                                            'saturationLimit', satLimit);
                                                                           
             %%% initialilzie exposure time popup
             uT = vGetUniqueID(list, 'T');
@@ -575,12 +577,12 @@ end
 [c, iSort] = sort(c);
 I = I(:,:,iSort);
 expNames = expNames(iSort);
-try
+%try
     handles = gridCycleSeries(handles, I);
-catch
-     errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
-     return
-end
+% catch
+%      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+%      return
+% end
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
 
@@ -826,6 +828,7 @@ function miSpotWeightIntensity_Callback(hObject, eventdata, handles)
 
 set(hObject, 'checked', 'on')
 set(handles.miSpotWeightEqual, 'checked', 'off');
+set(handles.miSpotWeightCoEqual, 'checked', 'off');
 handles.spotWeight = 'linear';
 guidata(hObject, handles);
 % --------------------------------------------------------------------
@@ -836,10 +839,20 @@ function miSpotWeightEqual_Callback(hObject, eventdata, handles)
 
 set(hObject, 'checked', 'on')
 set(handles.miSpotWeightIntensity, 'checked', 'off');
+set(handles.miSpotWeightCoEqual, 'checked', 'off');
 handles.spotWeight = 'equalize';
 guidata(hObject, handles);
 
-
+% --------------------------------------------------------------------
+function miSpotWeightCoEqual_Callback(hObject, eventdata, handles)
+% hObject    handle to miSpotWeightCoEqual (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+set(hObject, 'checked', 'on')
+set(handles.miSpotWeightIntensity, 'checked', 'off');
+set(handles.miSpotWeightEqual, 'checked', 'off');
+handles.spotWeight = 'co-equalize';
+guidata(hObject, handles);
 % --------------------------------------------------------------------
 function miExportCurrent_Callback(hObject, eventdata, handles)
 % hObject    handle to miExportCurrent (see GCBO)
@@ -923,5 +936,10 @@ function miParameters_Callback(hObject, eventdata, handles)
 % hObject    handle to miParameters (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+
+
+
 
 

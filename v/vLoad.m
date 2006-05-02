@@ -1,9 +1,21 @@
 function [v,msg] = vLoad(fname);
 % function v = vLoad(fname);
 % will load the  file <fname> into structure v
+% dispalys uigetfile when no fname is specified
 % v will have m entries were m is the number of measurements
 % each entry consists of n fields, where n is the number of headers in <filename> 
 % to see a list of fields in v, use fieldnames(v)
+
+if nargin == 0
+   [sName, sPath] = uigetfile('*.v');
+   if sName == 0
+       return
+   end
+   fname = [sPath, '\', sName];
+
+end
+   
+
 
 msg = [];
 [fid, message] = fopen(fname, 'rt');

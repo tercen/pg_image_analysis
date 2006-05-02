@@ -36,6 +36,8 @@ end
 rsizFactor = rSize./size(I(:,:,iGrid));
 oPP = rescale(gdata.oP, rsizFactor(1));
 
+%oPP = set(oPP, 'contrast', 'co-equalize');
+
 Igrid = getPrepImage(oPP, imresize(I(:,:,iGrid), rSize));
 
 spotPitch   = get(gdata.oArray, 'spotPitch');

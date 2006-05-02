@@ -12,7 +12,7 @@ close all
 
 %% User Settings
 % 1. Use (true) or don't use (false) the v-file flags
-autoOutlier = false;
+autoOutlier = true;
 % 2. Use (true) or don't use (false) manual outlier detection before
 % fitting:
 manOutlier = true;
@@ -126,7 +126,7 @@ mkdir(vPath, '_sFitReport_');
 options.outputDir = [vPath,'\_sFitReport'];
 options.format = 'html';
 options.showCode = false;
-publish('sFitReport.m', options); 
+publish('sFitReportCV.m', options); 
 
 
 iPoint = findstr(vName, '.');

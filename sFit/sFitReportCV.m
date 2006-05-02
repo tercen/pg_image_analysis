@@ -17,11 +17,10 @@ for i=1:length(series)
     y = series(i).y;
     w = ones(size(x));
     w(series(i).out) = 0;
-    try
-        [pRes, pAse, wOut] = computeFit(oP,x,y,w); 
-        dx = abs( (max(x) - min(x))/25);
-        xFit = [min(x):dx:max(x)];
-        yFit = getCurve(oF, xFit, pRes);
+    [pRes, pAse, wOut] = computeFit(oP,x,y,w); 
+     dx = abs( (max(x) - min(x))/25);
+     xFit = [min(x):dx:max(x)];
+     yFit = getCurve(oF, xFit, pRes);
      
     out = false(size(x));
     out(wOut < 0.01) = true;
@@ -55,6 +54,7 @@ for i=1:length(series)
     X = X(iPoints);
     N = N(iPoints);
     S = S(iPoints);
+    CV = S./Y;
     avFit = getCurve(oF, X, pRes);
     R2 = CalcR(avFit, Y');
     hAv = errorbar(X, Y, S./sqrt(N), '.');
@@ -91,10 +91,7 @@ for i=1:length(series)
    set(gca, 'Position', [0.0961    0.1674    0.5087    0.7313]);
    set(gcf, 'Position', [142   337   620   227])
    createtextbox(gcf, clLine);
+   figure
+   bar(X, CV);
    clear clLine;
-    catch
-        disp(strTitle);
-        disp(lasterr)
-    end
-       
 end
