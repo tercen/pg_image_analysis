@@ -31,8 +31,8 @@ function pdef = getProperties
 %
 pdef(1).name    = 'prpContrast';
 pdef(1).dft     = uint8(0);
-pdef(1).enumVal = uint8([0,1]);
-pdef(1).enumMap = {'equalize', 'linear'};
+pdef(1).enumVal = uint8([0,1,2]);
+pdef(1).enumMap = {'co-equalize', 'equalize', 'linear'};
 %
 pdef(2).name    = 'prpLargeDisk';
 pdef(2).dft     = 0.51;
@@ -130,7 +130,7 @@ pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'sqcMaxPositionOffset';
-pdef(end).dft   = 0.35;
+pdef(end).dft   = 0.4;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %

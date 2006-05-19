@@ -77,6 +77,7 @@ end
 oArray = array  ('mask'         , grdMask, ...
                  'spotPitch'    , grdSpotPitch, ...
                  'spotSize'     , grdSpotSize * grdSpotPitch, ...
+                 'rotation'     , grdRotation, ...
                  'xOffset'      , grdXOffset, ...
                  'yOffset'      , grdYOffset);
              
@@ -117,7 +118,7 @@ elseif grdUseImage == -1
     % use last
     settings.nGridImage = nImages;
 elseif grdUseImage > 0 & grdUseImage <= nImages
-    settings.gridImage = grdUseImage
+    settings.gridImage = grdUseImage;
 else
     error('PamSoft_Grid, invalid value for grdUseImage');
 end
@@ -129,6 +130,7 @@ sqc.maxAspectRatio          = sqcMaxAspectRatio;
 sqc.maxOffset               = sqcMaxPositionOffset;
 settings.sqc = sqc;
 settings.resize             = prpResize;
+
 
 [stateQuantification, oArray] = gridCycleSeries(I, oPrep, oArray, oS0, oQ0, qntSpotID, settings);
 for i=1:nImages

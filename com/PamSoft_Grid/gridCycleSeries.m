@@ -40,7 +40,9 @@ y(y>size(I,2)) = size(I,2);
 oS = segment(oS0, I(:,:, iGrid), x, y,rotOut);
 % quality control
 oProps = setPropertiesFromSegmentation(spotProperties, oS);
-qArray = setSet(oQ0, oS, oProps,clID);
+qArray = setSet(oQ0,   'oSegmentation', oS, ...
+                            'oProperties', oProps, ...
+                            'ID', clID);
 qArray = check4EmptySpots(qArray);
 qArray = replaceEmptySpots(qArray);
 qArray = check4BadSpots(qArray, 'mindiameter', spotPitch * sqc.minDiameter, ...
@@ -88,7 +90,9 @@ oS0 = set(oS0, 'spotPitch', spotPitch);
 oS = segment(oS0, I(:,:, iGrid), x, y,rotOut);
 % quality control
 oProps = setPropertiesFromSegmentation(spotProperties, oS);
-qArray = setSet(oQ0, oS, oProps, clID);
+qArray = setSet(oQ0,   'oSegmentation', oS, ...
+                            'oProperties', oProps, ...
+                            'ID', clID);
 qArray = check4EmptySpots(qArray);
 qArray = replaceEmptySpots(qArray);
 qArray = check4BadSpots(qArray, 'mindiameter', spotPitch * sqc.minDiameter, ...
@@ -124,7 +128,7 @@ for i=1:nImages
     sRefs = segment(oS0, I(:,:,i), x(iRef), y(iRef), rotOut);
     pRefs = setPropertiesFromSegmentation(spotProperties, sRefs);
     % find the position midpoint
-    qRefs = setSet(oQ0, sRefs, pRefs, []);
+    qRefs = setSet(oQ0, 'oSegmentation', sRefs, 'oProperties', pRefs);
     res = getResult(qRefs);
     [clxPos{1:length(res)}]  = deal(res.X_Position); xPos = cell2mat(clxPos);
     [clyPos{1:length(res)}]  = deal(res.Y_Position); yPos = cell2mat(clyPos);
