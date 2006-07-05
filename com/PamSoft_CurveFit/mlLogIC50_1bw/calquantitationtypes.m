@@ -97,7 +97,12 @@ aChiSqr = sum( (f-y).^2);
 iOut = y == 0;
 rChiSqr = sum( ( f(~iOut)-y(~iOut) )./y(~iOut).^2) ;
 
+hs = pOut(4);
+Yspan = pOut(2);
 
+% Yspan_signed receives the same sign as the hill slope to indicate
+% up/down curve
+Yspan_signed = sign(hs) * Yspan; 
 
 
 
@@ -107,7 +112,8 @@ quantitationTypes = [pOut;
                      pStdError;
                      R2;
                      aChiSqr;
-                    rChiSqr;
+                     rChiSqr;
+                     Yspan_signed;
                     ];
       
 confidenceTypes = wOut;
