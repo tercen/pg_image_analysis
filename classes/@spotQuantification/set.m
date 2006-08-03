@@ -25,7 +25,7 @@ for i=1:2:length(pArgin)
             end
 
         case 'oOutlier'
-            if isa(val, 'outlier')
+            if isa(val, 'outlier') | isempty(val)
                 q.oOutlier = val;
     
             else
@@ -37,7 +37,7 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = true;
             end
-        case oProperties
+        case 'oProperties'
             if isa(val, 'spotProperties')
                 q.oProperties = val;
             else

@@ -38,19 +38,30 @@ pSat        = get(qIn, 'signalSaturation');
 
 oComb = combineExposureTimes('combinationCriterium', maxSaturation);
 
-cMedSig     = combineData(oComb, medSig     , pSat, expTime);
-cMedBg      = combineData(oComb, medBg      , pSat, expTime);
+cMedSig     = combineData(oComb, double(medSig)     , pSat, expTime);
+cMedBg      = combineData(oComb, double(medBg)      , pSat, expTime);
 cMeanSig    = combineData(oComb, meanSig    , pSat, expTime);
 cMeanBg     = combineData(oComb, meanBg     , pSat, expTime);
 csSig       = combineData(oComb, sSig       , pSat, expTime);
 csBg        = combineData(oComb, sBg        , pSat, expTime);
-cmxSignal   = combineData(oComb, mxSignal   , pSat, expTime);
-cmnSignal   = combineData(oComb, mnSignal   , pSat, expTime);
-cmxBg       = combineData(oComb, mxBg       , pSat, expTime);
-cmnBg       = combineData(oComb, mnBg       , pSat, expTime);
+cmxSignal   = combineData(oComb, double(mxSignal)   , pSat, expTime);
+cmnSignal   = combineData(oComb, double(mnSignal)   , pSat, expTime);
+cmxBg       = combineData(oComb, double(mxBg)       , pSat, expTime);
+cmnBg       = combineData(oComb, double(mnBg)       , pSat, expTime);
 cpSat       = combineData(oComb, pSat       , pSat , ones(size(expTime)));
 
-
+qCombined = setSet(qIn(:,:,1)  , 'medianSignal', cMedSig, ...
+                            'medianBackground', cMedBg, ...
+                            'meanSignal', cMeanSig, ...
+                            'meanBackground', cMeanBg, ...
+                            'stdSignal', csSig, ...
+                            'stdBackground', csBg, ...
+                            'maxSignal', cmxSignal, ...
+                            'minSignal', cmnSignal, ...
+                            'maxBackground', cmxBg, ...
+                            'minBackground', cmnBg, ...
+                            'signalSaturation', cpSat);
+                    
 
 
 

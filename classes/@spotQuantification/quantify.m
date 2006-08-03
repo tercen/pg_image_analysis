@@ -1,5 +1,14 @@
 function oq = quantify(oq, I)
 
+% convert I to signed integer if necessary:
+% (to allow negative values after background subtraction, later on)
+switch class(I)
+    case 'uint16'
+        I = int16(I);
+    case 'uint8'
+        I = int8(I);
+end        
+
 [nRows, nCols] = size(oq);
 for i=1:nRows
     for j = 1:nCols
@@ -59,6 +68,7 @@ for i=1:nRows
                 bgIgnored =  bgMask &  (imLocal < bgLimits(1) | imLocal > bgLimits(2));
                 oq(i,j).iIgnored = find( sigIgnored(:)|bgIgnored(:) );
             end
+            % for the rank test:
             % since pixel intensities are integere, we can handle the ties
             % in MW test below by adding 0.5 to one of the
             % distributions (here: sigPix)

@@ -11,7 +11,7 @@ else
         if isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
             [n, m] = size(p);
             value = [p(:).(clNames{i})];
-            value = reshape(value, n,m);
+            value = reshape(value, n,m, length(value));
             return
         end
 

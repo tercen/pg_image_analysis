@@ -12,10 +12,10 @@ bOut = oc.criteriumParity * I >= oc.criteriumParity * oc.combinationCriterium;
 for i=2:s(3);
     b = ~bOut(:,:,i);
     Ih = I(:,:,i);
-    Ic(b) =   Ih(b)/expTimes(i);
-    
+    Ic(b) =   Ih(b)/expTimes(i);    
 end
-
+% convert to uint16
+Ic = uint16((Ic*(2^16-1))/max(Ic(:)));
 
     
 

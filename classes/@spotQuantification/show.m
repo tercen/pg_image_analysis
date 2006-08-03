@@ -2,7 +2,7 @@ function [hImage, hBound] = show(oQ, I, dr)
 if nargin < 3
     dr = [];
 end
-hImage = imshow(I, dr);
+hImage = imshow(I, dr, 'ini', 'fit');
 hBound = [];
 colormap(gca, 'jet');
 szArray = size(oQ);
