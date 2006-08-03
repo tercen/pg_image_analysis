@@ -1,13 +1,5 @@
 function oq = quantify(oq, I)
-
-% convert I to signed integer if necessary:
-% (to allow negative values after background subtraction, later on)
-switch class(I)
-    case 'uint16'
-        I = int16(I);
-    case 'uint8'
-        I = int8(I);
-end        
+    
 
 [nRows, nCols] = size(oq);
 for i=1:nRows
