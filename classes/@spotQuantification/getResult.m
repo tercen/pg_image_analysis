@@ -19,12 +19,14 @@ smb = getSigmBg(oq);
 [res(1:r, 1:c).Signal_Saturation]    = deal(oq.signalSaturation);
 dummy = getpignored(oq);
 [res(1:r, 1:c).Fraction_Ignored]    = deal(dummy.pIgnored);
+
 oProps = [oq(:).oProperties];
 oProps = reshape(oProps,r,c); oProps = struct(oProps);
 [res(1:r, 1:c).Diameter]            = deal(oProps.diameter);
 [res(1:r, 1:c).Shape_Factor]        = deal(oProps.formFactor);
 [res(1:r, 1:c).Aspect_Ratio]        = deal(oProps.aspectRatio);
 [res(1:r, 1:c).nChiSqr ]            = deal(oProps.nChiSqr);
+
 oSeg = [oq(:).oSegmentation];
 oSeg = reshape(oSeg,r,c); oSeg = struct(oSeg);
 dummy = getposition(oProps, oSeg);
@@ -32,7 +34,6 @@ dummy = getposition(oProps, oSeg);
 [res(1:r, 1:c).Y_Position]  = deal(dummy.Y_Position);
 [res(1:r, 1:c).X_Offset]    = deal(dummy.X_Offset);
 [res(1:r, 1:c).Y_Offset]    = deal(dummy.Y_Offset);
-
 [res(1:r, 1:c).Empty_Spot]  = deal(oq.isEmpty);
 [res(1:r, 1:c).Bad_Spot]    = deal(oq.isBad);
 [res(1:r, 1:c).Replaced_Spot] = deal(oq.isReplaced);
@@ -78,6 +79,6 @@ function out = getSigmBg(oq)
 for i =1:nRows
     for j =1:nCols
         out(i,j).meansmb     = oq(i,j).meanSignal - oq(i,j).meanBackground;
-        out(i,j).mediansmb   = oq(i,j).medianSignal - oq(i,j).medianBackground;
+        out(i,j).mediansmb   = int32(oq(i,j).medianSignal) - int32(oq(i,j).medianBackground);
     end
 end
