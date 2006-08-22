@@ -1,4 +1,4 @@
-function [x,y, rot, g, mx] = gridFind(g, I)
+function [cx,cy, rot, g, mx] = gridFind(g, I)
 % array.gridFind
 % function [x,y,rot,oArrayOut] = gridFind(oArray, I)
 % IN:
@@ -18,9 +18,22 @@ function [x,y, rot, g, mx] = gridFind(g, I)
 % location of the grid.
 
 % check if required parameters have been set
-if isempty(g.mask)
-    error('Parameter ''mask'' has not been set.');
+if isempty(g.row)
+    error('Parameter ''row'' has not been set.');
 end
+if isempty(g.col)
+    error('Parameter ''col'' has not been set.');
+end
+if size(g.row,2) > 1 || size(g.col,2) > 1 
+    error('Parameters ''row'' and ''col'' must be vectors');
+end
+if length(g.row) ~= length(g.col)
+    error('Parameters ''row'' and ''col'' must be vectors of the same length');
+end
+if ~isequal(size(g.xOffset),size(g.row)) || ~isequal(size(g.yOffset),size(g.row))
+    error('Parameters ''xOffset'' and ''yOffset'' must be vectors of the same length as ''row'' and ''col''');
+end
+
 if isempty(g.spotPitch)
     error('Parameter ''spotPitch'' has not been set.');
 end
@@ -28,12 +41,8 @@ if isempty(g.spotSize)
     error('Parameter ''spotSize'' has not been set.');
 end
 
-if ~isempty(g.xOffset) & size(g.xOffset) ~= size(g.mask)
-    error('Dimensions of parameter ''xOffset'' must be the same as that of parameter ''mask''.');
-end
-if ~isempty(g.yOffset) & size(g.yOffset) ~= size(g.mask)
-    error('Dimensions of parameter ''yOffset'' must be the same as that of parameter ''mask''.');
-end
+
+
 
 private = g.private;
 switch g.method
@@ -45,38 +54,37 @@ switch g.method
             private(1).fftTemplate     = makeFFTTemplate(g, size(I));
             % store the current grid settings so it can be checked if the
             % template needs to be updated on the next call.
-            private.mask            = g.mask;
-            private.spotPitch       = g.spotPitch;
-            private.spotSize        = g.spotSize;
-            private.rotation        = g.rotation;
-            private.imageSize       = size(I);
-        elseif  ~isequal(private.mask, g.mask) || ...
-                ~isequal(private.spotPitch, g.spotPitch) || ...
-                ~isequal(private.spotSize,g.spotSize) || ...
-                ~isequal(private.rotation,g.rotation) || ...
+            private(1).templateState = struct(g);
+            private(1).imageSize = size(I);
+        elseif  ~isequal(private.templateState, struct(g)) || ...
                 ~isequal(private.imageSize, size(I))
+                 % template needs updating
                 
-            
-                % template needs updating
-                
-            private.fftTemplate     = makeFFTTemplate(g, size(I));
+            private(1).fftTemplate     = makeFFTTemplate(g, size(I));
             % store the current grid settings so it can be checked if the
             % template needs to be updated on the next call.
-            private.mask            = g.mask;
-            private.spotPitch       = g.spotPitch;
-            private.spotSize        = g.spotSize;
-            private.rotation        = g.rotation;
+            private(1).templateState = struct(g);
+            private(1).imageSize = size(I);
         end
         g.private  = private;
         
         [mx, iRot] = templateCorrelation(I, private.fftTemplate);
         rot = g.rotation(iRot);
-        [cx, cy, ix,iy] = gridCoordinates(mx, ones(size(g.mask)), g.spotPitch, rot, g.xOffset, g.yOffset);
-        x = -ones(size(g.mask));
-        for i=1:length(cx)
-            x(ix(i), iy(i)) = cx(i)-2;
-            y(ix(i), iy(i)) = cy(i)-2;
+        
+        % get the coordinates for set1, set2 respectivley
+        bSet1 = g.row > 0 & g.col > 0;
+        bSet2 = ~bSet1;
+        cx = -ones(size(bSet1));
+        cy = -ones(size(cx));
+        if any(bSet1)
+            [cx(bSet1), cy(bSet1)] = gridCoordinates(g.row(bSet1), g.col(bSet1), g.xOffset(bSet1), g.yOffset(bSet1), mx, g.spotPitch, rot);
         end
+        if any(bSet2)
+            [cx(bSet2), cy(bSet2)] = gridCoordinates(g.row(bSet2), g.col(bSet2), g.xOffset(bSet2), g.yOffset(bSet2), mx, g.spotPitch, rot);
+        end
+        
+        cx = cx-2;
+        cy = cy-2;
         
         
     otherwise

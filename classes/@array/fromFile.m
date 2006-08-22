@@ -1,4 +1,4 @@
-function [g,clID] = fromFile(g, fName, gridRefMarker)
+function g = fromFile(g, fName, gridRefMarker)
 % array.fromFile
 % [oArrayOut, clID] = fromFile(oArray, filename, <gridRefMarker>)
 % read array object form file
@@ -54,11 +54,6 @@ if fid == -1
     error(['Could not open: ', fName]);
 end
 
-hdrLine{1} = 'Row';
-hdrLine{2} = 'Col';
-hdrLine{3} = 'ID';
-hdrLine{4} = 'Xoff';
-hdrLine{5} = 'Yoff';
 fLine = strread(fgetl(fid), '%s', 'delimiter', '\t')';
 
 % read in spot data 
@@ -75,41 +70,60 @@ while(1)
             [lRow, lCol, strID, lxOff, lyOff]  = strread(strLine,'%f%f%s%f%f', 'delimiter', '\t');
             row(n) = lRow;
             col(n) = lCol;
-            xOff(n) = lxOff;
-            yOff(n) = lyOff;
-             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
+            xOffset(n) = lxOff;
+            yOffset(n) = lyOff;
+            ID{n} = char(strID);
+           
+            %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
             eStr = [lasterr,' On line ',num2str(n),': ',strLine];
             error(eStr, 'error reading template file');
         end
-        ID(n) = cellstr(strID);
-        n= n+ 1;
+         n= n+ 1; 
 
     end
 end
 fclose(fid);
 % find grid references  (use gridRefMarker);
-% and create mask;
 if ~isempty(gridRefMarker)
-    iMatch = strmatch(gridRefMarker, ID);
-    if ~isempty(iMatch)
-        mask = zeros(max(row), max(col));
-        for n=1:length(iMatch)
-            i = row(iMatch(n));
-            j = col(iMatch(n));
-            mask(i,j) = 1;
-        end
-    else
-        mask = ones(max(row), max(col));
+    isreference = strncmp(gridRefMarker, ID, length(gridRefMarker));
+    if ~any(isreference)
+        % if no grdRefMarker set all true;
+        isreference = true(size(ID));
     end
 else
-    mask = ones(max(row), max(col));
+    % if no ref specified set all true;
+    isreference = true(size(ID));
 end
-g.mask = mask;
-for i=1:length(ID)
-    clID(row(i), col(i)) = ID(i);
-    g.xOffset(row(i), col(i)) = xOff(i);
-    g.yOffset(row(i), col(i)) = yOff(i);
-end
-% return ID's as well
+
+g.row = row';
+g.col = col';
+g.isreference = isreference';
+g.ID = ID';
+g.xOffset = xOffset';
+g.yOffset = yOffset';
+
+% and create mask;
+% if ~isempty(gridRefMarker)
+%     iMatch = strmatch(gridRefMarker, ID);
+%     if ~isempty(iMatch)
+%         mask = zeros(max(row), max(col));
+%         for n=1:length(iMatch)
+%             i = row(iMatch(n));
+%             j = col(iMatch(n));
+%             mask(i,j) = 1;
+%         end
+%     else
+%         mask = ones(max(row), max(col));
+%     end
+% else
+%     mask = ones(max(row), max(col));
+% end
+% g.mask = mask;
+% for i=1:length(ID)
+%     clID(row(i), col(i)) = ID(i);
+%     g.xOffset(row(i), col(i)) = xOff(i);
+%     g.yOffset(row(i), col(i)) = yOff(i);
+% end
+% % return ID's as well
 

@@ -30,7 +30,7 @@ results = getResult(q);
 results = results(:);
 fprintf(fid, '%s\n', '<Spots>');
 fNames = fieldnames(results);
-fprintf(fid, '%s\t%s\t', 'Row', 'Column');
+
 for i=1:length(fNames)
     if ismember(fNames(i), sFields)
         fprintf(fid, '%s\t', fNames{i});
@@ -38,8 +38,7 @@ for i=1:length(fNames)
 end
 fprintf(fid, '\n');
 for i=1:length(results)
-    [row, col] = ind2sub([nRows, nCols], i);
-    fprintf(fid, '%d\t%d\t', row, col);
+
     for j=1:length(fNames)
         
         if ismember(fNames(j), sFields)

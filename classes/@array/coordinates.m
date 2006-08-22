@@ -1,9 +1,3 @@
 function [cx,cy] = coordinates(oArray,mp, rotation)
-[x,y, subx, suby] = gridCoordinates(mp, oArray.mask, oArray.spotPitch, rotation, oArray.xOffset, oArray.yOffset);
+[cx,cy] = gridCoordinates(oArray.row, oArray.col, oArray.xOffset, oArray.yOffset, mp, oArray.spotPitch, rotation);
 
-iLin = sub2ind(size(oArray.mask), subx, suby);
-cx = zeros(size(oArray.mask));
-cx(iLin) = x;
-cy = zeros(size(cx));
-cy(iLin) = y;
-% EOF

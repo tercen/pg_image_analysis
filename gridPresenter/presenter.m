@@ -84,6 +84,9 @@ switch imType
         set(handles.cmDisplayRange12Bit, 'checked', 'off');
         set(handles.cmDisplayRange16Bit, 'checked', 'on');
         handles.fullRange = 2^16;
+    case 'double'
+        handles.fullRange = 1;
+        
 end
 dVal = handles.displayRange(2)/handles.fullRange;
 set(handles.slDisplayRange, 'Value' ,dVal);
@@ -186,7 +189,9 @@ set(handles.hSpot, 'CData',d/dVal);
 
 handles.focus = [iNew, jNew];
 guidata(hObject, handles);
-iStr = [num2str(iNew),':', num2str(jNew)];
+arrayRow = get(handles.oQ(iNew, jNew), 'arrayRow');
+arrayCol = get(handles.oQ(iNew, jNew), 'arrayCol');
+iStr = [num2str(arrayRow),':', num2str(arrayCol)];
 axes(handles.axImage);
 title(iStr);
 function plot_Callback(hObject, eventData, handles)

@@ -90,8 +90,14 @@ switch p.contrast
         % get 0.99 quantile
   
         q99 = quantile(Ipp(:), 0.99);
-        Ipp = imadjust(Ipp, [bgLevel, double(q99)]/bDepth);
-        Ipp = histeq(Ipp);
+        
+        % if the adjust step fails, refer to equalize:
+        try 
+            Ipp = imadjust(Ipp, [bgLevel, double(q99)]/bDepth);
+            Ipp = histeq(Ipp);
+        catch 
+            Ipp = histeq(Ipp);
+        end
         
 end
 

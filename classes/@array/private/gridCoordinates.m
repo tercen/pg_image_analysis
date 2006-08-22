@@ -1,4 +1,4 @@
-function [x,y, ix, iy] = gridCoordinates(mp, refMask, spotPitch, rotation, x0, y0)
+function [x,y, ix, iy] = gridCoordinates(row,col,x0,y0,mp, spotPitch, rotation)
 % function [x,y, ix, iy] = gridCoordinates(mp, refMask, spotPitch, rotation, x0, y0)
 % this function generates the coordinates of spots in a grid.
 % IN:
@@ -20,30 +20,22 @@ function [x,y, ix, iy] = gridCoordinates(mp, refMask, spotPitch, rotation, x0, y
 %
 % OUT:
 % x,y coordinates of positions
-% ix, iy, row, col indices corresponding to the entries in x and y.
-
-[nRows, nCols] = size(refMask);
-[ix,iy] = find(refMask);
-% if offsets from ideal are entered use these , if empty use zeros
-if isempty(x0)
-    x0 = zeros(size(refMask));
-end
-if isempty(y0)
-    y0 = zeros(size(refMask));
-end
-
-% convert to linear index
-iReq = sub2ind(size(refMask), ix, iy);
-iX0 = x0(iReq);
-iY0 = y0(iReq);
-
 % 
+
+ 
 if length(spotPitch) == 1
     spotPitch(2) = spotPitch(1);
 end
+row = abs(row);
+col = abs(col);
+
+nRows = max(row);
+nCols = max(col);
+
 % calculate grid coordinates, zeros centered
-x = spotPitch(1)*(ix-mean(1:nRows)) + spotPitch(1) * iX0;
-y = spotPitch(2)*(iy-mean(1:nCols)) + spotPitch(2) * iY0;
+
+x = spotPitch(1)*(row-mean(1:nRows)) + spotPitch(1) * x0;
+y = spotPitch(2)*(col-mean(1:nCols)) + spotPitch(2) * y0;
 
 % rotate the grid
 teta = (2*pi/360) * rotation;

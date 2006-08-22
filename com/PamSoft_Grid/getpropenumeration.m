@@ -5,7 +5,9 @@ global prpSmallDisk
 global prpCircleDiameter
 global prpCircleBlurr
 global prpResize
-global grdMask
+global grdRow
+global grdCol
+global grdIsReference
 global grdRotation
 global grdSpotPitch
 global grdSpotSize
@@ -26,6 +28,7 @@ global qntSaturationLimit
 global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
+global stateQuantification
 
 pdef = getProperties();
 [pnames{1:length(pdef)}] = deal(pdef.name);

@@ -59,11 +59,21 @@ pdef(end).dft   = [256,256];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-pdef(end+1).name = 'grdMask';
+pdef(end+1).name = 'grdRow';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
+pdef(end+1).name = 'grdCol';
+pdef(end).dft   = [];
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+%
+pdef(end+1).name = 'grdIsReference';
+pdef(end).dft   = [];
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+
 pdef(end+1).name = 'grdRotation';
 pdef(end).dft   = [-2:0.25:2];
 pdef(end).enumVal = [];

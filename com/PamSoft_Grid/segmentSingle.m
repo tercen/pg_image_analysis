@@ -5,7 +5,9 @@ global prpSmallDisk
 global prpCircleDiameter
 global prpCircleBlurr
 global prpResize
-global grdMask
+global grdRow
+global grdCol
+global grdIsReference
 global grdRotation
 global grdSpotPitch
 global grdSpotSize

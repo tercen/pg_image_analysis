@@ -1,4 +1,4 @@
-function qTypes = analyzecycleseries(imagePath)
+function qTypes = analyzecycleseries(imagePath, T, P)
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
@@ -32,6 +32,10 @@ global stateQuantification
 
 if ~iscell(imagePath)
     imagePath = cellstr(imagePath);
+end
+
+if length(T) ~= length(imagePath) | length(P) ~= length(imagePath) | length(P) ~= length(T)
+    error('Input arguments ''P'', ''T'', and ''imagePath'' must be arrays of the same length')
 end
 
 
@@ -123,14 +127,17 @@ for i=1:length(imagePath)
 end
 nImages = size(I,3);
 % initialize some implementation settings
+
+% The grid images are the exposure time series images of first / last / requested cycle
+[uP,pUbels, pLabels] = unique(P);
 if grdUseImage == 0
     % use first
-    settings.nGridImage = 1;
+    settings.nGridImage = find(pLabels == 1);
 elseif grdUseImage == -1
     % use last
-    settings.nGridImage = nImages;
+    settings.nGridImage = find(pLabels == length(up);
 elseif grdUseImage > 0 & grdUseImage <= nImages
-    settings.gridImage = grdUseImage;
+    settings.nGridImage = find(pLabels == grdUseImage);
 else
     error('PamSoft_Grid, invalid value for grdUseImage');
 end
@@ -144,10 +151,12 @@ settings.sqc = sqc;
 settings.resize             = prpResize;
 
 
-[stateQuantification, oArray] = gridCycleSeries(I, oPrep, oArray, oS0, oQ0, qntSpotID, settings);
+[stateQuantification, oArray] = gridCycleSeries(I, oPrep, oArray, oS0, oQ0, qntSpotID, T(settings.nGridImage),settings);
 for i=1:nImages
     qTypes(:,:,i) = makeQTypes(stateQuantification(:,:,i));
 end
+
+
 
 % permute qTypes from: DesignElement-QuantitationType-BioAssay 
 % to : BioAssay-DesignElement-QuantitationType

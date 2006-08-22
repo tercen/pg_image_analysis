@@ -1,6 +1,8 @@
 function res = getResult(oq)
 [r,c] = size(oq);
 oq = struct(oq);
+[res(1:r, 1:c).Row]                  = deal(oq.arrayRow);                  
+[res(1:r, 1:c).Column]               = deal(oq.arrayCol);
 [res(1:r,1:c).ID]                    = deal(oq.ID);
 smb = getSigmBg(oq);
 [res(1:r, 1:c).Mean_SigmBg]         = deal(smb.meansmb);

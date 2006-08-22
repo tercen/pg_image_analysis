@@ -1,37 +1,51 @@
 function template = makeTemplate(g, imageSize)
 % function Template = makeTemplate(g, imageSize)
-refMask          = g.mask;
-spotPitch        = g.spotPitch;
-spotDiameter     = g.spotSize;
-axRot            = g.rotation;
-x0               = g.xOffset;
-y0               = g.yOffset;
-
 mp = round(imageSize)/2;
+template = false(imageSize(1), imageSize(2), length(g.rotation));
 
-nSpots = length(find(refMask));
-
-spotRad = round(spotDiameter/2);
-se = strel('disk', spotRad);
-spot = uint8(getnhood(se));
-[s1, s2] = size(spot);
-template = uint8(zeros(imageSize(1), imageSize(2), length(axRot)));
-for iRot=1:length(axRot)
-    [x,y] = gridCoordinates(mp, refMask, spotPitch, axRot(iRot), x0, y0);
-    xyLu = [round(x),round(y)] - repmat(round([s1,s2]/2), nSpots,1);
-    xyRl = xyLu  + repmat([s1,s2] - 1, nSpots,1);
-
-    if any(xyLu < 1) | any(xyRl(:,1) > imageSize(1)) | any(xyRl(:,2) > imageSize(2))
-        error('Array out of image');
-    end
-
-    for i=1:nSpots
-        iX1 = xyLu(i,1);
-        iX2 = xyRl(i,1);
-        iY1 = xyLu(i,2);
-        iY2 = xyRl(i,2);
-        template(iX1:iX2, iY1:iY2, iRot) = spot;
-    end
+% if no offsets defines, set all to zero:
+if isempty(g.xOffset)
+    g.xOffset = zeros(size(g.row));
 end
-template = 255 * template;
-%EOF
+if isempty(g.yOffset)
+    g.yOffset = zeros(size(g.row));
+end
+% select the designated references
+useRow = g.col(g.isreference);
+useCol = g.row(g.isreference);
+r = round(g.spotSize/2);
+
+imSpot = zeros(round(2.1*r));
+sImSpot = round(size(imSpot)/2);
+[xCircle, yCircle] = circle(round(size(imSpot)/2), r, round(2*pi*r));
+[ix, iy] = find(~imSpot);
+bIn = inpolygon(ix, iy, xCircle, yCircle);
+% get the disk coordinates, centered around [0,0];
+xDisk = ix(bIn) - sImSpot(1);
+yDisk = iy(bIn) - sImSpot(2);
+
+% make a template for all required rotations:
+for i =1:length(g.rotation)
+    temp = false(size(template(:,:,1)));
+    set1 = useRow > 0 & useCol > 0;
+    if any(set1)
+        [x1,y1] = gridCoordinates(useCol(set1), useRow(set1),g.xOffset(set1), g.yOffset(set1), mp, g.spotPitch, g.rotation(i));        
+        for j=1:length(x1)
+            cSpot = [xDisk + x1(j), yDisk + y1(j)];
+            temp(sub2ind(size(temp), round(cSpot(:,1)), round(cSpot(:,2))) ) = true;
+        end
+    end    
+    set2 = useRow < 0 & useCol < 0;
+    if any(set2)
+        [x2,y2] = gridCoordinates(useCol(set2), useRow(set2),g.xOffset(set2), g.yOffset(set2), mp, g.spotPitch, g.rotation(i)); 
+        for j=1:length(x2)
+            cSpot = [xDisk + x2(j), yDisk + y2(j)];
+            temp(sub2ind(size(temp), round(cSpot(:,1)), round(cSpot(:,2))) ) = true;
+        end
+        
+    end
+    template(:,:,i) = temp;
+end
+
+
+

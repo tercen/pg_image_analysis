@@ -64,9 +64,12 @@ if length(varargin) == 1
     end
 end
 
-g.mask           = [];
-g.xOffset        = [];
-g.yOffset        = [];
+g.row           = [];
+g.col           = [];
+g.isreference   = [];
+g.xOffset       = [];
+g.yOffset       = [];
+g.ID            = [];
 g.spotPitch      = [];
 g.spotSize       = [];
 g.rotation       =  0;

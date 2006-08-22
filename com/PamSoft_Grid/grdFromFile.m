@@ -5,35 +5,17 @@ global prpSmallDisk
 global prpCircleDiameter
 global prpCircleBlurr
 global prpResize
-global grdMask
+global grdRow
+global grdCol
+global grdIsReference
 global grdRotation
 global grdSpotPitch
-global grdXOffset
-global grdYOffset
-global grdRotation
-global grdUseImage
-global segMethod
-global segEdgeSesitivity
-global segAreaSize
-global sqcMaxDiameter
-global sqcMinDiameter
-global sqcMinFormFactor
-global sqcMaxAspectRatio
-global sqcMaxPositionOffset
-global prpContrast
-global prpLargeDisk
-global prpSmallDisk
-global prpCircleDiameter
-global prpCircleBlurr
-global prpResize
-global grdMask
-global grdRotation
-global grdSpotPitch
+global grdSpotSize
 global grdXOffset
 global grdYOffset
 global grdUseImage
 global segMethod
-global segEdgeSesitivity
+global segEdgeSensitivity
 global segAreaSize
 global sqcMaxDiameter
 global sqcMinDiameter
@@ -44,13 +26,14 @@ global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
 global qntBackgroundMethod
-global stateQuantification
-global qntSeriesMode
-global qntSaturationLimit
-global qntBackgroundMethod
+global qntOutlierMethod
+global qntOutlierMeasure
 global stateQuantification
 
-[oArray,qntSpotID] =  fromFile(array, templatePath, grdRefMarker);
-grdMask = get(oArray, 'mask');
+oArray =  fromFile(array, templatePath, grdRefMarker);
+qntSpotID = get(oArray, 'ID');
+grdCol          = get(oArray, 'col');
+grdRow          = get(oArray, 'row');
+grdIsReference  = get(oArray, 'isreference');
 grdXOffset = get(oArray, 'xOffset');
 grdYOffset = get(oArray, 'yOffset');

@@ -11,6 +11,8 @@ if length(varargin) == 1
     end
 end
 oq.ID = [];
+oq.arrayRow = [];
+oq.arrayCol = [];
 oq.rotation = [];
 oq.backgroundMethod = 'localCorner';
 oq.backgroundDiameter = 4;

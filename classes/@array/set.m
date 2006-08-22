@@ -4,17 +4,41 @@ pArgin = varargin;
 for i=1:2:length(pArgin)
     bInvalid = 0;
     if length(pArgin) < i+1
-        error('set function expects property / value pairs as input');
+        error('set function expects property/value pairs as input');
     end
     prop = pArgin{i};
     val =  pArgin{i+1};
     switch prop
-        case 'mask'
+        case 'row'
             if isnumeric(val)
-                g.mask = val;
+                g.row = val;
             else
                 bInvalid = 1;
             end
+        case 'col'
+            if isnumeric(val)
+                g.col = val;
+            else
+                bInvalid = 1;
+            end  
+         case 'isreference'
+            if isnumeric(val) || islogical(val)
+                g.isreference = val;
+            else
+                bInvalid = 1;
+            end 
+         case 'xOffset'
+            if isnumeric(val)
+                g.xOffset = val;
+            else
+                bInvalid = 1;
+            end 
+         case 'yOffset'
+            if isnumeric(val)
+                g.yOffset = val;
+            else
+                bInvalid = 1;
+            end 
         case 'spotPitch'
             if isnumeric(val) & length(val) <= 2
                 g.spotPitch = val;
@@ -39,18 +63,7 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
-        case 'xOffset'
-            if isnumeric(val)
-                g.xOffset = val;
-            else
-                bInvalid = 1;
-            end
-        case 'yOffset'
-            if isnumeric(val)
-                g.yOffset = val;
-            else
-                bInvalid = 1;
-            end
+ 
         otherwise
             error(['Invalid property: ', prop]);
     end
