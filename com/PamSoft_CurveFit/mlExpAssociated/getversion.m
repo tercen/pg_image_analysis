@@ -24,8 +24,10 @@ global k_lower
 global k_upper
 version = 'CFEXPASS_1_0_0';
 % CFEXPASS_1_0_0;
-% dll cvs revision: 
+% distrib/PamSoft_CurveFit_mlExpAssociated.ctf (cvs 1.6)
+% distrib/PamSoft_CurveFit_mlExpAssociated_1_0.dll (cvs 1.6)
 % 060823 (RDW)
+%
 % added getversion method
 %
 % sort x and y on entry of calquantitationtype method, to ensure correct
