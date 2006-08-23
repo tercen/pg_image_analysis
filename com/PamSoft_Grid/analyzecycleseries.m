@@ -152,6 +152,4 @@ end
 % permute qTypes from: DesignElement-QuantitationType-BioAssay 
 % to : BioAssay-DesignElement-QuantitationType
 qTypes = permute(qTypes, [3,1,2]);
-
-
 %EOF

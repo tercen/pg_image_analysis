@@ -10,6 +10,7 @@ for i=1:2:length(pArgin)
     val =  pArgin{i+1};
     switch prop
         case 'row'
+         
             if isnumeric(val)
                 g.row = val;
             else

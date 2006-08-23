@@ -1,4 +1,4 @@
-function [qFinal, oArray] = gridCycleSeriesCombineExposures(I, oP, oArray, oS0, oQ0,clID, settings)
+function [qFinal, oArray] = gridCycleSeriesCombineExposures(I, oP, oArray, oS0, oQ0,clID, T, settings)
 % function [qFinal, oArray] = gridCycleSeries(gdata, I)
 if settings.seriesMode == 0 
         [qFinal, oArray] = seriesFixed(I,oP, oArray, oS0, oQ0, clID, T, settings);
@@ -20,6 +20,8 @@ sqc = settings.sqc;
 satLimit = get(oQ0, 'saturationLimit');
 oc = combineExposureTimes('combinationCriterium',satLimit);
 Igrid = combineImages(oc, I(:,:,iGrid), T);
+Igrid = I(:,:,end);
+
 
 rsizFactor = rSize./size(Igrid);
 oPP = rescale(oP, rsizFactor(1));
@@ -48,8 +50,11 @@ oS = segment(oS0, I(:,:, iGrid), x, y,rotOut);
 % quality control
 oProps = setPropertiesFromSegmentation(spotProperties, oS);
 qArray = setSet(oQ0,   'oSegmentation', oS, ...
-                            'oProperties', oProps, ...
-                            'ID', clID);
+                       'oProperties', oProps, ...
+                       'ID', clID, ...
+                       'arrayRow', get(oArray, 'row'), ...
+                       'arrayCol', get(oArray, 'col'));
+                   
 qArray = check4EmptySpots(qArray);
 qArray = replaceEmptySpots(qArray);
 qArray = check4BadSpots(qArray, 'mindiameter', spotPitch * sqc.minDiameter, ...

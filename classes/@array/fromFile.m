@@ -54,7 +54,27 @@ if fid == -1
     error(['Could not open: ', fName]);
 end
 
+% define columnheader keywords that identify the required columns in the
+% file:
+
+clHdrKeyWord{1} = 'Row';
+clHdrKeyWord{2} = 'Col';
+clHdrKeyWord{3} = 'ID';
+clHdrKeyWord{4} = 'Xoff';
+clHdrKeyWord{5} = 'Yoff';
+
+% read the header line into cell array
 fLine = strread(fgetl(fid), '%s', 'delimiter', '\t')';
+%identfy columns nrs corresponding to keyword.
+% error return when any of the keywords is not matched exactly one time:
+for i = 1:length(clHdrKeyWord)
+    iMatch = strmatch(clHdrKeyWord{i}, fLine);
+    if length(iMatch) ~= 1
+        error(['Error reading: ', fName,'. Cannot uniquely identify column header: ',clHdrKeyWord{i}]);
+    else
+        keyMatch(i) = iMatch;
+    end
+end
 
 % read in spot data 
 n = 1;
@@ -67,12 +87,16 @@ while(1)
     strLine = deblank(strLine);
     if ~isempty(strLine)
         try
-            [lRow, lCol, strID, lxOff, lyOff]  = strread(strLine,'%f%f%s%f%f', 'delimiter', '\t');
-            row(n) = lRow;
-            col(n) = lCol;
-            xOffset(n) = lxOff;
-            yOffset(n) = lyOff;
-            ID{n} = char(strID);
+            % read into cell array.
+            clLine = strread(strLine,'%s', 'delimiter', '\t');
+            % get row, col, ID, xOff, yOff according to clHdrKeyWord
+            % (keyMatch).
+            % convert to numerics if appropriate
+            row(n)     = str2num(char((clLine(keyMatch(1)))));
+            col(n)     = str2num(char((clLine(keyMatch(2)))));
+            ID(n)      = clLine(keyMatch(3));
+            xOff(n)    = str2num(char((clLine(keyMatch(4)))));
+            yOff(n)    = str2num(char((clLine(keyMatch(5)))));
            
             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
@@ -100,8 +124,8 @@ g.row = row';
 g.col = col';
 g.isreference = isreference';
 g.ID = ID';
-g.xOffset = xOffset';
-g.yOffset = yOffset';
+g.xOffset = xOff';
+g.yOffset = yOff';
 
 % and create mask;
 % if ~isempty(gridRefMarker)

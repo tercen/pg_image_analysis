@@ -101,8 +101,8 @@ oArray = array  ('row'          , grdRow, ...
 oS0 = segmentation( 'method'            , strSegMethod, ...
                     'spotPitch'         , grdSpotPitch, ...
                     'edgeSensitivity'   , segEdgeSensitivity, ...
-                    'areaSize'          , segAreaSize);
-                
+                    'areaSize'          , segAreaSize, ...
+                    'nFilterDisk'       , prpLargeDisk * grdSpotPitch);
 % initialize quantification object
 if isequal(strQntOutlierMethod, 'none')
     oOut = [];
@@ -135,7 +135,7 @@ if grdUseImage == 0
     settings.nGridImage = find(pLabels == 1);
 elseif grdUseImage == -1
     % use last
-    settings.nGridImage = find(pLabels == length(up);
+    settings.nGridImage = find(pLabels == length(uP));
 elseif grdUseImage > 0 & grdUseImage <= nImages
     settings.nGridImage = find(pLabels == grdUseImage);
 else
@@ -151,7 +151,7 @@ settings.sqc = sqc;
 settings.resize             = prpResize;
 
 
-[stateQuantification, oArray] = gridCycleSeries(I, oPrep, oArray, oS0, oQ0, qntSpotID, T(settings.nGridImage),settings);
+[stateQuantification, oArray] = gridCycleSeriesCombineExposures(I, oPrep, oArray, oS0, oQ0, qntSpotID, T(settings.nGridImage),settings);
 for i=1:nImages
     qTypes(:,:,i) = makeQTypes(stateQuantification(:,:,i));
 end
