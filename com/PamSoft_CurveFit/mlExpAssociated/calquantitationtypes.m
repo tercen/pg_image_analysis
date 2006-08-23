@@ -27,6 +27,7 @@ modelID = getModelID();
 x = double(xData);
 y = double(yData);
 
+
 if size(x,2) > size(x,1)
     x = x';
 end
@@ -34,6 +35,7 @@ if size(y,2) > size(y,1)
     y = y';
 end
 
+[x, iSort] = sort(x); y = y(iSort);
 
 % check if parameter set, otherwise refer to defaults
 

@@ -99,7 +99,7 @@ pdef(20).name   = 'xOffset';
 pdef(20).dft     = 0.0;
 
 pdef(21).name   = 'xOffset_auto';
-pdef(21).dft    = uint8(1);
+pdef(21).dft    = uint8(0);
 pdef(21).enumVal    = uint8([0,1]);
 pdef(21).enumMap = {'no', 'yes'};
 
@@ -107,6 +107,6 @@ pdef(22).name   = 'xVini';
 pdef(22).dft    = 2.0;
 
 pdef(23).name  = 'xVini_auto';
-pdef(23).dft    = uint8(1);
+pdef(23).dft    = uint8(0);
 pdef(23).enumVal = uint8([0,1]);
 pdef(23).enumMap = {'no', 'yes'};
