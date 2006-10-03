@@ -22,16 +22,16 @@ function varargout = gridManager(varargin)
 
 % Edit the above text to modify the response to help gridManager
 
-% Last Modified by GUIDE v2.5 24-Apr-2006 10:41:02
+% Last Modified by GUIDE v2.5 09-May-2006 12:48:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
-                   'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @gridManager_OpeningFcn, ...
-                   'gui_OutputFcn',  @gridManager_OutputFcn, ...
-                   'gui_LayoutFcn',  [] , ...
-                   'gui_Callback',   []);
+    'gui_Singleton',  gui_Singleton, ...
+    'gui_OpeningFcn', @gridManager_OpeningFcn, ...
+    'gui_OutputFcn',  @gridManager_OutputFcn, ...
+    'gui_LayoutFcn',  [] , ...
+    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
     gui_State.gui_Callback = str2func(varargin{1});
 end
@@ -109,16 +109,18 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.7.2 uc';
+handles.version = 'alpha.7.3';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.seriesMode = 'fixed';
 handles.spotWeight = 'co-equalize';
 
 miFixedSegmentation_Callback(handles.miFixedSegmentation, [], handles);
-strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
+strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')'];
 set(handles.miFilter, 'Label', strLabel);
 
+handles.combineExposures = false;
+set(handles.miCombineExposures, 'checked', 'off', 'enable', 'off');
 
 guidata(hObject, handles);
 
@@ -129,7 +131,7 @@ function Close(hObject, eData, handles)
 SetIniPars(handles.iniFile, handles.iniPars);
 closereq;
 % --- Outputs from this function are returned to the command line.
-function varargout = gridManager_OutputFcn(hObject, eventdata, handles) 
+function varargout = gridManager_OutputFcn(hObject, eventdata, handles)
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -186,7 +188,7 @@ for i=1:nRows
             end
 
             exportWell(handles.expNames, handles.resBase, handles.expMode, handles.cAxis, handles.qImage, bImages, bQuant);
-        
+
         end
     end
 end
@@ -200,101 +202,101 @@ set(hObject, 'enable', 'on');
 guidata(hObject, handles);
 
 % --------------------------------------------------------------------
-    function miLoadSet_Callback(hObject, eventdata, handles)
-        % hObject    handle to miLoadSet (see GCBO)
-        % eventdata  reserved - to be defined in a future version of MATLAB
-        % handles    structure with handles and user data (see GUIDATA)
-        newDir = uigetdir(handles.iniPars.dataDir, 'Please, select a data set.');
-        if newDir
-            handles.iniPars.dataDir = newDir;
-            try
-                oData = dataSet('path', newDir, 'instrument', handles.iniPars.dftInstrument, ... 
-                    'filter', handles.iniPars.dataSearchFilter, 'forceStructure',handles.iniPars.dataForceStructure );
-                set(gcf, 'pointer', 'watch');
-                drawnow;
-                oData = getList(oData);
-                list = get(oData, 'list');
-                set(handles.stData, 'string', newDir);
+function miLoadSet_Callback(hObject, eventdata, handles)
+% hObject    handle to miLoadSet (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+newDir = uigetdir(handles.iniPars.dataDir, 'Please, select a data set.');
+if newDir
+    handles.iniPars.dataDir = newDir;
+    try
+        oData = dataSet('path', newDir, 'instrument', handles.iniPars.dftInstrument, ...
+            'filter', handles.iniPars.dataSearchFilter, 'forceStructure',handles.iniPars.dataForceStructure );
+        set(gcf, 'pointer', 'watch');
+        drawnow;
+        oData = getList(oData);
+        list = get(oData, 'list');
+        set(handles.stData, 'string', newDir);
 
-                handles.list = list;
-                handles.instrument = get(oData, 'instrument');
-                imSize = get(oData, 'imageSize');
+        handles.list = list;
+        handles.instrument = get(oData, 'instrument');
+        imSize = get(oData, 'imageSize');
 
-            catch
-                set(gcf, 'pointer', 'arrow');
-                [errstr, errid] = lasterr;
-                errordlg(lasterr,'Load Failed !!!');
-                return
-            end
-            % read instrument parameters and initialize array object
-            instrumentFile = [handles.instrument,'.instrument'];
-            try
-                pars = readInstrumentParameters(instrumentFile);
-            catch
-                errordlg(lasterr);
-                return
-            end
-            names = fieldnames(pars);
-            for i=1:length(names)
-                if isempty(pars.(names{i}))
-                    errordlg('Instrument parameters were not properly initalized');
-                    return;
-                end
-            end
-            
-
-           % Set array object , preprocessing object and segmentation
-            % object with instrument specific parameters.
-            spotPitch = pars.spotPitch;
-            satLimit = pars.saturationLimit;
-            inipars = handles.iniPars;
-            axRot = [inipars.minRot:inipars.dRot:inipars.maxRot];
-            handles.oArray = set(handles.oArray, 'spotPitch', spotPitch, ...
-                                                 'spotSize', inipars.spotSize * spotPitch, ...
-                                                 'rotation', axRot);
-                                             
-            handles.oP = set(handles.oP, 'nCircle',spotPitch * inipars.ppCircle, ...
-                                          'nLargeDisk', spotPitch * inipars.ppLargeDisk, ...
-                                          'nSmallDisk', spotPitch* inipars.ppSmallDisk, ...
-                                          'nBlurr', spotPitch * inipars.ppBlurr );
-            
-        
-            
-            es = [inipars.segEdgeLowSensitivity, inipars.segEdgeHighSensitivity];
-            handles.oS = segmentation('areaSize', inipars.segAreaSize, ...
-                                      'edgeSensitivity', es);
-       
-            oOut = outlier('method', inipars.outlierMethod , ...   
-                           'measure', inipars.outlierMetric);
-                       
-            handles.oQ = spotQuantification('backgroundMethod', inipars.qBackgroundMethod, ...
-                                            'oOutlier', oOut, ...
-                                            'saturationLimit', satLimit);
-                                                                          
-            %%% initialilzie exposure time popup
-            uT = vGetUniqueID(list, 'T');
-            set(handles.puIntegrationTime, 'String', uT);
-            uF = vGetUniqueID(list, 'F');
-            set(handles.puFilter', 'String', uF);
-            %%%%%%%%%%%
-            arrays = initializeDataSet(list, handles.instrument);
-            arrays = initializeGraph(handles.axes1, arrays);
-
-            handles.arrays = arrays;
-
-            well_Callback(arrays(1,1).hPlot, [], handles);
-            handles.selectedWell = [1,1];
-            set(gcf, 'pointer', 'arrow');
-            drawnow;
-
-            strDir = [handles.iniPars.dataDir, '\', handles.iniPars.resDir];
-            if ~exist(strDir, 'dir')
-                mkdir(handles.iniPars.dataDir, handles.iniPars.resDir);
-            end
-            set(handles.miExportCurrent, 'Enable', 'off');
+    catch
+        set(gcf, 'pointer', 'arrow');
+        [errstr, errid] = lasterr;
+        errordlg(lasterr,'Load Failed !!!');
+        return
+    end
+    % read instrument parameters and initialize array object
+    instrumentFile = [handles.instrument,'.instrument'];
+    try
+        pars = readInstrumentParameters(instrumentFile);
+    catch
+        errordlg(lasterr);
+        return
+    end
+    names = fieldnames(pars);
+    for i=1:length(names)
+        if isempty(pars.(names{i}))
+            errordlg('Instrument parameters were not properly initalized');
+            return;
         end
+    end
 
-        guidata(hObject, handles);
+
+    % Set array object , preprocessing object and segmentation
+    % object with instrument specific parameters.
+    spotPitch = pars.spotPitch;
+    satLimit = pars.saturationLimit;
+    inipars = handles.iniPars;
+    axRot = [inipars.minRot:inipars.dRot:inipars.maxRot];
+    handles.oArray = set(handles.oArray, 'spotPitch', spotPitch, ...
+        'spotSize', inipars.spotSize * spotPitch, ...
+        'rotation', axRot);
+
+    handles.oP = set(handles.oP, 'nCircle',spotPitch * inipars.ppCircle, ...
+        'nLargeDisk', spotPitch * inipars.ppLargeDisk, ...
+        'nSmallDisk', spotPitch* inipars.ppSmallDisk, ...
+        'nBlurr', spotPitch * inipars.ppBlurr );
+
+
+
+    es = [inipars.segEdgeLowSensitivity, inipars.segEdgeHighSensitivity];
+    handles.oS = segmentation('areaSize', inipars.segAreaSize, ...
+        'edgeSensitivity', es);
+
+    oOut = outlier('method', inipars.outlierMethod , ...
+        'measure', inipars.outlierMetric);
+
+    handles.oQ = spotQuantification('backgroundMethod', inipars.qBackgroundMethod, ...
+        'oOutlier', oOut, ...
+        'saturationLimit', satLimit);
+
+    %%% initialilzie exposure time popup
+    uT = vGetUniqueID(list, 'T');
+    set(handles.puIntegrationTime, 'String', uT);
+    uF = vGetUniqueID(list, 'F');
+    set(handles.puFilter', 'String', uF);
+    %%%%%%%%%%%
+    arrays = initializeDataSet(list, handles.instrument);
+    arrays = initializeGraph(handles.axes1, arrays);
+
+    handles.arrays = arrays;
+
+    well_Callback(arrays(1,1).hPlot, [], handles);
+    handles.selectedWell = [1,1];
+    set(gcf, 'pointer', 'arrow');
+    drawnow;
+
+    strDir = [handles.iniPars.dataDir, '\', handles.iniPars.resDir];
+    if ~exist(strDir, 'dir')
+        mkdir(handles.iniPars.dataDir, handles.iniPars.resDir);
+    end
+    set(handles.miExportCurrent, 'Enable', 'off');
+end
+
+guidata(hObject, handles);
 
 % --------------------------------------------------------------------
 function miData_Callback(hObject, eventdata, handles)
@@ -318,7 +320,7 @@ function miAbout_Callback(hObject, eventdata, handles)
 % hObject    handle to miAbout (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-str = ['PamGrid ', handles.version, ' (c)2005 PamGene International BV']; 
+str = ['PamGrid ', handles.version, ' (c)2005 PamGene International BV'];
 helpdlg(str, 'About ...');
 function well_Callback(hObject, eventData, handles)
 wells = handles.arrays;
@@ -337,7 +339,7 @@ if ~isempty(handles.selectedWell)
         strColor = 'g';
     end
     set(wells(iOld, jOld).hPlot, 'color', strColor, 'markerfacecolor', 'w')
-    
+
 end
 if ~isempty(handles.template)
     set(handles.pbAll, 'enable', 'on');
@@ -348,7 +350,7 @@ handles.selectedWell = [i,j];
 
 set(wells(i,j).hPlot, 'markerfacecolor', [0.7, 0.3, 1]);
 set(handles.stWell, 'String', wells(i,j).id);
-guidata(hObject, handles); 
+guidata(hObject, handles);
 
 function [i,j] = findCallingWell(hCalling, wells)
 [nRows, nCols] = size(wells);
@@ -358,8 +360,8 @@ for i=1:nRows
             return
         end
     end
-end                
-            
+end
+
 function arrays = initializeDataSet(list, instrument)
 
 if isequal(instrument(1:4), 'QC96');
@@ -370,7 +372,7 @@ if isequal(instrument(1:4), 'FD10');
     instrument = 'PS4_';
 end
 switch instrument(1:4)
-    case 'PS96' 
+    case 'PS96'
         wells = ones(12,8);
         strRow = ['ABCDEFGH'];
         strCol = ['01';'02';'03';'04';'05';'06';'07';'08';'09'; '10'; '11'; '12'];
@@ -401,16 +403,16 @@ switch instrument(1:4)
                 arrays(i).id = strID;
                 arrays(i).done = 0;
                 arrays(i).strResultFile = [];
-                
+
 
             else
                 arrays(i).used = 0;
                 arrays(i).done = 0;
-                
+
             end
         end
-        
-      
+
+
 
     otherwise
         error('unsupported instrument');
@@ -505,9 +507,9 @@ cd(curDir);
 if fName
     handles.iniPars.templateDir = pathName;
     handles.template = fName;
-    handles.oArray = set(handles.oArray, 'mask', [],'xOffset', [],'yOffset', []);
+    handles.oArray = resetArray(handles.oArray);
     try
-        [handles.oArray, handles.clID] = fromFile(handles.oArray, [pathName, '\', fName], handles.iniPars.gridRefMarker);
+        handles.oArray = fromFile(handles.oArray, [pathName, '\', fName], handles.iniPars.gridRefMarker);
     catch
         errordlg(lasterr, 'Error while loading template file');
         return
@@ -529,12 +531,110 @@ set(gcf, 'pointer', 'watch');
 drawnow
 
 
+if handles.combineExposures
+    handles = analyzeCombineExposures(hObject, handles);
+elseif ~handles.combineExposures
+    handles = analyzeSeparateExposures(hObject, handles);
+end
+
+function  handles = analyzeCombineExposures(hObject, handles)
 
 % find selected well entries
 % W
 currentArray = handles.arrays(handles.selectedWell(1), handles.selectedWell(2));
 [wellList{1:length(handles.list)}] = deal(handles.list.W);
-iCurrentWell = strmatch(currentArray.id, char(wellList)); 
+iCurrentWell = strmatch(currentArray.id, char(wellList));
+currentList = handles.list(iCurrentWell);
+% F
+val =   get(handles.puFilter, 'value');
+clFilter =   get(handles.puFilter, 'String');
+[filterList{1:length(currentList)}] = deal(currentList.F);
+iCurrentFilter = strmatch(clFilter{val}, filterList, 'exact');
+% Here is the list of all images from the current well with current filter
+currentList = currentList(iCurrentFilter);
+
+nImages = length(currentList);
+
+stString = ['Analyzing ',num2str(nImages), ' images for well ',currentArray.id,'...'];
+set(handles.stStatus, 'String', stString);
+drawnow
+
+% load all images
+try
+    for i=1:nImages
+
+        I(:,:,i) = imread([currentList(i).path, '\', currentList(i).name]);
+    end
+catch
+    errordlg(lasterr, currentArray.id);
+    return
+end
+drawnow;
+time = clock;
+for i = 1:nImages
+    pump  = char(currentList(i).P);
+    c(i) = str2num(pump(2:end));
+    exp    = char(currentList(i).T);
+    e(i)  = str2num(exp(2:end));
+%     str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], handles.iniPars.imageResultsExtension);
+%     expNames(i) = cellstr(str);
+end
+[c, iSort] = sort(c);
+I = I(:,:,iSort);
+e = e(iSort);
+
+
+try
+handles = gridCycleSeriesAndCombineExposures(handles, I,c ,e);
+catch
+     errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+     return
+end
+currentArray.done = 1;
+handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
+
+strTime = num2str(etime(clock, time));
+%disp([currentArray.id, ':', strTime]);
+stString = ['Ready (',strTime,'s)'];
+set(handles.stStatus, 'String', stString);
+set(gcf, 'pointer', 'arrow');
+if handles.bShow
+    % produce combined images for presenter
+    stString = 'Combining images for presentation...';
+    set(handles.stStatus, 'String', stString);
+    [uPump, niks, pumpLabels] = unique(c);
+    satLimit = get(handles.qImage(1), 'saturationLimit');
+    oce = combineExposureTimes('combinationCriterium', satLimit);
+    for i=1:length(uPump)
+        Ic(:,:,i) = combineImages(oce, I(:,:,i == pumpLabels), e(i == pumpLabels));
+        thisP = ['P',num2str(uPump(i))];
+        thisT = 'Tcombined';
+        expNames{i} = [currentList(1).path, '\',currentList(1).W, '_', currentList(1).F,'_',thisT,'_',thisP,'.',handles.iniPars.imageResultsExtension];
+    end
+    hp = showInteractive(handles.qImage, Ic, uPump);
+    set(hp, 'name', [currentArray.id,'_TCombined']);
+    drawnow
+end
+
+stString = ['Computation ready in: (',strTime,'s)'];
+set(handles.stStatus, 'String', stString);
+
+% Export
+strBase = [currentList(i).W, '_', currentList(i).F, '_TCombined'];
+resBase = [handles.iniPars.dataDir,'\', handles.iniPars.resDir, '\', strBase];
+handles.resBase = resBase;
+handles.expNames = expNames;
+handles.expMode = 'kinetics';
+handles.cAxis = c;
+
+
+function handles = analyzeSeparateExposures(hObject, handles)
+
+% find selected well entries
+% W
+currentArray = handles.arrays(handles.selectedWell(1), handles.selectedWell(2));
+[wellList{1:length(handles.list)}] = deal(handles.list.W);
+iCurrentWell = strmatch(currentArray.id, char(wellList));
 currentList = handles.list(iCurrentWell);
 % F
 val =   get(handles.puFilter, 'value');
@@ -554,13 +654,14 @@ nImages = length(currentList);
 stString = ['Analyzing ',num2str(nImages), ' images for well ',currentArray.id,'...'];
 set(handles.stStatus, 'String', stString);
 drawnow
-rSize = [handles.iniPars.xResize, handles.iniPars.yResize];
+
+%rSize = [handles.iniPars.xResize, handles.iniPars.yResize];
 
 try
     for i=1:nImages
-        
+
         I(:,:,i) = imread([currentList(i).path, '\', currentList(i).name]);
-     end
+    end
 catch
     errordlg(lasterr, currentArray.id);
     return
@@ -569,20 +670,20 @@ drawnow;
 
 time = clock;
 for i = 1:nImages
-     pump  = char(currentList(i).P);
-     c(i) = str2num(pump(2:end));
-     str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], handles.iniPars.imageResultsExtension);
-     expNames(i) = cellstr(str); 
+    pump  = char(currentList(i).P);
+    c(i) = str2num(pump(2:end));
+    str = fnReplaceExtension([currentList(i).path, '\', currentList(i).name], handles.iniPars.imageResultsExtension);
+    expNames(i) = cellstr(str);
 end
 [c, iSort] = sort(c);
 I = I(:,:,iSort);
 expNames = expNames(iSort);
-%try
+try
     handles = gridCycleSeries(handles, I);
-% catch
-%      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
-%      return
-% end
+catch
+     errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+     return
+end
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
 
@@ -592,9 +693,12 @@ stString = ['Ready (',strTime,'s)'];
 set(handles.stStatus, 'String', stString);
 set(gcf, 'pointer', 'arrow');
 if handles.bShow
-     hp = showInteractive(handles.qImage, I);
-     set(hp, 'name', currentArray.id);
-     drawnow
+    hp = showInteractive(handles.qImage, I, c);
+    if ~ischar(currentArray.id)
+        currentArray.id = '';
+    end
+    set(hp, 'name', currentArray.id);
+    drawnow
 end
 
 % Export
@@ -604,6 +708,7 @@ handles.resBase = resBase;
 handles.expNames = expNames;
 handles.expMode = 'kinetics';
 handles.cAxis = c;
+
 
 % --------------------------------------------------------------------
 function miUpdate_Callback(hObject, eventdata, handles)
@@ -619,17 +724,17 @@ end
 
 
 function exportWell(imNames, aggrName, aggrMode, aggrAxis, oQ, bImages, bSeries)
-    
-    try
-        if bImages
-            export(oQ, 'images', imNames);
-        end
-        if bSeries
-            export(oQ, aggrMode, aggrName,aggrAxis);
-        end
-    catch
-        errordlg(lasterr, 'Error while exporting data');
+
+% try
+    if bImages
+        export(oQ, 'images', imNames);
     end
+    if bSeries
+        export(oQ, aggrMode, aggrName,aggrAxis);
+    end
+% catch
+%    errordlg(lasterr, 'Error while exporting data');
+% end
 % --------------------------------------------------------------------
 function miExport_Callback(hObject, eventdata, handles)
 % hObject    handle to miExport (see GCBO)
@@ -762,7 +867,7 @@ if ~isequal(sFiles, 0)
     handles.iniPars.imagesDir = sPath;
 end
 guidata(hObject, handles);
-       
+
 
 
 % --------------------------------------------------------------------
@@ -775,7 +880,7 @@ a = inputdlg('edit here: ', 'Filter', 1, cellstr(handles.iniPars.dataSearchFilte
 if ~isempty(a)
     handles.iniPars.dataSearchFilter = char(a);
     guidata(hObject, handles);
-    strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')']; 
+    strLabel = ['Edit Search Filter (',handles.iniPars.dataSearchFilter,')'];
     set(hObject, 'Label', strLabel);
 end
 
@@ -876,7 +981,7 @@ if ~bQuant & ~bImages
     errordlg('No Export Options switched on: saved nothing!', 'Export Current');
 end
 
-    
+
 exportWell(handles.expNames, handles.resBase, handles.expMode, handles.cAxis, handles.qImage, bImages, bQuant);
 
 set(gcf, 'pointer', 'arrow');
@@ -921,8 +1026,8 @@ function miParEdit_Callback(hObject, eventdata, handles)
 % hObject    handle to miParEdit (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-try 
-    
+try
+
     dos(['notepad ',handles.iniFile]);
 catch
     errordlg(lasterr, 'Could not open parameter file');
@@ -937,9 +1042,23 @@ function miParameters_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+% --------------------------------------------------------------------
+function miCombineExposures_Callback(hObject, eventdata, handles)
+% hObject    handle to miCombineExposures (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 
-
-
-
+itemIsChecked = isequal( get(hObject, 'checked') , 'on');
+% toggle state
+if itemIsChecked
+    set(hObject, 'checked', 'off');
+    set(handles.puIntegrationTime, 'Enable', 'on');
+    handles.combineExposures = false;
+else
+    set(hObject, 'checked', 'on');
+    set(handles.puIntegrationTime, 'Enable', 'off');
+    handles.combineExposures = true;
+end
+guidata(hObject, handles);
 
 

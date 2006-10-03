@@ -32,9 +32,7 @@ for i=1:2:length(pArgin)
             end
         case 'nCircle'
             if isnumeric(val)
-                 if round(val) <0
-                    bInvalid = 1;
-                end
+               
                 
                 p.nCircle = round(val);
             else

@@ -33,9 +33,11 @@ nRows = max(row);
 nCols = max(col);
 
 % calculate grid coordinates, zeros centered
+rmp = min(row) + (max(row)-min(row))/2;
+cmp = min(col) + (max(col)-min(col))/2;
 
-x = spotPitch(1)*(row-mean(1:nRows)) + spotPitch(1) * x0;
-y = spotPitch(2)*(col-mean(1:nCols)) + spotPitch(2) * y0;
+x = spotPitch(1)*(row-rmp) + spotPitch(1) * x0;
+y = spotPitch(2)*(col-cmp) + spotPitch(2) * y0;
 
 % rotate the grid
 teta = (2*pi/360) * rotation;

@@ -96,9 +96,9 @@ for i  = 1:nRows
             outSeg(i,j).methodOutput.spotRadius = r;
             outSeg(i,j).methodOutput.nChiSqr = nChiSqr;
             [xFit, yFit] = circle(x0,y0,r,round(pi*r)/2);
-            [xc,yc] = find(~Ilocal);
-            [in, on] = inpolygon(xc,yc, xFit, yFit);
-            Ilocal(in) = true;    
+            %[xc,yc] = find(~Ilocal);
+            %[in, on] = inpolygon(xc,yc, xFit, yFit);
+            Ilocal = roipoly(Ilocal, xFit, yFit);    
         else
             outSeg(i,j).methodOutput = []; 
         end

@@ -43,7 +43,7 @@ nImages = size(I,3);
 rSize = [gdata.iniPars.xResize, gdata.iniPars.yResize];
 
 % preprocessing and grid finding
-rsizFactor = rSize./size(Igrid);
+rsizFactor = rSize./size(Ic);
 oPP = rescale(gdata.oP, rsizFactor(1));
 
 Igrid = getPrepImage(oPP, imresize(Ic, rSize));
@@ -54,7 +54,7 @@ gdata.oArray = set(gdata.oArray, 'spotPitch', spotPitch * rsizFactor , ...
             'spotSize', spotSize * rsizFactor(1));
 
 [x,y,rotOut, gdata.oArray] = gridFind(gdata.oArray, Igrid);
-% scale back to original image size, make sure the coordinate sare within the image 
+% scale back to original image size, make sure the coordinates are within the image 
 gdata.oArray = set(gdata.oArray, 'spotPitch', spotPitch , ...
             'spotSize', spotSize);
 
@@ -70,7 +70,10 @@ oS = segment(gdata.oS, Ic, x, y,rotOut);
 
 % quality control
 oProps = setPropertiesFromSegmentation(spotProperties, oS);
-qArray = setSet(gdata.oQ, oS, oProps, gdata.clID);
+qArray = setSet(gdata.oQ,   'oSegmentation', oS, ...
+                            'oProperties', oProps, ...
+                             'ID', gdata.clID);
+
 qArray = check4EmptySpots(qArray);
 qArray = replaceEmptySpots(qArray);
 qArray = check4BadSpots(qArray, 'mindiameter', spotPitch * gdata.iniPars.minDiameter, ...
@@ -86,9 +89,15 @@ for i=1:nImages
     qImage(:,:,i) = quantify(qArray, I(:,:,i));
 end
 
+% now combine exposures for each cycle serie
+[uPump, dummy, pumpLabels] = unique(p);
+for i=1:length(uPump)
+    qCombined(:,:,i) = combineExpTimeQuantification(qImage(:,:,i == pumpLabels), exp(i == pumpLabels));
+end
+gdata.qImage = qCombined;
+% EOF
 
     
-
         
     
 

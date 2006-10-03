@@ -1,5 +1,13 @@
 function oP = rescale(oP, rFactor)
-oP.nSmallDisk = max(round(oP.nSmallDisk * rFactor),1);
-oP.nLargeDisk = max(round(oP.nLargeDisk * rFactor),1);
-oP.nCircle = max(round(oP.nCircle * rFactor),1);
-oP.nBlurr = max(round(oP.nBlurr * rFactor),1);
+if oP.nSmallDisk > 0
+    oP.nSmallDisk = max(round(oP.nSmallDisk * rFactor),1);
+end
+if oP.nLargeDisk > 0
+    oP.nLargeDisk = max(round(oP.nLargeDisk * rFactor),1);
+end
+if oP.nCircle > 0
+    oP.nCircle = max(round(oP.nCircle * rFactor),1);
+end
+if oP.nBlurr > 0
+    oP.nBlurr = max(round(oP.nBlurr * rFactor),1);
+end
