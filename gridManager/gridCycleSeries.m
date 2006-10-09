@@ -24,10 +24,9 @@ end
 % ------------------------------------------------------------------------
 function gdata = seriesFixed(gdata,I)
 % here are some hardcoded settings:
-maxSegIter = 2; % Max iteration for spot pitch refinement
 maxSubIter = 2; % Max iterations for subs vs refs refinement 
 maxRefSubOffset = 0.15; % Max offset criterium between refs and subs.
-maxPrimaryOffset = gdata.iniPars.maxOffset * 1.2;
+
 % gridding with segmentation fixed on gridImage
 nImages = size(I,3);
 rSize = [gdata.iniPars.xResize, gdata.iniPars.yResize];
@@ -80,58 +79,20 @@ xOff = get(gdata.oArray, 'xOffset');
 yOff = get(gdata.oArray, 'yOffset');
 ID = get(gdata.oArray, 'ID');
 
-% start segmentation
-for pass = 1:maxSegIter   
-    oS(bSegment) = segment(S0, I(:,:, iGrid), xRef(bSegment), yRef(bSegment),rotOut);
-    % QC
-    oProps = setPropertiesFromSegmentation(spotProperties, oS);
-    % create the quantification object
-    qRefs = setSet(gdata.oQ,   'oSegmentation', oS, ...
-        'oProperties', oProps, ...
-        'ID', ID(isRef), ...
-        'arrayRow', arrayRow(isRef), ...
-        'arrayCol', arrayCol(isRef));
-                        
-    qRefs = check4EmptySpots(qRefs);
-    qRefs = replaceEmptySpots(qRefs);
-    qRefs = check4BadSpots(qRefs, 'mindiameter', spotPitch * gdata.iniPars.minDiameter, ...
-        'maxdiameter', spotPitch * gdata.iniPars.maxDiameter, ...
-        'maxaspectRatio', gdata.iniPars.maxAspectRatio, ...
-        'minformFactor', gdata.iniPars.minFormFactor, ...
-        'maxpositionDelta',spotPitch * maxPrimaryOffset);%iniPars.maxOffset);
-                
-    qRefs = replaceBadSpots(qRefs);
-    % When a minmimum nr of refs are correctly found 
-    % Use the refs found to refine the spotpitch
-    bFound = ~get(qRefs, 'isReplaced');
-    if length(find(bFound)) > 1 
-        [xPos, yPos] = getPosition(qRefs);
-        % define an array object with refs only
-        array2fit = array(  'row', arrayRow(isRef), ...
-                        'col', arrayCol(isRef), ...
-                        'isreference', bFound, ...
-                        'xOffset', xOff(isRef), ...
-                        'yOffset', yOff(isRef), ...
-                        'spotPitch', spotPitch, ...
-                        'rotation', rotOut);
-        % refine the spotPitch and array midpoint
-        arrayRefined = refinePitch(array2fit, xPos, yPos);
-        spotPitch = get(arrayRefined, 'spotPitch');
-        refMp = midPoint(arrayRefined, xPos, yPos);
-        % calculate array coordinates based on refined pitch                                                             
-        [xRef,yRef] = coordinates(arrayRefined, refMp);
-    else
-        break;
-    end
-    % if necessary go for a another pass to retry the references that
-    % were not correctly semented on the first pass, using the refined
-    % pitch
-    if any(~bFound)
-        bSegment = ~bFound;
-    else
-        break;
-    end
-end
+array2fit = array(  'row', arrayRow(isRef), ...
+    'col', arrayCol(isRef), ...
+    'isreference', isRef(isRef), ...
+    'xOffset', xOff(isRef), ...
+    'yOffset', yOff(isRef), ...
+    'spotPitch', spotPitch, ...
+    'rotation', rotOut);
+
+q = setSet(gdata.oQ, ...
+    'ID', ID(isRef), ...
+    'arrayRow', arrayRow(isRef), ...
+    'arrayCol', arrayCol(isRef));
+
+[qRefs, refSpotPitch, mpRefs]  = segmentAndRefine(I(:,:,iGrid), S0, array2fit, q, xRef, yRef, gdata.iniPars);
 
 % Below the final spotQuantification object array, combination of qRef and
 % possibly qSub
@@ -142,7 +103,7 @@ qAll(isRef) = qRefs; %so far, so good
 % pass if the offset between resf and sub is to large
 
 if any(~isRef)
-    arrayRefined = set(arrayRefined, ...
+    arrayRefined = array(...
         'row', arrayRow(~isRef), ...
         'col', arrayCol(~isRef), ...
         'isreference', isRef(~isRef), ...
@@ -150,51 +111,28 @@ if any(~isRef)
         'yOffset', yOff(~isRef), ...
         'spotPitch', spotPitch, ...
         'rotation', rotOut);
-
-    % These are the initial coordinates, refined based on the ref spots
-    [xSub, ySub] = coordinates(arrayRefined, refMp);
-    for pass = 1:maxSubIter
-        oS = segment(S0, I(:,:, iGrid), xSub,ySub,rotOut);
-        oProps = setPropertiesFromSegmentation(spotProperties, oS);
-
-        qSub = setSet(gdata.oQ, ...
-            'oSegmentation', oS, ...
-            'oProperties', oProps, ...
-            'ID', ID(~isRef), ...
-            'arrayRow', arrayRow(~isRef), ...
-            'arrayCol', arrayCol(~isRef));
-
-        qSub = check4EmptySpots(qSub);
-        qSub = replaceEmptySpots(qSub);
-        qSub = check4BadSpots(qSub, ... 
-            'mindiameter', spotPitch * gdata.iniPars.minDiameter, ...
-            'maxdiameter', spotPitch * gdata.iniPars.maxDiameter, ...
-            'maxaspectRatio', gdata.iniPars.maxAspectRatio, ...
-            'minformFactor', gdata.iniPars.minFormFactor, ...
-            'maxpositionDelta',spotPitch * maxPrimaryOffset);
+    
+   q = setSet(gdata.oQ, ...
+    'ID', ID(~isRef), ...
+    'arrayRow', arrayRow(~isRef), ...
+    'arrayCol', arrayCol(~isRef));
             
-
-        qSub = replaceBadSpots(qSub);
+    % These are the initial coordinates, refined based on the ref spots
+    [xSub, ySub] = coordinates(arrayRefined, mpRefs);
+    for pass = 1:maxSubIter
+        [qSub, spotPitch, mpSub] = segmentAndRefine(I(:,:,iGrid), S0, arrayRefined, q, xSub, ySub, gdata.iniPars); 
        
         % if spots are not correctly detected, iterate global position with
         % respect to the refs.
          bFound = ~get(qSub, 'isReplaced');
-        if any(~bFound) 
-            % If indicated to refine the global position of the refs vs. that of the
-            % subs          
-            array2fit = set (arrayRefined,  'isreference', bFound);
-            
-            [xPos, yPos] = getPosition(qSub);
-            subMp = midPoint(array2fit, xPos, yPos);
-             
-            delta = norm(subMp - refMp)/spotPitch;
-            
+        if any(~bFound)                  
+            delta = norm(mpSub - mpRefs)/spotPitch;           
             if delta > maxRefSubOffset
                 warning(['delta ref-sub: ', num2str(delta), ', start refinement attempt']) 
                 % if the substrate midpoint is to far from the ref
                 % midpoint, re-do
-                [xSub,ySub] = coordinates(array2fit, subMp);
-                refMp = subMp;
+                [xSub,ySub] = coordinates(array2fit, mpSub);
+                mpRefs = mpSub;
             else
                 break;
             end
@@ -224,7 +162,7 @@ for i=1:nImages
     qImage(:,:,i) = quantify(qAll, I(:,:,i));
 end
 gdata.qImage = qImage;
-gdata.oArray = set(gdata.oArray, 'spotPitch', spotPitch);
+%gdata.oArray = set(gdata.oArray, 'spotPitch', spotPitch);
 %--------------------------------------------------------------------------
 function gdata = seriesAdapt(gdata, I)
 
@@ -285,5 +223,57 @@ gdata.qImage = qImage;
 % scale the array object back for next run
 gdata.oArray = set(gdata.oArray, 'spotPitch', spotPitch , ...
             'spotSize', spotSize);
+%-----------------------------------------------------------------
 
-        
+
+function [qOut, spotPitch, mp] = segmentAndRefine(I, S0, array2fit, q, x, y, iniPars)
+% Segments and attempts to refine the spotpitch
+maxSegIter = 2;
+maxPrimaryOffset = iniPars.maxOffset * 1.2;
+
+oS = repmat(S0, size(x));
+spotPitch = get(array2fit, 'spotPitch');
+rotOut = get(array2fit, 'rotation');
+bSegment = true(size(x));
+for pass = 1:maxSegIter   
+    oS(bSegment) = segment(S0, I, x(bSegment), y(bSegment),rotOut);
+    % QC
+    oProps = setPropertiesFromSegmentation(spotProperties, oS);
+    % create the quantification object
+    q = setSet(q,   'oSegmentation', oS, ...
+        'oProperties', oProps);
+                        
+    q = check4EmptySpots(q);
+    q = replaceEmptySpots(q);
+    q = check4BadSpots(q, 'mindiameter', spotPitch * iniPars.minDiameter, ...
+        'maxdiameter', spotPitch * iniPars.maxDiameter, ...
+        'maxaspectRatio', iniPars.maxAspectRatio, ...
+        'minformFactor', iniPars.minFormFactor, ...
+        'maxpositionDelta',spotPitch * maxPrimaryOffset);%iniPars.maxOffset);
+                
+    q = replaceBadSpots(q);
+    % When a minmimum nr of spots are correctly found 
+    % Use these to refine the spotpitch
+    bFound = ~get(q, 'isReplaced');
+    if length(find(bFound)) > 1 
+        [xPos, yPos] = getPosition(q);
+        % refine the spotPitch and array midpoint
+        array2fit = set(array2fit, 'isreference', bFound);
+        arrayRefined = refinePitch(array2fit, xPos, yPos);
+        spotPitch = get(arrayRefined, 'spotPitch');
+        mp = midPoint(arrayRefined, xPos, yPos);
+        % calculate array coordinates based on refined pitch                                                             
+        [xRef,yRef] = coordinates(arrayRefined, mp);
+    else
+        break;
+    end
+    % if necessary go for a another pass to retry the spots that
+    % were not correctly semented on the first pass, using the refined
+    % pitch
+    if any(~bFound)
+        bSegment = ~bFound;
+    else
+        break;
+    end
+end
+qOut = q;

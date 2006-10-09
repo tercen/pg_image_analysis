@@ -90,6 +90,8 @@ iniPars.qBackgroundMethod = 'localCorner';
 iniPars.outlierMethod = 'iqrBased';
 iniPars.outlierMetric = 1.75;
 
+
+
 handles.iniPars = getparsfromfile(handles.iniFile, iniPars);
 handles.list = [];
 handles.selectedWell = [];
@@ -109,7 +111,7 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.7.3';
+handles.version = 'alpha.7.3.1';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.seriesMode = 'fixed';
@@ -537,6 +539,7 @@ elseif ~handles.combineExposures
     handles = analyzeSeparateExposures(hObject, handles);
 end
 
+
 function  handles = analyzeCombineExposures(hObject, handles)
 
 % find selected well entries
@@ -679,7 +682,7 @@ end
 I = I(:,:,iSort);
 expNames = expNames(iSort);
 try
-    handles = gridCycleSeries(handles, I);
+       handles = gridCycleSeries(handles, I);
 catch
      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
      return
