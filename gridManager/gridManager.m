@@ -322,7 +322,7 @@ function miAbout_Callback(hObject, eventdata, handles)
 % hObject    handle to miAbout (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-str = ['PamGrid ', handles.version, ' (c)2005 PamGene International BV'];
+str = ['PamGrid ', handles.version, ' (c)2006 PamGene International BV'];
 helpdlg(str, 'About ...');
 function well_Callback(hObject, eventData, handles)
 wells = handles.arrays;
@@ -681,12 +681,12 @@ end
 [c, iSort] = sort(c);
 I = I(:,:,iSort);
 expNames = expNames(iSort);
-try
-       handles = gridCycleSeries(handles, I);
-catch
-     errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
-     return
-end
+% try
+        handles = gridCycleSeries(handles, I);
+% catch
+%      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+%      return
+% end
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
 

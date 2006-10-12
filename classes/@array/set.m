@@ -64,7 +64,8 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end
- 
+        case 'ID'
+            g.ID = val;
         otherwise
             error(['Invalid property: ', prop]);
     end
