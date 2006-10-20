@@ -1,4 +1,4 @@
-function qTypes = analyzecycleseries(imagePath, T, P)
+function qTypes = analyzecycleseries_multiexposure(imagePath, T, P)
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
@@ -151,7 +151,7 @@ settings.sqc = sqc;
 settings.resize             = prpResize;
 
 
-[stateQuantification, oArray] = gridCycleSeriesCombineExposures(I, oPrep, oArray, oS0, oQ0, qntSpotID, T(settings.nGridImage),settings);
+[stateQuantification, oArray] = pgrCycleSeriesCombineExposures(I, oPrep, oArray, oS0, oQ0, qntSpotID, T(settings.nGridImage),settings);
 for i=1:nImages
     qTypes(:,:,i) = makeQTypes(stateQuantification(:,:,i));
 end

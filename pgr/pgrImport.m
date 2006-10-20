@@ -2,6 +2,11 @@ function [importedFields, data] = imageneImport(fPath, fields)
 %[importedFields, data] = imageneInport(fPath, fields)
 fid = fopen(fPath, 'rt');
 % scroll to Begin Raw Data before starting:
+if fid == -1
+    error(['could not open: ' , fPath, ' for reading']);
+end
+
+
 data = [];
 while(1)
     strLine = fgetl(fid);

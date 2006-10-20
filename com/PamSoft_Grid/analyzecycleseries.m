@@ -145,7 +145,7 @@ settings.sqc = sqc;
 settings.resize             = prpResize;
 
 
-[stateQuantification, oArray] = gridCycleSeries(I, oPrep, oArray, oS0, oQ0, settings);
+[stateQuantification, oArray] = pgrCycleSeries(I, oPrep, oArray, oS0, oQ0, settings);
 for i=1:nImages
     qTypes(:,:,i) = makeQTypes(stateQuantification(:,:,i));
 end

@@ -111,7 +111,7 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.7.3.1';
+handles.version = 'alpha.7.3.2';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.seriesMode = 'fixed';
@@ -640,19 +640,25 @@ currentArray = handles.arrays(handles.selectedWell(1), handles.selectedWell(2));
 iCurrentWell = strmatch(currentArray.id, char(wellList));
 currentList = handles.list(iCurrentWell);
 % F
-val =   get(handles.puFilter, 'value');
+fval =   get(handles.puFilter, 'value');
 clFilter =   get(handles.puFilter, 'String');
 [filterList{1:length(currentList)}] = deal(currentList.F);
-iCurrentFilter = strmatch(clFilter{val}, filterList, 'exact');
+iCurrentFilter = strmatch(clFilter{fval}, filterList, 'exact');
 currentList = currentList(iCurrentFilter);
 % T
-val  = get(handles.puIntegrationTime, 'value');
+tval  = get(handles.puIntegrationTime, 'value');
 clTime  = get(handles.puIntegrationTime, 'String');
 [timeList{1:length(currentList)}] =  deal(currentList.T);
-iCurrentTime = strmatch(clTime{val}, timeList, 'exact');
+iCurrentTime = strmatch(clTime{tval}, timeList, 'exact');
 currentList = currentList(iCurrentTime);
 
 nImages = length(currentList);
+if nImages == 0
+    stString = ['No images found for well ',currentArray.id,' with ',clFilter{fval}, ' and ',clTime{tval}];
+    set(handles.stStatus, 'String', stString);
+    set(gcf, 'pointer', 'arrow');
+    return;
+end
 
 stString = ['Analyzing ',num2str(nImages), ' images for well ',currentArray.id,'...'];
 set(handles.stStatus, 'String', stString);
@@ -681,8 +687,48 @@ end
 [c, iSort] = sort(c);
 I = I(:,:,iSort);
 expNames = expNames(iSort);
+
+% get and initialize GUI-based settings:
+handles.oP = set(handles.oP, 'contrast', handles.spotWeight);
+
+switch handles.segmentationMethod
+    case 'Edge'
+        nFilt = 0;
+    case 'Threshold'
+        nFilt = handles.iniPars.ppLargeDisk;
+end
+
+handles.oS = set(handles.oS,    'method', handles.segmentationMethod, ...
+                            'nFilterDisk', nFilt);                      
+switch handles.seriesMode
+    case 'fixed'
+         settings.seriesMode = 0;
+    case 'adapt'
+        settings.seriesMode = 1;
+end
+
+switch handles.gridMode
+    case 'kinFirst'
+        settings.nGridImage = 1;
+    case 'kinLast'
+        settings.nGridImage = size(I,3);
+end
+
+sqc.minDiameter             = handles.iniPars.minDiameter;
+sqc.maxDiameter             = handles.iniPars.maxDiameter;
+sqc.minFormFactor           = handles.iniPars.minFormFactor; 
+sqc.maxAspectRatio          = handles.iniPars.maxAspectRatio;
+sqc.maxOffset               = handles.iniPars.maxOffset;
+settings.sqc = sqc;
+settings.resize             = [handles.iniPars.xResize, handles.iniPars.yResize];
+
+
 % try
-        handles = gridCycleSeries(handles, I);
+        
+%        obsolete call   
+%handles = gridCycleSeries(handles, I);
+%        function proto: [qFinal, oArray] = pgrCycleSeries(I, oP, oArray, oS0, oQ0, settings)
+         [handles.qImage, handles.oArray] = pgrCycleSeries(I, handles.oP, handles.oArray, handles.oS, handles.oQ, settings);
 % catch
 %      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
 %      return
