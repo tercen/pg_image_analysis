@@ -1,27 +1,42 @@
 function oq = quantify(oq, I)
-    
+% function oq = quantify(oq, I)
+% IN: 
+% oq: array of spotQuantification objects (one for each spot) with relevant
+% properties set 
+% I: image to quantify
+% OUT:
+% oq: array of spotQuantification objects (corresponding to IN) contatining
+% the quantification
 
-[nRows, nCols] = size(oq);
+
+[nRows, nCols] = size(oq); % this is obsolete, the double loop over nRow and nCols can (will) be replaced by a single loop over length(oq(:))
+
 for i=1:nRows
     for j = 1:nCols
+        % this sets the mask for the background pixels
+        % (spotQuantification/private)
         if isempty(oq(i,j).iBackground)
             oq(i,j) = setBackgroundMask(oq(i,j));
         end
+        
         if isempty(oq(i,j).oOutlier)
             bOut = false;
         else
             bOut = true;
         end
 
-        bwSignal= getBinSpot(oq(i,j).oSegmentation);    
+        % get the foreground pixel mask from the segmentation    
+        bwSignal= getBinSpot(oq(i,j).oSegmentation);
 
         if any(bwSignal(:))
             sLocal = size(bwSignal);
             cLu = get(oq(i,j).oSegmentation, 'cLu');
             cLu = round(cLu);
+            
+            % imLocal is the image "zoomed" around the spot
             imLocal = I(cLu(1):cLu(1)+ sLocal(1) -1, cLu(2): cLu(2) + sLocal(2) -1);         
-                % quantify signal
-            sigPix = imLocal(bwSignal);
+           % quantify signal
+            sigPix = imLocal(bwSignal); % array of pixles making up the spot
             if bOut
                 [iOutSignal, sigLimits] = detect(oq(i,j).oOutlier, double(sigPix));
             else
@@ -53,7 +68,7 @@ for i=1:nRows
                 oq(i,j).iIgnored = find( sigIgnored(:)|bgIgnored(:) );
             end
             % for the rank test:
-            % since pixel intensities are integere, we can handle the ties
+            % since pixel intensities are integer, we can handle the ties
             % in MW test below by adding 0.5 to one of the
             % distributions (here: sigPix)
             oq(i,j).pSignal = test2r(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'n');
