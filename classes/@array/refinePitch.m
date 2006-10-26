@@ -1,5 +1,8 @@
 function oArray = refinePitch(oArray,xPos, yPos)
-
+% oArray = refinePitch(oArray,xPos, yPos)
+% Find and update the best fitting spot pitch of an array defined by the oArray object
+% and actual coordinates xPos, yPos
+% See also array/array, array/midPoint
     
 
 isRef = oArray.isreference;
@@ -17,6 +20,8 @@ v = (R * [xPos;yPos]);
 % get the number of row pitch and column pitch  measures in the set
 nr = length(unique(r)) -1;
 nc = length(unique(c)) -1;
+
+% calculate the pitch
 if nr > 0 && nc  < 1
     pitch= (v(1,:)-min(v(1,:)))/(r-min(r)); 
 elseif nr < 1 && nc > 0    

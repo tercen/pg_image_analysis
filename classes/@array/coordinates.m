@@ -1,4 +1,8 @@
 function [cx,cy] = coordinates(oArray,mp, rotation)
+%[cx,cy] = coordinates(oArray,mp, rotation)
+% returns x and y coordinates of an array defined by the oArray object
+% plus a midpoint [x,y]  plus an optional rotation (dft = 0)
+% See also array/array
 if isempty(oArray.xOffset)
     oArray.xOffset = zeros(size(oArray.row));
 end
@@ -8,6 +12,10 @@ end
 
 if nargin < 3
     rotation = oArray.rotation;
+end
+
+if isempty(oArray.spotPitch)
+    error('array property spotPitch is not defined')
 end
 
 % get the coordinates for set1, set2 respectivley

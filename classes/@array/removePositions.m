@@ -1,5 +1,16 @@
 function oArray = removePositions(oArray, bRemove)
-
+% function oArray = removePositions(oArray, bRemove)
+% 
+% if isequal(bRemove, 'isreference')
+%     bKeep = ~oArray.isreference;
+% elseif  isequal(bRemove, '~isreference')
+%     bKeep = oArray.isreference;
+% elseif islogical(bRemove)
+%     bKeep = ~bRemove;
+% else
+%     error('invalid value for bRemove')
+% end
+% See also array/array
 if isequal(bRemove, 'isreference')
     bKeep = ~oArray.isreference;
 elseif  isequal(bRemove, '~isreference')
