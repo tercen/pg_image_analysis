@@ -10,9 +10,12 @@ function g = fromFile(g, fName, gridRefMarker)
 % ID: spot ID
 % Xoff: offset from ideal in pixels
 % Yoff: offset from ideal in pixels
+% Next to these required columns more columns can be added for user
+% reference. array.fromFile will skip these.
+% 
 % OUT:
-% oArrayOut will contain updated mask
-% clID, (nRows, nCol) cell array of strings containing the spot IDs
+% oArrayOut will contain loaded row, col, isreference, xOffset, yOffset
+%
 % IN:
 % oArray: array object as definde by oArray = array(args)
 % filename: full path to the template file
@@ -22,29 +25,52 @@ function g = fromFile(g, fName, gridRefMarker)
 % the template file all spots are used as gridRefMarkers.
 %
 % EXAMPLE:
-% template file ('temp.txt')
-% Row    Col ID      Xoff    Yoff
-% 1     1   SPOT1   0       0
-% 1     2   #ref    0       0 
-% 2     1   #ref    0       0
-% 2     2   SPOT2   0       0
+% template file ('MyArray.txt')
+% Row    Col ID      Xoff    Yoff   MyRef
+% 1     1   SPOT1   0       0       mutation1
+% 1     2   #ref    0       0       ref
+% 2     1   #ref    0       0       ref
+% 2     2   SPOT2   0       0       mutation1
 % 
 % oArray = array();
-% [oArray, clID] = fromFile(oArray, 'temp.txt', '#');
-% mask = get(oArray, 'mask');
-% results in:
-% mask = [0 1
-%         1 0 ]
-% clID = ['SPOT1'  '#ref' 
-%          '#ref'    'SPOT2']
-%
-% and oArray = fromFile(oArray, 'temp.txt')
-% mask = get(oArray, 'mask')
-% results in:
-% mask = [1 1
-%         1 1];
-%
+% % oArray = fromFile(oArray, 'MyArray.txt', '#');
+% r = get(oArray, 'row')
+% 
+% r =
+% 
+%      1
+%      1
+%      2
+%      2
+% >> b = get(oArray, 'isreference')
+% 
+% b =
+% 
+%      0
+%      1
+%      1
+%      0
+% 
+% % and >> b = get(oArray, 'isreference')
+% 
+% b =
+% 
+%      1
+%      1
+%      1
+%      1
+% 
+%  >> ID = get(oArray, 'ID')
+% 
+% ID = 
+% 
+%     'SPOT1'
+%     '#ref'
+%     '#ref'
+%     'SPOT2'
 % See also array/array, array/gridFind
+
+
 if nargin == 2
     gridRefMarker = [];
 end

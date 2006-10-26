@@ -18,22 +18,28 @@ function g = array(varargin)
 % oArray = set(oArray, 'prop1', val1, 'prop2', 'val2, ...
 % 
 % array properties:
-% mask: nRows x nCols matrix where nRows and nCols give the dimensions of
-% the array. mask(i,j) must be set to 1 if position [i,j] in the array is a grid
-% reference, otherwise 0.
+% row: n-element vector with row indices of spots in the array
+% col: n-element vector with column indices of spots in an array
+% A second grid around the same midpoint as the first grid may be defined
+% using negative indices.(see also http://psp.pamgene.com:8080/PamWorld/870)
+%
+% isreference: n-element logical vector with true for those spots that are
+% to be used as position references (corresponding to row and col)
 %
 % spotPitch: 2 element vector, set to xPitch and yPitch of the spots in the array in pixels
 %           If xPitch == yPitch spotPitch may be set a a scalar.
 %
 % spotSize: scalar, set to approximate diameter of the spots in the array in pixels
 %
-% xOffset, yOffset nRows  x nCols matrix containing y,x (respectively) offsets from ideal
-% in units spotPitch:
+% xOffset, yOffset n-element vector containing y,x (respectively) offsets from ideal
+% in units spotPitch (for spots corresponding to row and col)
 %   xOffset(i,j) = -0.5 means x coordinate of point X 0.5 a pitch to the
 %   left. 
 %   When xOffset, or yOffset are left empty the grid will dft to
 %   zeros(nRows, nCols);
 % 
+% ID: n-element cell array of strings containing ID's for the spots
+% corresponding to row and col
 % rotation: vector, (dft: 0) , use to set the possible rotations in degrees of the array to be probed.
 %
 %
@@ -43,15 +49,23 @@ function g = array(varargin)
 % To define an 4 x 4 array with grid references on the corner, a spotSize
 % of 10 pixels, a spotPitch of 15 pixels.
 % oArray = array();
-% mask = zeros(4);
-% mask(1,1) = 1; mask(1,4) = 1;mask(4,1) = 1;mask(4,4) = 1
+% row = [1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4]';
+% col = [1,2,3,4,1,2,3,4,1,2,3,4,1,2,3,4]';
+% isreference = false(size(col)); 
+% isreference(1,1) = true; isreference(1,4) = true;
+% isrefrence(4,1) = true; isrefrence(4,4) =true;
 % % probe rotations between -2 and 2 degreesl, step 0.25;
 % rot = [-2:0.2:2];
-% oArray = set(oArray, 'mask', mask, 'rotation', rot, 'spotPitch', 15,
-% 'spotSize', 10);
+% oArray = set(oArray, 'col', col, ...
+%                      'row', row, ...
+%                      'isreference', isrefence, ...     
+%                      'rotation', rot, ...
+%                      'spotPitch', 15, ...
+%                      'spotSize, 10); 
 %
 % array public member functions (ex get and set)
-% See also array/gridFind, array/fromFile.
+% See also array/gridFind, array/fromFile,
+% http://psp.pamgene.com:8080/PamWorld/870
 
 if length(varargin) == 1
     % copy input object to output object
