@@ -1,6 +1,6 @@
-function g = fromFile(g, fName, gridRefMarker)
+function [g, extraHeaders, extraColumns] = fromFile(g, fName, gridRefMarker)
 % array.fromFile
-% [oArrayOut, clID] = fromFile(oArray, filename, <gridRefMarker>)
+% [oArrayOut, otherHeaders] = fromFile(oArray, filename, <gridRefMarker>)
 % read array object form file
 % This method can be used to read in mask and spot ID's for a tab delimited
 % textfile filename (ie a template file).
@@ -10,12 +10,14 @@ function g = fromFile(g, fName, gridRefMarker)
 % ID: spot ID
 % Xoff: offset from ideal in pixels
 % Yoff: offset from ideal in pixels
-% Next to these required columns more columns can be added for user
-% reference. array.fromFile will skip these.
+% Next to these required columns extra columns can be added for user
+% reference
 % 
 % OUT:
 % oArrayOut will contain loaded row, col, isreference, xOffset, yOffset
-%
+% extraHeaders: headers of the extra colums as a cell array (see above)
+% extraColumns:extra colum,sn corresponding to extra headers, as a cell
+% array
 % IN:
 % oArray: array object as definde by oArray = array(args)
 % filename: full path to the template file
@@ -102,6 +104,12 @@ for i = 1:length(clHdrKeyWord)
     end
 end
 
+% make a list of the none matched headers
+bMatch = false(size(fLine));
+bMatch(keyMatch) = true;
+extraHeaders = fLine(~bMatch);
+
+
 % read in spot data 
 n = 1;
 while(1)
@@ -123,7 +131,7 @@ while(1)
             ID(n)      = clLine(keyMatch(3));
             xOff(n)    = str2num(char((clLine(keyMatch(4)))));
             yOff(n)    = str2num(char((clLine(keyMatch(5)))));
-           
+            extraColumns(n,:) = clLine(~bMatch);
             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
             eStr = [lasterr,' On line ',num2str(n),': ',strLine];
@@ -153,27 +161,4 @@ g.ID = ID';
 g.xOffset = xOff';
 g.yOffset = yOff';
 
-% and create mask;
-% if ~isempty(gridRefMarker)
-%     iMatch = strmatch(gridRefMarker, ID);
-%     if ~isempty(iMatch)
-%         mask = zeros(max(row), max(col));
-%         for n=1:length(iMatch)
-%             i = row(iMatch(n));
-%             j = col(iMatch(n));
-%             mask(i,j) = 1;
-%         end
-%     else
-%         mask = ones(max(row), max(col));
-%     end
-% else
-%     mask = ones(max(row), max(col));
-% end
-% g.mask = mask;
-% for i=1:length(ID)
-%     clID(row(i), col(i)) = ID(i);
-%     g.xOffset(row(i), col(i)) = xOff(i);
-%     g.yOffset(row(i), col(i)) = yOff(i);
-% end
-% % return ID's as well
 

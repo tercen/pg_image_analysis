@@ -24,8 +24,8 @@ row = abs(oArray.row);
 col = abs(oArray.col);
 
 if any(isRef)
-    rmp = min(row) + (max(row)-min(row))/2;
-    cmp = min(col) + (max(col)-min(col))/2;
+    rmp = min(row(isRef)) + (max(row(isRef))-min(row(isRef)))/2;
+    cmp = min(col(isRef)) + (max(col(isRef))-min(col(isRef)))/2;
 
     mp(:,1) = -1 + (xPos(isRef) -oArray.spotPitch(1)    *oArray.xOffset(isRef)) + (rmp - row(isRef)) * oArray.spotPitch(1);
     mp(:,2) = -1 + (yPos(isRef) -oArray.spotPitch(end)  *oArray.yOffset(isRef)) + (cmp - col(isRef)) * oArray.spotPitch(end);
