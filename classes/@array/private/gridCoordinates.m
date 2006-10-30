@@ -1,36 +1,36 @@
-function [x,y, ix, iy] = gridCoordinates(row,col,x0,y0,mp, spotPitch, rotation)
-% function [x,y, ix, iy] = gridCoordinates(mp, refMask, spotPitch, rotation, x0, y0)
-% this function generates the coordinates of spots in a grid.
+function [x,y] = gridCoordinates(row,col,x0,y0,mp, spotPitch, rotation)
+% function [x,y] = gridCoordinates(mp, refMask, spotPitch, rotation, x0, y0)
+% this function generates the coordinates of spots in a grid. private
+% function of the array class
+%
 % IN:
 %
-% mp: two component vector with the x and y coordinate of the midpoint of
-% the array in the image or template.
+% row: row indices used in the array (N element vector)
+% col: col indices used in the array (N element vector)
 %
-% refMask: array (size = [nRow, nCol[), each element corresponding to a
-% position in the grid, element = 1 if a coordinate for the corresponding position is required, 0 otherwise.
+% x0, xOffsets from ideal in units spotPitch, N element vector correspondig
+% to row and col
+%
+% y0, yOffsets from ideal in units spotPitch, N element vector
+% corresponding to row and col
+%
+% mp: two element vector with the x and y coordinate of the midpoint of
+% the array in the image or template.
 %
 % spotPitch (2 element vector) x and y pitch of the array, if spotPitch is
 % scalar the function use spotPitch for both the x and y pitch.
 %
-% rotation (scalar) rotation of the arry
-%
-% x0: array of size refMask containing offsets from ideal x coordinate for individual
-% positions. x0 = [] dfts to x0 = zeros(size(refMask));
-% y0, see x0
+% rotation (scalar) rotation of the array (degrees)
 %
 % OUT:
 % x,y coordinates of positions
-% 
 
- 
+
 if length(spotPitch) == 1
     spotPitch(2) = spotPitch(1);
 end
 row = abs(row);
 col = abs(col);
-
-nRows = max(row);
-nCols = max(col);
 
 % calculate grid coordinates, zeros centered
 rmp = min(row) + (max(row)-min(row))/2;
@@ -43,7 +43,7 @@ y = spotPitch(2)*(col-cmp) + spotPitch(2) * y0;
 teta = (2*pi/360) * rotation;
 R = [cos(teta), -sin(teta);
     sin(teta), cos(teta)];
-v = (R * [x';y'])';
+v = (R * [x';y'])'; % Note: this is matrix multiplcation
 x = v(:,1); y = v(:,2);
 
 % center around midpoint of array in image or template
