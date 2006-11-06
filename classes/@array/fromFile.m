@@ -85,28 +85,33 @@ end
 % define columnheader keywords that identify the required columns in the
 % file:
 
-clHdrKeyWord{1} = 'Row';
-clHdrKeyWord{2} = 'Col';
-clHdrKeyWord{3} = 'ID';
-clHdrKeyWord{4} = 'Xoff';
-clHdrKeyWord{5} = 'Yoff';
+clHdrKeyWord{1} = 'Row'; bRequired(1) = true;
+clHdrKeyWord{2} = 'Col'; bRequired(2) = true;
+clHdrKeyWord{3} = 'ID' ; bRequired(3) = true; 
+clHdrKeyWord{4} = 'Xoff'; bRequired(4) = true;
+clHdrKeyWord{5} = 'Yoff'; bRequired(5) = true;
+clHdrKeyWord{6} = 'xFixedPosition'; bRequired(6) = false;
+clHdrKeyWord{7} = 'yFixedPosition'; bRequired(7) = false;
 
 % read the header line into cell array
 fLine = strread(fgetl(fid), '%s', 'delimiter', '\t')';
 %identfy columns nrs corresponding to keyword.
 % error return when any of the keywords is not matched exactly one time:
+keyMatch = zeros(size(bRequired));
 for i = 1:length(clHdrKeyWord)
-    iMatch = strmatch(clHdrKeyWord{i}, fLine);
-    if length(iMatch) ~= 1
+    iMatch = find(strcmp(clHdrKeyWord{i}, fLine));
+    if isempty(iMatch) && bRequired(i)
+        error(['Error reading: ', fName,'. Cannot find required columns header: ', clHdrKeyWord{i}]);
+    elseif length(iMatch) > 1
         error(['Error reading: ', fName,'. Cannot uniquely identify column header: ',clHdrKeyWord{i}]);
-    else
+    elseif ~isempty(iMatch)
         keyMatch(i) = iMatch;
     end
 end
 
 % make a list of the none matched headers
 bMatch = false(size(fLine));
-bMatch(keyMatch) = true;
+bMatch(keyMatch(find(keyMatch))) = true;
 extraHeaders = fLine(~bMatch);
 
 
@@ -131,6 +136,10 @@ while(1)
             ID(n)      = clLine(keyMatch(3));
             xOff(n)    = str2num(char((clLine(keyMatch(4)))));
             yOff(n)    = str2num(char((clLine(keyMatch(5)))));
+            if keyMatch(6) && keyMatch(7)
+                xFxd(n) = str2num(char((clLine(keyMatch(6)))));
+                yFxd(n) = str2num(char((clLine(keyMatch(7)))));
+            end
             extraColumns(n,:) = clLine(~bMatch);
             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
@@ -160,5 +169,14 @@ g.isreference = isreference';
 g.ID = ID';
 g.xOffset = xOff';
 g.yOffset = yOff';
+if keyMatch(6) && keyMatch(7)
+    g.xFixedPosition = xFxd';
+    g.yFixedPosition = yFxd';
+else
+    g.xFixedPosition = zeros(size(row'));
+    g.yFixedPosition = zeros(size(row'));
+end
+
+    
 
 

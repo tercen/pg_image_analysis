@@ -1,4 +1,4 @@
-function [cx,cy, rot, g, mx] = gridFind(g, I)
+function [x,y, rot, g, mx] = gridFind(g, I)
 % array.gridFind
 % function [x,y,rot,oArrayOut] = gridFind(oArray, I)
 % IN:
@@ -30,8 +30,32 @@ end
 if length(g.row) ~= length(g.col)
     error('Parameters ''row'' and ''col'' must be vectors of the same length');
 end
+
+
+
+
 if ~isequal(size(g.xOffset),size(g.row)) || ~isequal(size(g.yOffset),size(g.row))
     error('Parameters ''xOffset'' and ''yOffset'' must be vectors of the same length as ''row'' and ''col''');
+end
+
+if ~isempty(g.xFixedPosition)
+    if ~isequal(size(g.xFixedPosition),size(g.row)) || ~isequal(size(g.yFixedPosition),size(g.row))
+        error('Parameters ''xFixedPosition'' and ''yFixedPosition'' must be vectors of the same length as ''row'' and ''col''');
+    end
+else
+    g.xFixedPosition = zeros(size(g.row));
+    g.yFixedPosition = zeros(size(g.col));
+end
+
+% if all xFixedPosition and yFixedPosition are non-zero (i.e. already set)
+% return immediately
+
+x = g.xFixedPosition;
+y = g.yFixedPosition;
+if ~any(~g.xFixedPosition) & ~any(~g.yFixedPosition)
+    mx = midPoint(g, g.xFixedPosition, g.yFixedPosition);
+    rot = 0;
+    return
 end
 
 if isempty(g.spotPitch)
@@ -90,3 +114,8 @@ switch g.method
     otherwise
         error('Unknown value for grid property ''method''');
 end
+% override the final results with the xFixedPosition and yFixedPosition
+% props.
+x(~x) = cx(~x);
+y(~y) = cy(~y);
+

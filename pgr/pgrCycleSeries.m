@@ -32,14 +32,22 @@ oPP = rescale(oP, rsizFactor(1));
 Igrid = getPrepImage(oPP, imresize(I(:,:,iGrid), rSize));
 spotPitch   = get(oArray, 'spotPitch');
 spotSize    = get(oArray, 'spotSize');
+xfxd =  get(oArray,   'xFixedPosition');
+yfxd =  get(oArray,   'yFixedPosition');
+
 oArray = set(oArray, 'spotPitch', spotPitch * rsizFactor , ...
-            'spotSize', spotSize * rsizFactor(1));
+                     'spotSize', spotSize * rsizFactor(1) , ...
+                     'xFixedPosition', xfxd * rsizFactor(1), ...
+                     'yFixedPosition', yfxd * rsizFactor(2) );
 
 [x,y,rotOut, oArray] = gridFind(oArray, Igrid);
 
 % scale back to original image size, make sure the coordinate sare within the image 
 oArray = set(oArray, 'spotPitch', spotPitch , ...
-                                  'spotSize', spotSize);
+    'spotSize', spotSize, ...
+    'xFixedPosition', xfxd, ...
+    'yFixedPosition', yfxd);
+
 x = x/rsizFactor(1);
 y = y/rsizFactor(2);
 x(x<1) = 1;
@@ -165,7 +173,7 @@ rsizFactor = rSize./size(I(:,:,iGrid));
 spotPitch = get(foArray, 'spotPitch');
 spotSize = get(foArray , 'spotSize');
 
-foArray = set(foArray, 'spotPitch', spotPitch * rsizFactor , ...
+scArray = set(foArray, 'spotPitch', spotPitch * rsizFactor , ...
             'spotSize', spotSize * rsizFactor(1));
 oPP = rescale(oP, rsizFactor(1));
 
@@ -184,7 +192,7 @@ mp0 = midPoint(foArray, x0, y0);
 for i=1:nImages
     % now find the grid on the individual images, 
     Igrid = getPrepImage(oPP, imresize(I(:,:,i), rSize));
-    [x,y,rotOut, foArray] = gridFind(foArray, Igrid);
+    [x,y,rotOut, scArray] = gridFind(scArray, Igrid);
     
     x = x/rsizFactor(1);
     y = y/rsizFactor(2);

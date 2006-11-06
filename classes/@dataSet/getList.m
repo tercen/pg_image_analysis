@@ -1,4 +1,8 @@
 function [d,list] = getList(d)
+if isempty(d.path)
+    error('Please set the path property');
+end
+
 
 switch d.instrument
     case 'detect';

@@ -40,6 +40,18 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = 1;
             end 
+        case 'xFixedPosition'
+            if isnumeric(val)
+                g.xFixedPosition = val;
+            else
+                bInvalid = 1;
+            end 
+        case 'yFixedPosition'
+             if isnumeric(val)
+                g.yFixedPosition = val;
+            else
+                bInvalid = 1;
+            end 
         case 'spotPitch'
             if isnumeric(val) & length(val) <= 2
                 g.spotPitch = val;

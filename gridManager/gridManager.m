@@ -723,12 +723,10 @@ settings.sqc = sqc;
 settings.resize             = [handles.iniPars.xResize, handles.iniPars.yResize];
 
 
-% try
-        
-%        obsolete call   
-%handles = gridCycleSeries(handles, I);
-%        function proto: [qFinal, oArray] = pgrCycleSeries(I, oP, oArray, oS0, oQ0, settings)
-         [handles.qImage, handles.oArray] = pgrCycleSeries(I, handles.oP, handles.oArray, handles.oS, handles.oQ, settings);
+%try
+%      obsolete call:   
+%      handles = gridCycleSeries(handles, I);
+        [handles.qImage, handles.oArray] = pgrCycleSeries(I, handles.oP, handles.oArray, handles.oS, handles.oQ, settings);
 % catch
 %      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
 %      return

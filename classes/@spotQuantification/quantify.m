@@ -14,7 +14,7 @@ function oq = quantify(oq, I)
 for i=1:nRows
     for j = 1:nCols
         % this sets the mask for the background pixels
-        % (spotQuantification/private)
+        % (spotQuantification.setBackgroundMask method)
         if isempty(oq(i,j).iBackground)
             oq(i,j) = setBackgroundMask(oq(i,j));
         end
@@ -50,6 +50,9 @@ for i=1:nRows
             % quantify background
             bgPix = imLocal(oq(i,j).iBackground);
             if bOut
+                
+                
+                
                 [iOutBackground, bgLimits] = detect(oq(i,j).oOutlier, double(bgPix));
             else
                 iOutBackground = false(size(bgPix));
