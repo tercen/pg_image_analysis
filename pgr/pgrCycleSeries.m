@@ -144,6 +144,9 @@ if any(~isRef)
     qAll(~isRef) = qSub;
 end
 
+% reset flags
+qAll = setSet(qAll, 'isReplaced', false(size(qAll)), 'isBad', false(size(qAll)));
+
 qAll = check4BadSpots(qAll, ...
     'mindiameter', spotPitch * qcc.minDiameter, ...
     'maxdiameter', spotPitch * qcc.maxDiameter, ...
@@ -225,7 +228,7 @@ foArray = set(foArray, 'spotPitch', spotPitch , ...
 function [qOut, spotPitch, mp] = segmentAndRefine(I, S0, array2fit, q, x, y, iniPars)
 % Segments and attempts to refine the spotpitch
 maxSegIter = 2;
-maxPrimaryOffset = iniPars.maxOffset * 1.2;
+maxPrimaryOffset = iniPars.maxOffset * 1.1;
 
 oS = repmat(S0, size(x));
 spotPitch = get(array2fit, 'spotPitch');
@@ -280,4 +283,5 @@ for pass = 1:maxSegIter
     
 end
 % reset all the flags
-qOut = setSet(q, 'isReplaced', false(size(q)), 'isEmpty', false(size(q)), 'isBad', false(size(q)));
+% qOut = setSet(q, 'isReplaced', false(size(q)), 'isEmpty', false(size(q)), 'isBad', false(size(q)));
+qOut = setSet(q, 'isReplaced', false(size(q)),  'isBad', false(size(q)));

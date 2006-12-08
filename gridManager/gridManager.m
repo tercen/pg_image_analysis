@@ -111,7 +111,7 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.7.3.2';
+handles.version = 'alpha.7.3.3';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.seriesMode = 'fixed';
@@ -722,15 +722,13 @@ sqc.maxOffset               = handles.iniPars.maxOffset;
 settings.sqc = sqc;
 settings.resize             = [handles.iniPars.xResize, handles.iniPars.yResize];
 
-
-%try
-%      obsolete call:   
-%      handles = gridCycleSeries(handles, I);
+try
         [handles.qImage, handles.oArray] = pgrCycleSeries(I, handles.oP, handles.oArray, handles.oS, handles.oQ, settings);
-% catch
-%      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
-%      return
-% end
+catch
+      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+      return
+end
+
 currentArray.done = 1;
 handles.arrays(handles.selectedWell(1), handles.selectedWell(2)) = currentArray;
 
