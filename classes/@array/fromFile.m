@@ -101,8 +101,10 @@ keyMatch = zeros(size(bRequired));
 for i = 1:length(clHdrKeyWord)
     iMatch = find(strcmp(clHdrKeyWord{i}, fLine));
     if isempty(iMatch) && bRequired(i)
-        error(['Error reading: ', fName,'. Cannot find required columns header: ', clHdrKeyWord{i}]);
+        fclose(fid);
+        error(['Error reading: ', fName,'. Cannot find required columns header: ', clHdrKeyWord{i}]);       
     elseif length(iMatch) > 1
+        fclose(fid);
         error(['Error reading: ', fName,'. Cannot uniquely identify column header: ',clHdrKeyWord{i}]);
     elseif ~isempty(iMatch)
         keyMatch(i) = iMatch;
@@ -144,6 +146,7 @@ while(1)
             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
             eStr = [lasterr,' On line ',num2str(n),': ',strLine];
+            fclose(fid);
             error(eStr, 'error reading template file');
         end
          n= n+ 1; 
