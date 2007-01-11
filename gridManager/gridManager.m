@@ -111,7 +111,7 @@ set(gcf, 'position', [6.4 7.07692 95.4 29.3846]);
 % Update handles structure
 set(handles.pbAll, 'enable', 'off');
 set(handles.pbThis, 'enable', 'off');
-handles.version = 'alpha.7.3.3';
+handles.version = 'alpha.7.3.4';
 miPreProcessingFast_Callback(handles.miPreProcessingFast, [], handles);
 handles.prepMode = 'fast';
 handles.seriesMode = 'fixed';
@@ -723,10 +723,10 @@ settings.sqc = sqc;
 settings.resize             = [handles.iniPars.xResize, handles.iniPars.yResize];
 
 try
-        [handles.qImage, handles.oArray] = pgrCycleSeries(I, handles.oP, handles.oArray, handles.oS, handles.oQ, settings);
+         [handles.qImage, handles.oArray] = pgrCycleSeries(I, handles.oP, handles.oArray, handles.oS, handles.oQ, settings);
 catch
-      errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
-      return
+       errordlg(lasterr, ['Error while analyzing: ',currentArray.id]);
+       return
 end
 
 currentArray.done = 1;
