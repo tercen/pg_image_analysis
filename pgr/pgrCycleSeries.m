@@ -145,7 +145,8 @@ if any(~isRef)
 end
 
 % reset flags
-qAll = setSet(qAll, 'isReplaced', false(size(qAll)), 'isBad', false(size(qAll)));
+qAll = setSet(qAll, 'isReplaced', false(size(qAll)), 'isBad', false(size(qAll)) );
+
 
 qAll = check4BadSpots(qAll, ...
     'mindiameter', spotPitch * qcc.minDiameter, ...
@@ -157,10 +158,12 @@ qAll = check4BadSpots(qAll, ...
 qAll = replaceBadSpots(qAll);
        
 
+
 clear qRefs
 clear qSub
 for i=1:nImages
     qImage(:,:,i) = quantify(qAll, I(:,:,i));
+    %qImage(:,:,i) = check4EmptySpots(qImage(:,:,i), 'quantification');
 end
 qFinal = qImage;
 %gdata.oArray = set(gdata.oArray, 'spotPitch', spotPitch);
@@ -172,6 +175,7 @@ nImages = size(I,3);
 rSize = settings.resize;
 iGrid = settings.nGridImage;
 [qFixed, foArray] = seriesFixed(I(:,:,iGrid), oP, oArray, oS0, oQ0, settings);
+
 rsizFactor = rSize./size(I(:,:,iGrid));
 spotPitch = get(foArray, 'spotPitch');
 spotSize = get(foArray , 'spotSize');
@@ -190,12 +194,13 @@ ps = get(qFixed, 'oSegmentation');
 principalSegmentation = [ps{:}];
 % find the midpoint associated with the principalSegmentation:
 [x0, y0] = getPosition(qFixed);
-mp0 = midPoint(foArray, x0, y0);
+array2fit = removePositions(foArray, '~isreference');
+mp0 = midPoint(array2fit, x0, y0);
 
 for i=1:nImages
     % now find the grid on the individual images, 
     Igrid = getPrepImage(oPP, imresize(I(:,:,i), rSize));
-    [x,y,rotOut, scArray] = gridFind(scArray, Igrid);
+    [x,y,rotOut] = gridFind(scArray, Igrid);
     
     x = x/rsizFactor(1);
     y = y/rsizFactor(2);
@@ -228,7 +233,7 @@ foArray = set(foArray, 'spotPitch', spotPitch , ...
 function [qOut, spotPitch, mp] = segmentAndRefine(I, S0, array2fit, q, x, y, iniPars)
 % Segments and attempts to refine the spotpitch
 maxSegIter = 2;
-maxPrimaryOffset = iniPars.maxOffset * 1.1;
+maxPrimaryOffset = iniPars.maxOffset * 1.2;
 
 oS = repmat(S0, size(x));
 spotPitch = get(array2fit, 'spotPitch');
@@ -243,7 +248,7 @@ for pass = 1:maxSegIter
     oProps = setPropertiesFromSegmentation(spotProperties, oS);
     % create the quantification object
     q = setSet(q,   'oSegmentation', oS, ...
-        'oProperties', oProps);
+                     'oProperties', oProps);
                         
     q = check4EmptySpots(q);
     q = replaceEmptySpots(q);
@@ -283,5 +288,4 @@ for pass = 1:maxSegIter
     
 end
 % reset all the flags
-% qOut = setSet(q, 'isReplaced', false(size(q)), 'isEmpty', false(size(q)), 'isBad', false(size(q)));
-qOut = setSet(q, 'isReplaced', false(size(q)),  'isBad', false(size(q)));
+qOut = q;%setSet(q, 'isReplaced', false(size(q)), 'isEmpty', false(size(q)), 'isBad', false(size(q)));
