@@ -23,6 +23,6 @@ global hs_auto
 global hs_lower
 global hs_upper
 
-qNames = {'Y0', 'Yspan', 'logIC50','hs', 'Y0 standard error', 'Ymax standard error', 'logIC50 standard error','hs standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr', 'Yspan_signed'};
+qNames = {'Y0', 'Yspan', 'logIC50','hs', 'Y0 standard error', 'Yspan standard error', 'logIC50 standard error','hs standard error', 'R2', 'absolute ChiSqr', 'relative ChiSqr', 'Yspan_signed', 'Ymax', 'Ymax standard error'};
 
 qNames = qNames';

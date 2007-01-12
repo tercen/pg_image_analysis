@@ -99,14 +99,14 @@ rChiSqr = sum( ( f(~iOut)-y(~iOut) )./y(~iOut).^2) ;
 
 hs = pOut(4);
 Yspan = pOut(2);
-
+Y0 = pOut(1);
 % Yspan_signed receives the same sign as the hill slope to indicate
 % up/down curve
 Yspan_signed = sign(hs) * Yspan; 
 
-
-
-
+% calculate Ymax = Y0 + Yspan + associated standard errro.
+Ymax = Y0 + Yspan;
+seYmax = sqrt(pStdError(1)^2 + pStdError(2)^2);
 
 quantitationTypes = [pOut;
                      pStdError;
@@ -114,6 +114,11 @@ quantitationTypes = [pOut;
                      aChiSqr;
                      rChiSqr;
                      Yspan_signed;
-                    ];
-      
+                     Ymax;
+                     seYmax;
+                     ];
+
+if any(~isfinite(quantitationTypes))
+    error('Non finite results');
+end
 confidenceTypes = wOut;
