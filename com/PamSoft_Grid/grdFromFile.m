@@ -14,6 +14,8 @@ global grdSpotSize
 global grdXOffset
 global grdYOffset
 global grdUseImage
+global grdXFixedPosition
+global grdYFixedPosition
 global segMethod
 global segEdgeSensitivity
 global segAreaSize
@@ -28,7 +30,9 @@ global qntSaturationLimit
 global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
+global qntShowPamGridViewer
 global stateQuantification
+
 
 oArray =  fromFile(array, templatePath, grdRefMarker);
 qntSpotID = get(oArray, 'ID');
@@ -37,3 +41,6 @@ grdRow          = get(oArray, 'row');
 grdIsReference  = get(oArray, 'isreference');
 grdXOffset = get(oArray, 'xOffset');
 grdYOffset = get(oArray, 'yOffset');
+grdXFixedPosition = get(oArray, 'xFixedPosition');
+grdYFixedPosition = get(oArray, 'yFixedPosition');
+

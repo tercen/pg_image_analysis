@@ -11,9 +11,13 @@ global grdIsReference
 global grdRotation
 global grdSpotPitch
 global grdSpotSize
+global grdXPosition
+global grdYPosition
 global grdXOffset
 global grdYOffset
 global grdUseImage
+global grdXFixedPosition
+global grdYFixedPosition
 global segMethod
 global segEdgeSensitivity
 global segAreaSize
@@ -28,6 +32,7 @@ global qntSaturationLimit
 global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
+global qntShowPamGridViewer
 global stateQuantification
 
 if ~iscell(imagePath)

@@ -5,13 +5,19 @@ function pdef = getProperties
 % global prpCircleDiameter
 % global prpCircleBlurr
 % global prpResize
-% global grdMask
+% global grdRow
+% global grdCol
+% global grdIsReference
 % global grdRotation
 % global grdSpotPitch
 % global grdSpotSize
+% global grdXPosition
+% global grdYPosition
 % global grdXOffset
 % global grdYOffset
 % global grdUseImage
+% global grdXFixedPosition
+% global grdYFixedPosition
 % global segMethod
 % global segEdgeSensitivity
 % global segAreaSize
@@ -26,7 +32,9 @@ function pdef = getProperties
 % global qntBackgroundMethod
 % global qntOutlierMethod
 % global qntOutlierMeasure
+% global qntShowPamGridViewer
 % global stateQuantification
+
 
 %
 pdef(1).name    = 'prpContrast';
@@ -95,6 +103,16 @@ pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'grdYOffset';
+pdef(end).dft   = [];
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+%
+pdef(end+1).name = 'grdXFixedPosition';
+pdef(end).dft   = [];
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+%
+pdef(end+1).name = 'grdYFixedPosition';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
@@ -173,6 +191,11 @@ pdef(end+1).name = 'qntOutlierMeasure';
 pdef(end).dft   = 1.75;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
+%
+pdef(end+1).name = 'qntShowPamGridViewer';
+pdef(end).dft = uint8(0);
+pdef(end).enumVal = uint8([0,1,2]);
+pdef(end).enumMap = {'No', 'Show, Wait for Close', 'Show and Continue'};
 
 
 

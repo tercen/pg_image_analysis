@@ -5,14 +5,21 @@ global prpSmallDisk
 global prpCircleDiameter
 global prpCircleBlurr
 global prpResize
-global grdMask
+global grdRow
+global grdCol
+global grdIsReference
 global grdRotation
 global grdSpotPitch
+global grdSpotSize
+global grdXPosition
+global grdYPosition
 global grdXOffset
 global grdYOffset
 global grdUseImage
+global grdXFixedPosition
+global grdYFixedPosition
 global segMethod
-global segEdgeSesitivity
+global segEdgeSensitivity
 global segAreaSize
 global sqcMaxDiameter
 global sqcMinDiameter
@@ -23,6 +30,9 @@ global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
 global qntBackgroundMethod
+global qntOutlierMethod
+global qntOutlierMeasure
+global qntShowPamGridViewer
 global stateQuantification
 version = 'PAMSOFT_GRID_1_0_1';
 % PAMSOFT_GRID_1_0_1

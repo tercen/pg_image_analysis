@@ -14,6 +14,8 @@ global grdSpotSize
 global grdXOffset
 global grdYOffset
 global grdUseImage
+global grdXFixedPosition
+global grdYFixedPosition
 global segMethod
 global segEdgeSensitivity
 global segAreaSize
@@ -28,6 +30,7 @@ global qntSaturationLimit
 global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
+global qntShowPamGridViewer
 global stateQuantification
 
 if ~iscell(imagePath)
@@ -83,16 +86,24 @@ end
 if isempty(grdYOffset)
     grdYOffset = zeros(size(grdCol));
 end
+if isempty(grdXFixedPosition)
+    grdXFixedPosition = zeros(size(grdCol));
+end
+if isempty(grdYFixedPosition)
+    grdYFixedPosition = zeros(size(grdCol));
+end
 
-oArray = array  ('row'          , grdRow, ...
-                 'col'          , grdCol, ...
-                 'isreference'  , grdIsReference, ...
-                 'spotPitch'    , grdSpotPitch, ...
-                 'spotSize'     , grdSpotSize * grdSpotPitch, ...
-                 'rotation'     , grdRotation, ...
-                 'xOffset'      , grdXOffset, ...
-                 'yOffset'      , grdYOffset, ...
-                 'ID'           , qntSpotID);
+oArray = array  ('row'              , grdRow, ...
+                 'col'              , grdCol, ...
+                 'isreference'      , grdIsReference, ...
+                 'spotPitch'        , grdSpotPitch, ...
+                 'spotSize'         , grdSpotSize * grdSpotPitch, ...
+                 'rotation'         , grdRotation, ...
+                 'xOffset'          , grdXOffset, ...
+                 'yOffset'          , grdYOffset, ...
+                 'xFixedPosition'   , grdXFixedPosition, ...
+                 'yFixedPosition'   , grdYFixedPosition, ...
+                 'ID'               , qntSpotID);
              
 % initialize segmentation object
 oS0 = segmentation( 'method'            , strSegMethod, ...
@@ -153,4 +164,14 @@ end
 % permute qTypes from: DesignElement-QuantitationType-BioAssay 
 % to : BioAssay-DesignElement-QuantitationType
 qTypes = permute(qTypes, [3,1,2]);
+
+if qntShowPamGridViewer ~=0
+    hViewer = showInteractive(stateQuantification, I, 1:nImages);
+    set(hViewer, 'Name', 'PamGridViewer');
+    if qntShowPamGridViewer == 1
+        uiwait(hViewer);
+    end
+end
+
+
 %EOF
