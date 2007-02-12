@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+  <!--PamSoft_Grid.prj-->
+  <MATLABPath>
+    <Directory>C:\PamSoft\DataAnalysis\pgr</Directory>
+    <Directory>C:\PamSoft\DataAnalysis\common</Directory>
+    <Directory>C:\PamSoft\DataAnalysis\v</Directory>
+    <Directory>C:\PamSoft\DataAnalysis\gridPresenter</Directory>
+    <Directory>C:\PamSoft\DataAnalysis\classes</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\general</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\ops</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\lang</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\elmat</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\elfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\specfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\matfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\datafun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\polyfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\funfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\sparfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\scribe</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\graph2d</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\graph3d</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\specgraph</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\graphics</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\uitools</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\strfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\imagesci</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\iofun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\audiovideo</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\timefun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\datatypes</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\verctrl</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\codetools</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\helptools</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\winfun</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\demos</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\timeseries</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\hds</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\guide</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\matlab\plottools</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\local</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\shared\controllib</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\compiler</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\dotnetbuilder\dotnetbuilder</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\images\images</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\images\imuitools</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\images\imdemos</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\images\iptutils</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\shared\imageslib</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\images\medformats</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\optim</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\shared\optimlib</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\work</Directory>
+    <Directory>C:\Program Files\MATLAB\R2006b\toolbox\stats</Directory>
+  </MATLABPath>
+  <MCCProperties>
+    <wrapper>
+      <type>com</type>
+      <component_name>PamSoft_Grid</component_name>
+      <default_class>analyze</default_class>
+      <additionalProperty>3.8</additionalProperty>
+    </wrapper>
+    <intermediate_dir>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\src</intermediate_dir>
+    <output_dir>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\distrib</output_dir>
+    <link>lib</link>
+    <MCR_runtime_options>
+      <share_mcr>false</share_mcr>
+    </MCR_runtime_options>
+    <generate_code_only>false</generate_code_only>
+    <verbose>true</verbose>
+    <options_file/>
+    <debug>false</debug>
+    <toolboxes_on_path shortcut="all"/>
+    <warning shortcut="default">
+      <warn name="specified_file_mismatch">enable</warn>
+      <warn name="repeated_file">enable</warn>
+      <warn name="switch_ignored">enable</warn>
+      <warn name="missing_lib_sentinel">enable</warn>
+      <warn name="demo_license">enable</warn>
+    </warning>
+  </MCCProperties>
+  <file_info>
+    <category name="analyze">
+      <!--Do not modify the value of the name attribute, unless it is a class name.-->
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\analyzecycleseries.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\getpropdefault.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\getpropenumeration.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\getquantitationtypenames.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\qClear.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\qLoad.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\qQuantify.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\qSave.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\qShow.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\segmentSingle.m</file>
+      <file>C:\PamSoft\DataAnalysis\com\PamSoft_Grid\grdFromFile.m</file>
+    </category>
+    <category name="Other files">
+      <!--Do not modify the value of the name attribute, unless it is a class name.-->
+    </category>
+    <category name="C/C++ files">
+      <!--Do not modify the value of the name attribute, unless it is a class name.-->
+    </category>
+  </file_info>
+  <packaging>
+    <name>PamSoft_Grid_pkg</name>
+    <mcr include="false"/>
+    <additional_files/>
+  </packaging>
+</project>
