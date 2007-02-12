@@ -3,7 +3,7 @@
 
 [Setup]
 AppName=PamSoft Grid Component
-AppVerName=PamSoft Grid Component 3.6
+AppVerName=PamSoft Grid Component 3.8
 AppPublisher=PamGene International BV
 DefaultDirName=C:\Program Files\BioNavigator\AX
 DisableDirPage=yes
@@ -19,7 +19,7 @@ SolidCompression=yes
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "C:\PamSoft\DataAnalysis\com\PamSoft_Grid\distrib\PamSoft_Grid_3_6.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\PamSoft\DataAnalysis\com\PamSoft_Grid\distrib\PamSoft_Grid_3_8.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\PamSoft\DataAnalysis\com\PamSoft_Grid\distrib\PamSoft_Grid.ctf"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
