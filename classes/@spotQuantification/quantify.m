@@ -74,7 +74,8 @@ for i=1:nRows
             % since pixel intensities are integer, we can handle the ties
             % in MW test below by adding 0.5 to one of the
             % distributions (here: sigPix)
-            oq(i,j).pSignal = test2r(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'n');
+            %oq(i,j).pSignal = test2r(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'n');
+            oq(i,j).pSignal = ranksum(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'method', 'approximate');
             nPix = length(sigPix(~iOutSignal));
             oq(i,j).signalSaturation = length(find(sigPix(~iOutSignal) >= oq(i,j).saturationLimit))/nPix;    
         end
