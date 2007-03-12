@@ -15,6 +15,7 @@ p.modelObj  = f;
 p.iniPars   = [];
 p.lbPars    = [];
 p.ubPars    = [];
+p.fitPars   = true(size(get(f, 'clParameter')));
 p.fitMethod = 'Normal';
 p.robTune   = 1;
 

@@ -54,7 +54,13 @@ for i=1:2:length(pArgin)
             error([p.model, ' expects exactly ', num2str(nPars), ' upper bounds.']);
         end
     
-    
+    elseif isequal(pName, 'fitPars')
+        if length(pVal == length(fDef.clParameter))
+            p.fitPars = pVal;
+        else
+            error([p.model, ' expects exactly ', num2str(nPars), ' logicals for fitPars']);
+        end
+        
     elseif isequal(pName, 'fitMethod')
         if isequal(pVal, 'Normal')|isequal(pVal, 'Robust')|isequal(pVal, 'Robust2')|isequal(pVal, 'Filter')
             p.fitMethod = pVal;

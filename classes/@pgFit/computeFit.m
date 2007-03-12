@@ -1,4 +1,4 @@
-function [pRes, pStdError, wRes] = computeFit(pgfit, X, Y, W)
+function [pRes, pStdError, wRes, pgfit] = computeFit(pgfit, X, Y, W)
 
 % check size and shape of input
 if nargin < 4
@@ -51,7 +51,13 @@ for i=1:sy2
     if ~isempty(pgfit.ubPars)
         pUpper = pgfit.ubPars;
     end
-
+    
+    outofbound = p0 <= pLower | p0 >= pUpper; 
+    if any(outofbound)
+        error(['pgFit: initial parameters are not within set bounds for parameter no: ',num2str(find(outofbound'))]);
+    end
+    
+        
     switch pgfit.fitMethod
         case 'Normal'
             options = optimset('Jacobian', pgfit.jacobian,'Display', 'none' ,'MaxFunEvals', 10, 'TolX', 1e-8);
@@ -158,10 +164,12 @@ for i=1:sy2
     end %<switch>
     jac = full(jac);
     fit = getCurve(pgfit.modelObj, X, pRes(:,i));
-
+    
     switch pgfit.errorMethod
         case 'ASE'
-            pStdError(:,i) = fitAse(fit - Y(:,i), jac);
+            bUsed = logical(pgfit.fitPars);
+            pStdError(:,i) = zeros(size(p0));
+            pStdError(bUsed,i) = fitAse(fit - Y(:,i), jac(:,bUsed));
     end
     
 end %<i loop>

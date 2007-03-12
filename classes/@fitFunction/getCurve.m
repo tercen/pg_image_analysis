@@ -1,4 +1,8 @@
-function varargout = getCurve(f, x, p)
+function varargout = getCurve(f, x, p, bFit)
+if nargin < 4
+    bFit = true(1, size(p,1));
+end
+
 
 [sp1, sp2] = size(p);
 
@@ -12,7 +16,7 @@ bJac = logical(bJac);
 for i=1:sp2
     strFunction = f.strFitFunctionName;
     if bJac
-        [y(:,i), j]  = feval(strFunction, x, p(:,i));
+        [y(:,i), j]  = feval(strFunction, x, p(:,i), bFit);
         J(:,:,i) = j;
     else
         y(:,i) = feval(strFunction,x, p(:,i));
