@@ -18,6 +18,7 @@ function pdef = getProperties
 % global grdUseImage
 % global grdXFixedPosition
 % global grdYFixedPosition
+% global grdSearchDiameter
 % global segMethod
 % global segEdgeSensitivity
 % global segAreaSize
@@ -51,16 +52,6 @@ pdef(3).name    = 'prpSmallDisk';
 pdef(3).dft     = 0.17;
 pdef(3).enumVal = [];
 pdef(3).enumMap = [];
-%
-pdef(4).name    = 'prpCircleDiameter';
-pdef(4).dft     = 30;
-pdef(4).enumVal = [];
-pdef(4).enumMap = [];
-%
-pdef(end+1).name = 'prpCircleBlurr';
-pdef(end).dft   = 0.3;
-pdef(end).enumVal = [];
-pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'prpResize';
 pdef(end).dft   = [256,256];
@@ -97,6 +88,11 @@ pdef(end).dft   = 0.66;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
+pdef(end+1).name = 'grdSearchDiameter';
+pdef(end).dft   = 5;
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+%
 pdef(end+1).name = 'grdXOffset';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
@@ -119,16 +115,28 @@ pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'grdUseImage';
 pdef(end).dft   = int8(-1);
-pdef(end).enumVal = int8([-1,0]);
-pdef(end).enumMap = {'Last', 'First'};
+pdef(end).enumVal = int8([-2,-1,0]);
+pdef(end).enumMap = {'First then Last', 'Last', 'First'};
 %
-pdef(end+1).name = 'segMethod';
-pdef(end).dft   = uint8(1);
-pdef(end).enumVal = int8([0,1]);
-pdef(end).enumMap = {'Threshold', 'Edge'};
+pdef(end+1).name = 'grdOptimizeSpotPitch';
+pdef(end).dft = uint8(1);
+pdef(end).enumVal = uint8([0,1]);
+pdef(end).enumMap = {'no', 'yes'};
+%
+pdef(end+1).name = 'grdOptimizeRefVsSub';
+pdef(end).dft = uint8(1);
+pdef(end).enumVal = uint8([0,1]);
+pdef(end).enumMap = {'no', 'yes'};
+
+
+
+% pdef(end+1).name = 'segMethod';
+% pdef(end).dft   = uint8(1);
+% pdef(end).enumVal = int8([0,1]);
+% pdef(end).enumMap = {'Threshold', 'Edge'};
 %
 pdef(end+1).name = 'segEdgeSensitivity';
-pdef(end).dft   = [0, 0.005];
+pdef(end).dft   = [0, 0.01];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
@@ -169,19 +177,19 @@ pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'qntSeriesMode';
 pdef(end).dft   = uint8(0);
-pdef(end).enumVal = uint8([0,1]);
-pdef(end).enumMap = {'Fixed', 'Adapt'};
+pdef(end).enumVal = uint8([0,1,2,3]);
+pdef(end).enumMap = {'Fixed', 'Adapt Global', 'Adapt Local', 'Adapt All'};
 %
 pdef(end+1).name = 'qntSaturationLimit';
 pdef(end).dft   = -1 + 2^16;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-pdef(end+1).name = 'qntBackgroundMethod';
-pdef(end).dft   = uint8(0);
-pdef(end).enumVal = uint8([0]);
-pdef(end).enumMap = {'localCorner'};
-%
+% pdef(end+1).name = 'qntBackgroundMethod';
+% pdef(end).dft   = uint8(0);
+% pdef(end).enumVal = uint8([0]);
+% pdef(end).enumMap = {'localCorner'};
+% %
 pdef(end+1).name = 'qntOutlierMethod';
 pdef(end).dft   = uint8(1);
 pdef(end).enumVal = uint8([0,1]);

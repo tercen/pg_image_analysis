@@ -2,8 +2,6 @@ function qTypes = analyzecycleseries(imagePath)
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
-global prpCircleDiameter
-global prpCircleBlurr
 global prpResize
 global grdRow
 global grdCol
@@ -16,7 +14,9 @@ global grdYOffset
 global grdUseImage
 global grdXFixedPosition
 global grdYFixedPosition
-global segMethod
+global grdSearchDiameter
+global grdOptimizeSpotPitch
+global grdOptimizeRefVsSub;
 global segEdgeSensitivity
 global segAreaSize
 global sqcMaxDiameter
@@ -27,11 +27,11 @@ global sqcMaxPositionOffset
 global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
-global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
 global qntShowPamGridViewer
 global stateQuantification
+
 
 if ~iscell(imagePath)
     imagePath = cellstr(imagePath);
@@ -54,18 +54,28 @@ end
  
 [val, map]= getpropenumeration('prpContrast');
 strPrpContrast = char(map(prpContrast == val));
-[val, map]    = getpropenumeration('segMethod');
-strSegMethod = char(map(segMethod == val));
-[val, map] = getpropenumeration('qntBackgroundMethod');
-strQntBackgroundMethod = char(map(qntBackgroundMethod == val));
+% [val, map]    = getpropenumeration('segMethod');
+% strSegMethod = char(map(segMethod == val));
+strSegMethod = 'Edge';
+% [val, map] = getpropenumeration('qntBackgroundMethod');
+% strQntBackgroundMethod = char(map(qntBackgroundMethod == val));
+strQntBackgroundMethod = 'localCorner';
 [val, map] = getpropenumeration('qntOutlierMethod');
 strQntOutlierMethod = char(map(qntOutlierMethod == val));
+
+% read in the images 
+nRead = 0;
+for i=1:length(imagePath)
+    if ~isempty(imagePath(i))
+        nRead = nRead + 1;
+        I(:,:,nRead) = imread(imagePath{i});
+    end
+end
+nImages = size(I,3);
 
 % initialize preprocessing object
 oPrep = preProcess('nSmallDisk' , prpSmallDisk * grdSpotPitch, ...
                    'nLargeDisk' , prpLargeDisk * grdSpotPitch, ...
-                   'nCircle'    , prpCircleDiameter * grdSpotPitch, ...
-                   'nBlurr'     , prpCircleBlurr * grdSpotPitch, ...
                    'contrast'   , strPrpContrast);
                
 % initialize array object
@@ -93,6 +103,18 @@ if isempty(grdYFixedPosition)
     grdYFixedPosition = zeros(size(grdCol));
 end
 
+
+if ~isempty(grdSearchDiameter)
+    mp = size(I(:,:,1))/2;
+    r = grdSpotPitch * grdSearchDiameter/2;
+    [r,c] = circle(mp, r, round(2*pi*r));
+    srchRoi = roipoly(I(:,:,1), c,r);    
+else
+    srchRoi = [];
+end
+
+
+
 oArray = array  ('row'              , grdRow, ...
                  'col'              , grdCol, ...
                  'isreference'      , grdIsReference, ...
@@ -103,6 +125,7 @@ oArray = array  ('row'              , grdRow, ...
                  'yOffset'          , grdYOffset, ...
                  'xFixedPosition'   , grdXFixedPosition, ...
                  'yFixedPosition'   , grdYFixedPosition, ...
+                 'roiSearch'        , srchRoi, ... 
                  'ID'               , qntSpotID);
              
 % initialize segmentation object
@@ -123,24 +146,23 @@ oQ0 = spotQuantification('backgroundMethod', strQntBackgroundMethod, ...
                          'saturationLimit',  qntSaturationLimit, ...
                          'oOutlier', oOut);
                      
-% read in the images 
-nRead = 0;
 
 
-for i=1:length(imagePath)
-    if ~isempty(imagePath(i))
-        nRead = nRead + 1;
-        I(:,:,nRead) = imread(imagePath{i});
-    end
-end
-nImages = size(I,3);
+
+
 % initialize some implementation settings
 if grdUseImage == 0
     % use first
     settings.nGridImage = 1;
+    settings.nSegImage  = 1;
 elseif grdUseImage == -1
     % use last
     settings.nGridImage = nImages;
+    settings.nSegImage = nImages;
+elseif grdUseImage == -2
+    % grid on first, seg on last
+    settings.nGridImage = 1;
+    settings.nSegImage = nImages;
 elseif grdUseImage > 0 & grdUseImage <= nImages
     settings.gridImage = grdUseImage;
 else
@@ -154,10 +176,12 @@ sqc.maxAspectRatio          = sqcMaxAspectRatio;
 sqc.maxOffset               = sqcMaxPositionOffset;
 settings.sqc = sqc;
 settings.resize             = prpResize;
+settings.optimizeSpotPitch  = grdOptimizeSpotPitch;
+settings.optimizeRefVsSub   = grdOptimizeRefVsSub;
 
-
-[stateQuantification, oArray] = pgrCycleSeries(I, oPrep, oArray, oS0, oQ0, settings);
+stateQuantification = pgrCycleSeriesTest(I, oPrep, oArray, oS0, oQ0, settings);
 for i=1:nImages
+  
     qTypes(:,:,i) = makeQTypes(stateQuantification(:,:,i));
 end
 
@@ -172,6 +196,5 @@ if qntShowPamGridViewer ~=0
         uiwait(hViewer);
     end
 end
-
 
 %EOF

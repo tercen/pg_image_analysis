@@ -2,8 +2,6 @@ function [val, map] = getPropEnumeration(parName)
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
-global prpCircleDiameter
-global prpCircleBlurr
 global prpResize
 global grdRow
 global grdCol
@@ -16,7 +14,9 @@ global grdYOffset
 global grdUseImage
 global grdXFixedPosition
 global grdYFixedPosition
-global segMethod
+global grdSearchDiameter
+global grdOptimizeSpotPitch
+global grdOptimizeRefVsSub;
 global segEdgeSensitivity
 global segAreaSize
 global sqcMaxDiameter
@@ -27,7 +27,6 @@ global sqcMaxPositionOffset
 global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
-global qntBackgroundMethod
 global qntOutlierMethod
 global qntOutlierMeasure
 global qntShowPamGridViewer

@@ -9,10 +9,10 @@ if nargin == 1
 else
     
     for i=1:length(clNames)
-        if isequal(strField, 'binSpot')
+        if strcmp(strField, 'binSpot')
             value = getBinSpot(s);
             return
-        elseif isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
+        elseif strcmp(strField, clNames{i}) && ~strcmp(clNames{i}, 'private')
             [n, m] = size(s);
             [value{1:n, 1:m}]  = deal(s.(clNames{i}));
             value = cell2mat(value);
