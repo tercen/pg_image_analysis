@@ -129,7 +129,7 @@ if any(~isRef)
                 warning(['delta ref-sub: ', num2str(delta), ', start refinement attempt']) 
                 % if the substrate midpoint is to far from the ref
                 % midpoint, re-do
-                [xSub,ySub] = coordinates(array2fit, mpSub);
+                [xSub,ySub] = coordinates(arrayRefined, mpSub);
                 mpRefs = mpSub;
             else
                 break;
@@ -243,6 +243,7 @@ rotOut = get(array2fit, 'rotation');
 
 bSegment = true(size(x));
 for pass = 1:maxSegIter   
+  
     oS(bSegment) = segment(S0, I, x(bSegment), y(bSegment),rotOut);
     % QC
     oProps = setPropertiesFromSegmentation(spotProperties, oS);

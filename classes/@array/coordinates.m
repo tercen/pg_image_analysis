@@ -1,6 +1,7 @@
 function [cx,cy] = coordinates(oArray,mp, rotation)
 %[cx,cy] = coordinates(oArray,mp, rotation)
 % returns x and y coordinates of an array defined by the oArray object
+% for entries with isreference == true;
 % plus a midpoint [x,y]  plus an optional rotation (dft = 0)
 % See also array/array
 if isempty(oArray.xOffset)
@@ -19,16 +20,20 @@ if isempty(oArray.spotPitch)
 end
 
 % get the coordinates for set1, set2 respectivley
-bSet1 = oArray.row > 0 & oArray.col > 0;
-bSet2 = ~bSet1;
-cx = -ones(size(bSet1));
-cy = -ones(size(cx));
-if any(bSet1)
-    [cx(bSet1), cy(bSet1)] = gridCoordinates(oArray.row(bSet1), oArray.col(bSet1), oArray.xOffset(bSet1), oArray.yOffset(bSet1), mp, oArray.spotPitch, rotation);
-end
-if any(bSet2)
-    [cx(bSet2), cy(bSet2)] = gridCoordinates(oArray.row(bSet2), oArray.col(bSet2), oArray.xOffset(bSet2), oArray.yOffset(bSet2), mp, oArray.spotPitch, rotation);
-end
+% bSet1 = oArray.row > 0 & oArray.col;
+% bSet2 = oArray.col < 0 & oArray.row;
+% cx = -ones(size(bSet1));
+% cy = -ones(size(bSet1));
+% bRefSet1 = bSet1 & oArray.isreference;
+% bRefSet2 = bSet2 & oArray.isreference;
+% 
+% if any(bRefSet1)
+%     [cx(bSet1), cy(bSet1)] = gridCoordinates(oArray.row(bSet1), oArray.col(bSet1), oArray.xOffset(bSet1), oArray.yOffset(bSet1), mp, oArray.spotPitch, rotation, oArray.isreference(bSet1));
+% end
+% if any(bRefSet2)
+%     [cx(bSet2), cy(bSet2)] = gridCoordinates(oArray.row(bSet2), oArray.col(bSet2), oArray.xOffset(bSet2), oArray.yOffset(bSet2), mp, oArray.spotPitch, rotation, oArray.isreference(bSet2));
+% end
         
+[cx, cy] = gridCoordinates(oArray.row, oArray.col, oArray.xOffset, oArray.yOffset, mp, oArray.spotPitch, oArray.rotation, oArray.isreference);
 
 

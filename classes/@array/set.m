@@ -78,6 +78,13 @@ for i=1:2:length(pArgin)
             end
         case 'ID'
             g.ID = val;
+        case 'roiSearch'
+            if islogical(val)
+                g.roiSearch = val;
+            else
+                bInvalid = 1;
+            end
+        
         otherwise
             error(['Invalid property: ', prop]);
     end

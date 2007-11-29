@@ -58,12 +58,17 @@ if ~any(~g.xFixedPosition) & ~any(~g.yFixedPosition)
     return
 end
 
+if isempty(g.roiSearch)
+    g.roiSearch = true(size(I));
+end
+
 if isempty(g.spotPitch)
     error('Parameter ''spotPitch'' has not been set.');
 end
 if isempty(g.spotSize)
     error('Parameter ''spotSize'' has not been set.');
 end
+
 
 
 
@@ -75,6 +80,7 @@ switch g.method
         % the template needs to be updated.
         if ~isfield(private, 'fftTemplate')
             % update template
+  
             private(1).fftTemplate     = makeFFTTemplate(g, size(I));
             % store the current grid settings so it can be checked if the
             % template needs to be updated on the next call.
@@ -92,7 +98,8 @@ switch g.method
         end
         g.private  = private;
         
-        [mx, iRot] = templateCorrelation(I, private.fftTemplate);
+      
+        [mx, iRot] = templateCorrelation(I, private.fftTemplate,g.roiSearch);
         rot = g.rotation(iRot);
         
         % get the coordinates for set1, set2 respectivley

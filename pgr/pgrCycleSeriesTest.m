@@ -27,7 +27,11 @@ else
 end
 
 [xg,yg,rotOut]= globalGrid(I(:,:,iGrid), oArray, oP, rSize);
-q = segmentImage(I(:,:,iSeg), oS0, oQ0, oArray, xg, yg, rotOut, settings.sqc);
+q = segmentImage(I(:,:,iSeg), oS0, oQ0, oArray, xg, yg, rotOut, ...
+                           settings.sqc, ...
+                           settings.optimizeSpotPitch, ...
+                           settings.optimizeRefVsSub);
+
 qOut = seriesQuantify(q, I);
 
 %--------------------------------------------------------------------------
@@ -50,7 +54,11 @@ end
 
 for i=1:nImages
     [xg,yg, rotOut] = globalGrid(I(:,:, iGrid), oArray, oP, rSize);
-    q = segmentImage(I(:,:,i), oS0, oQ0, oArray, xg, yg, rotOut, settings);
+    q = segmentImage(I(:,:,i), oS0, oQ0, oArray, xg, yg, rotOut, ... 
+                              settings.sqc, ...
+                              settings.optimizeSpotPitch, ...
+                              settings.optimizeRefVsSub);
+                          
     qOut(:,:,i) = quantify(q, I(:,:,i));
 end
 
@@ -67,7 +75,11 @@ end
 [xg,yg, rotOut] = globalGrid(I(:,:, iGrid), oArray, oP, rSize);
 
 for i=1:nImages
-    q = segmentImage(I(:,:,i), oS0, oQ0, oArray, xg, yg, rotOut, settings.sqc);
+    q = segmentImage(I(:,:,i), oS0, oQ0, oArray, xg, yg, rotOut, ...
+            settings.sqc, ...
+            settings.optimizeSpotPitch, ...
+            settings.optimizeRefVsSub);
+        
     qOut(:,:,i) = quantify(q, I(:,:,i));
 end
 
@@ -84,7 +96,11 @@ end
 
 % first perform a standard fixed segmentation on the grid image
 [xg,yg, rotOut] = globalGrid(I(:,:, iGrid), oArray, oP, rSize);
-qFixed = segmentImage(I(:,:,iSeg), oS0, oQ0, oArray, xg, yg, rotOut, settings.sqc);
+qFixed = segmentImage(I(:,:,iSeg), oS0, oQ0, oArray, xg, yg, rotOut, ..., 
+            settings.sqc, ...
+            settings.optimizeSpotPitch, ...
+            settings.optimizeRefVsSub);
+
 
 spotPitch = get(oArray, 'spotPitch');
 bRef = get(oArray, 'isreference');
@@ -92,51 +108,68 @@ S0 = set(oS0, 'spotPitch', spotPitch);
 % get the principal segmentation from the fixedData:
 ps = get(qFixed, 'oSegmentation');
 % convert from cell array to normal array:
-principalSegmentation = [ps{:}];
+principalSegmentation = [ps{:}]';
 % find the midpoint associated with the principalSegmentation:
 [x0, y0] = getPosition(qFixed);
-array2fit = removePositions(oArray, '~isreference');
-mp0 = midPoint(array2fit, x0, y0);
+%array2fit = removePositions(oArray, '~isreference');
+mp0 = midPoint(oArray, x0, y0);
 
 for i=1:nImages
    [x,y,rotOut] = globalGrid(I(:,:,i), oArray, oP, rSize);
     % resegment the refs only
-    sRefs = segment(S0, I(:,:,i), x(bRef), y(bRef), rotOut);
-    pRefs = setPropertiesFromSegmentation(spotProperties, sRefs);
+    principalSegmentation(bRef) = segment(S0, I(:,:,i), x(bRef), y(bRef), rotOut);
+    pRefs = setPropertiesFromSegmentation(spotProperties, principalSegmentation(bRef));
     % find the position midpoint
-    qRefs = setSet(oQ0, 'oSegmentation', sRefs, 'oProperties', pRefs);
-    [xPos, yPos] = getPosition(qRefs);
-    array2fit = removePositions(oArray, '~isreference');
-    mp = midPoint(array2fit, xPos, yPos);
+   
+    
+    qFixed(bRef) = setSet(qFixed(bRef), 'oSegmentation', principalSegmentation(bRef) , ... 
+                                'oProperties', pRefs);
+    [xPos, yPos] = getPosition(qFixed);
+    %array2fit = removePositions(oArray, '~isreference');
+
+    mp = midPoint(oArray, xPos, yPos);
     % shift the entire principal segmentation based on mp shift found
     coS = shift(principalSegmentation,mp - mp0);
-    qImage(:,:,i) = setSet(qFixed,'oSegmentation', coS');
+    qImage(:,:,i) = setSet(qFixed,'oSegmentation', coS);
     % and Quantify
     qImage(:,:,i) = quantify(qImage(:,:,i), I(:,:,i));
 end
 qFinal = qImage;
 
 %-----------------------------------------------------------------
-function [q, spotPitch, mp] = segmentAndRefine(I, S0, array2fit, q, x, y, iniPars)
+function [q, spotPitch, mp] = segmentAndRefine(I, S0, array2fit, q, x, y, iniPars, fOptimizeSpotPitch)
 % Segments and attempts to refine the spotpitch
-maxSegIter = 2;
+ if fOptimizeSpotPitch
+    % this determines if (a) spotPitch refinement iteration(s) will be
+    % performed
+    maxIter = 2;
+ else
+    maxIter = 1;
+ end
+ 
 maxPrimaryOffset = iniPars.maxOffset * 1.2;
-maxDelta = 0.2;
-
+maxDelta = 0.3;
 oS = repmat(S0, size(x));
 spotPitch = get(array2fit, 'spotPitch');
+refSpotPitch = 0;
 
 mp = midPoint(array2fit, x,y);
-
 rotOut = get(array2fit, 'rotation');
 
-bSegment = true(size(x));
 fxdx = get(array2fit, 'xFixedPosition');
-
 bFixedSpot = fxdx ~= 0;
 
-for pass = 1:maxSegIter     
-    oS(bSegment) = segment(S0, I, x(bSegment), y(bSegment),rotOut);
+% start the refinemnet loop, terminate when the refinedSpotPitch is close
+% enough to the input spotPitch  (or when maxIter is reached);
+iter = 0;
+delta = maxDelta + 1;
+while delta > maxDelta   
+    iter = iter + 1;
+    if iter > maxIter
+        break;
+    end
+    S0 = set(S0, 'spotPitch', spotPitch);
+    oS = segment(S0, I, x, y,rotOut);
     % QC
     oProps = setPropertiesFromSegmentation(spotProperties, oS);
     % create the quantification object
@@ -161,7 +194,7 @@ for pass = 1:maxSegIter
     % if too little spots are correctly found, skip spot pitch refinement
     % here:
      bFound = ~get(q, 'isReplaced');
-    if length(bFound) <= 5
+    if length(find(bFound)) <= 5
         break;
     end
   % Use the spots found to refine the pitch and array midpoint
@@ -170,27 +203,29 @@ for pass = 1:maxSegIter
   
   [xPos, yPos] = getPosition(q);
 
-  array2fit = set(array2fit, 'isreference', bFound&~bFixedSpot);
+  array2fit = set(array2fit, 'isreference', ~bFixedSpot);
+
+  
   arrayRefined = refinePitch(array2fit, xPos, yPos);
-  spotPitch = get(arrayRefined, 'spotPitch');
+  refSpotPitch = get(arrayRefined, 'spotPitch');  
+
+  delta = abs(refSpotPitch - spotPitch);
+  
+  
   mp = midPoint(arrayRefined, xPos, yPos);
+
+  
   % calculate array coordinates based on refined pitch
   [xr,yr] = coordinates(arrayRefined, mp);
-  % calculate the eucl. distance between old and refined coordinates
-  delta  = sqrt((xr - x).^2 + (yr-y).^2);
-  % update the coordinates
+  
+  disp(['iter ',num2str(iter)]);
+  disp(['delta: ', num2str(delta)]);
+  disp(['sp in: ', num2str(spotPitch)]);
+  disp(['sp out: ', num2str(refSpotPitch)]);
+ 
+  spotPitch = refSpotPitch;
   x(~bFixedSpot) = xr(~bFixedSpot);
-  y(~bFixedSpot) = yr(~bFixedSpot);
- % go for another pass for those spots that were not found or have a to
- % large delta
-  
-  bSegment = ~bFound | (delta/spotPitch) > maxDelta;
-  if all(~bSegment)
-      break;
-  end
-  
-  
-  
+  y(~bFixedSpot) = yr(~bFixedSpot); 
 end
 
 % reset flags and final qc
@@ -230,7 +265,34 @@ y(y<1) = 1;
 x(x>size(I,1)) = size(I,1);
 y(y>size(I,2)) = size(I,2);
 
-function qOut = segmentImage(I, oS0, oQ0, oArray, x, y, rot,  sqc)
+function q = segmentImage(I, oS0, oQ0, oArray, x, y, rot,  sqc, fOpPitch, fOpRefSub)
+
+if fOpRefSub
+    % parse inputs the function that perfroms the segmentation and refines
+    % - if necessary -
+    % the position of the sub array versus that of the ref array
+    q = sSegmentImage_RefineRefVsSub(I, oS0, oQ0, oArray, x, y, rot,  sqc, fOpPitch);
+else
+     % segmentation without optimization
+     q = sSegmentImage(I, oS0, oQ0, oArray, x, y, rot,  sqc, fOpPitch);
+end
+
+function qOut = sSegmentImage(I, oS0, oQ0, oArray, x, y, rot,  sqc, fOpPitch)
+spotPitch = get(oArray, 'spotPitch');
+S0 = set(oS0, 'spotPitch', spotPitch);
+arrayRow = get(oArray, 'row');
+arrayCol = get(oArray, 'col');
+ID = get(oArray, 'ID');
+oArray = set(oArray, 'rotation', rot);
+q = setSet(oQ0, ...
+    'ID', ID, ...
+    'arrayRow', arrayRow, ...
+    'arrayCol', arrayCol);
+     
+qOut = segmentAndRefine(I, S0,oArray, q, x, y, sqc, fOpPitch); 
+  
+  
+function qOut = sSegmentImage_RefineRefVsSub(I, oS0, oQ0, oArray, x, y, rot,  sqc, fOpPitch)
 maxSubIter = 2; % Max iterations for subs vs refs refinement 
 maxRefSubOffset = 0.15; % Max offset criterium between refs and subs.
 % SEGMENTATION
@@ -275,7 +337,8 @@ q = setSet(oQ0, ...
     'arrayCol', arrayCol(isRef));
 
 
-[qRefs, refSpotPitch, mpRefs]  = segmentAndRefine(I, S0, array2fit, q, xRef, yRef, sqc);
+[qRefs, refSpotPitch, mpRefs]  = segmentAndRefine(I, S0, array2fit, q, xRef, yRef, sqc, fOpPitch);
+
 
 qOut(isRef) = qRefs; % refs are quantified!
 
@@ -302,11 +365,11 @@ if any(~isRef)
     % These are the initial coordinates, refined based on the ref spots
     [xSub, ySub] = coordinates(arrayRefined, mpRefs);
     for pass = 1:maxSubIter
-        [qSub, spotPitch, mpSub] = segmentAndRefine(I, S0, arrayRefined, q, xSub, ySub, sqc); 
+        [qSub, spotPitch, mpSub] = segmentAndRefine(I, S0, arrayRefined, q, xSub, ySub, sqc, fOpPitch); 
    
         % if spots are not correctly detected, iterate global position with
         % respect to the refs.
-         bFound = ~get(qSub, 'isReplaced');
+        bFound = ~get(qSub, 'isReplaced');
         if any(~bFound & ~bFixedSpot(~isRef)) || all(bFixedSpot)           
           
             delta = norm(mpSub - mpRefs)/spotPitch;           

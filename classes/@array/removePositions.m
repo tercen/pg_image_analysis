@@ -7,6 +7,7 @@ function oArray = removePositions(oArray, bRemove)
 %     bKeep = oArray.isreference;
 % elseif islogical(bRemove)
 %     bKeep = ~bRemove;
+
 % else
 %     error('invalid value for bRemove')
 % end
@@ -26,6 +27,8 @@ oArray.row = oArray.row(bKeep);
 oArray.col = oArray.col(bKeep);
 oArray.xOffset = oArray.xOffset(bKeep);
 oArray.yOffset = oArray.yOffset(bKeep);
+oArray.xFixedPosition = oArray.xFixedPosition(bKeep);
+oArray.yFixedPosition = oArray.yFixedPosition(bKeep);
 oArray.ID = oArray.ID(bKeep);
 
     

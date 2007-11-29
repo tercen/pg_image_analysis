@@ -89,13 +89,14 @@ g.ID            = [];
 g.spotPitch      = [];
 g.spotSize       = [];
 g.rotation       =  0;
+g.roiSearch      = [];
 g.method         = 'correlation2D';
 g.private        = struct([]);
 
 
 g = class(g, 'array');
 if length(varargin) > 1
-
     g = set(g, varargin{:});
 end
+
 

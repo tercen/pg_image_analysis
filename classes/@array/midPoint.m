@@ -1,4 +1,4 @@
-function mp = midPoint(oArray, xPos, yPos);
+function mp = midPoint(oArray, xPos, yPos)
 % mp = midPoint(oArray, xPos, yPos);
 % find the midPoint of an array defined by the oArray object and 
 % actual coordinates xPos, yPos (corresponding to row and col properties.

@@ -3,34 +3,42 @@ function oArray = refinePitch(oArray,xPos, yPos)
 % Find and update the best fitting spot pitch of an array defined by the oArray object
 % and actual coordinates xPos, yPos
 % See also array/array, array/midPoint
-    
 
+% cater for differnt x and y pitch
+% use the ratio of the pitch on input for the refinement
+
+if length(oArray.spotPitch) == 1
+    aYX = 1;
+else
+    aYX = oArray.spotPitch(2)/oArray.spotPitch(1);
+end
 isRef = oArray.isreference;
 
-r =     abs(oArray.row(isRef))';
-c =     abs(oArray.col(isRef))';
-xPos = xPos(isRef)';
-yPos = yPos(isRef)';
-% correct for the inferred rotation
-teta = -(2*pi/360) * oArray.rotation;
-R = [cos(teta), -sin(teta);
-    sin(teta), cos(teta)];
-v = (R * [xPos;yPos]);
+r =     oArray.row;
+c =     oArray.col;
 
-% get the number of row pitch and column pitch  measures in the set
-nr = length(unique(r)) -1;
-nc = length(unique(c)) -1;
-
-% calculate the pitch
-if nr > 0 && nc  < 1
-    pitch= (v(1,:)-min(v(1,:)))/(r-min(r)); 
-elseif nr < 1 && nc > 0    
-    pitch = (v(2,:)-min(v(2,:)))/(c-min(c));
-elseif nr > 0 && nc > 0
-    pitch(1)= (v(1,:)-min(v(1,:)))/(r-min(r)); 
-    pitch(2) = (v(2,:)-min(v(2,:)))/(c-min(c));
-    pitch = (nr* pitch(1) + nc* pitch(2))/(nr + nc);
+if (~all(r>0) & ~all(r<0)) | (~all(c>0) & ~all(c<0) )
+    warning('cannot simultaneously refine pitch for pos and neg index arrays, keeping positive index only')
+    bUse = r > 0 & c > 0; 
 else
-    pitch = [];
+    bUse = true(size(r));
 end
-oArray.spotPitch = pitch;
+
+r = abs(r(isRef & bUse));
+c = abs(c(isRef & bUse));
+
+xPos = xPos(isRef & bUse);
+yPos = yPos(isRef & bUse);
+
+if any(isRef & bUse)
+    dr = r(2:end)-r(1);
+    dc = c(2:end)-c(1);
+    dx = xPos(2:end)- xPos(1);
+    dy = yPos(2:end)- yPos(1);
+    pitch = sqrt( (dx.^2 + dy.^2)./(dr.^2 + (aYX*dc).^2) );
+
+    if length(pitch) > 1
+        bOut = detect(outlier, pitch(:));
+        oArray.spotPitch = mean(pitch(~bOut));
+    end
+end
