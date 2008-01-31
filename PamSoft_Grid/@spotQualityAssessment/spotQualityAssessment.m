@@ -18,7 +18,7 @@ function stro = setProps(stro, varargin)
 propdef.maxDiameter = 1.5;
 propdef.minDiameter = 0.5;
 propdef.maxOffset   = 0.4;
-propdef.maxPValue   = 0.02;
-propdef.maxDipole   = 0.01;
+propdef.minSnr      = 1;
+propdef.minSignalAlignment   = 0;
 
 stro = setVarArginOptions(propdef, stro, varargin{:});

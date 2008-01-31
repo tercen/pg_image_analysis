@@ -1,4 +1,4 @@
-function oq = spotQuantification(varargin);
+function oq = spotQuantification(varargin)
 if length(varargin) == 1
     % use existing object
     bIn = varargin{1};
@@ -33,9 +33,9 @@ oq.maxSignal = [];
 oq.iIgnored = [];
 oq.fractionIgnored = [];
 oq.iBackground = [];
-oq.pSignal = [];
 oq.signalSaturation = [];
-oq.dipole = [];
+oq.spotAlignment = [];
+oq.backgroundAlignment = [];
 oq.isEmpty = false;
 oq.isBad   = false;
 oq.isReplaced = false;

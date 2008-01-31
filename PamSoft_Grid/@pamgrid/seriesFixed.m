@@ -1,4 +1,8 @@
 function q = seriesFixed(pgr, I, varargin)
+% function q = seriesFixed(pgr, I, varargin)
+% Analysis of image series with:
+% Global gridding on a fixed image
+% Local spot finding on a fixed image
 opdef.cycle = [];
 opdef.exposure = [];
 op = setVarArginOptions(opdef, [], varargin{:});

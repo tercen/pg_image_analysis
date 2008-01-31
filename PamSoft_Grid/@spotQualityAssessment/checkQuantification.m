@@ -2,17 +2,14 @@ function flag = checkQuantification(sa, q)
 qs = get(q(:));
 flag = zeros(length(qs),1);
 % 1. find those spots that are considered empty:
-bEmpty = [qs.pSignal] > sa.maxPValue;
+snr = ([qs.meanSignal] - [qs.meanBackground])./sqrt([qs.stdSignal].^2 + [qs.stdBackground].^2);
+bEmpty = snr < sa.minSnr;
 flag(bEmpty) = 2;
 
-% 2. spots that were previously replaced and are not empty are considered
-% bad spots
-% flag(~bEmpty & [qs.isReplaced]) = 1;
+% 2. find bad aligned
+bBad = [qs.spotAlignment] < sa.minSignalAlignment;
+flag(bBad) = 1;
 
-% 3. spots with an apparent miss-allignment are considered bad spots
-bMiss = [qs.dipole] < sa.maxDipole;
-
-flag(bMiss) = 1;
 
 
 
