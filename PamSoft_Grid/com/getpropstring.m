@@ -1,4 +1,4 @@
-function qSave(savePath)
+function dftValue = getPropDefault(parName);
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
@@ -31,5 +31,14 @@ global qntOutlierMethod
 global qntOutlierMeasure
 global qntShowPamGridViewer
 global stateQuantification
-save(savePath, 'stateQuantification', '-mat');
-%EOF
+
+pdef = getProperties();
+[pnames{1:length(pdef)}] = deal(pdef.name);
+iMatch = strmatch(parName, pnames, 'exact');
+if ~isempty(iMatch)
+    dftValue = pdef(iMatch).string;
+else
+    dftValue = [];
+end
+
+
