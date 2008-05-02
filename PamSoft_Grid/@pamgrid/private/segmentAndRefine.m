@@ -76,9 +76,11 @@ while delta > maxDelta
     y(~bFixedSpot) = yr(~bFixedSpot);
 end
 % replace bad spots by the default spot
+
 oS(flags == 1) = setAsDftSpot(oS(flags == 1));
 
 % create the array of spotQuantification objects for output.
+
 q = setSet(pgr.oSpotQuantification, ...
                 'oSegmentation', oS, ...
                 'isEmpty', flags == 2, ...

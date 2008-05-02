@@ -120,8 +120,8 @@ pdef(end).enumMap = [];
 pdef(end+1).name = 'grdUseImage';
 pdef(end).string = 'Global grid, use image for gridding';
 pdef(end).dft   = int8(-3);
-pdef(end).enumVal = int8([-3,-2,-1,0]);
-pdef(end).enumMap = {'Refs on First then Last', 'Last', 'First'}%,'All'} ;
+pdef(end).enumVal = int8([-3,-2,-1, 0]);
+pdef(end).enumMap = {'Refs on First then Last', 'Last', 'First', 'All'} ;
 %
 pdef(end+1).name = 'grdOptimizeSpotPitch';
 pdef(end).string = 'Global grid, optimize spot pitch';
@@ -232,7 +232,7 @@ pdef(end+1).name = 'qntShowPamGridViewer';
 pdef(end).string = 'Show Pamgrid viewer';
 pdef(end).dft = uint8(0);
 pdef(end).enumVal = uint8([0,1,2]);
-pdef(end).enumMap = {'No'}%, 'Show, Wait for Close', 'Show and Continue'};
+pdef(end).enumMap = {'No','Show, Wait for Close', 'Show and Continue'};
 
 
 
