@@ -47,8 +47,8 @@ s0 = [s0{:}]';% convert to array of segmentation objects
 [x0, y0] = getPosition(s0);
 mp0 = midPoint(pgr.oArray, x0, y0);
 % prepare for segmenting the other images.
-bRef = get(oArray, 'isreference');
-spPitch = get(oArray, 'spotPitch');
+bRef = get(pgr.oArray, 'isreference');
+spPitch = get(pgr.oArray, 'spotPitch');
 os = set(pgr.oSegmentation, 'spotPitch',spPitch); 
 
 for i=1:size(I,3)

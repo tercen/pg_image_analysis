@@ -36,17 +36,25 @@ spotPitch = round(spotPitch);
 s = repmat(oS, length(cx(:)), 1);
 
 for i=1:length(cx(:))
+
         s(i) = oS;
         s(i).initialMidpoint = [cx(i), cy(i)];
         delta = 2;
+        %keyboard
         xLocal = round(xLu(i) + [0, 2*spotPitch]);
         yLocal = round(yLu(i) + [0, 2*spotPitch]);
+     
+        
         
         % do while delta larger than sqrt(2) 
         deltaIter = 0;
         while delta > sqrt(2) && deltaIter < 3
             deltaIter = deltaIter + 1;            
-            
+            % make sure the local coordinates are within the image
+            xLocal(xLocal < 1) = 1;
+            xLocal(xLocal > size(I,1)) = size(I,1);
+            yLocal(yLocal < 1) = 1;
+            yLocal(yLocal > size(I,2)) = size(I,2);
             % get the local image around the spot
             Ilocal = I(xLocal(1):xLocal(2),yLocal(1):yLocal(2));
             % center in the local image, keep the center part only.

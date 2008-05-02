@@ -169,7 +169,7 @@ pgr = pamgrid(  'oPreProcessing',   oPrep, ...
                 'useImage', strUseImage);
             
 
-stateQuantification = analyzeImages(pgr, imagePath);
+[stateQuantification, I, exp, cycles] = analyzeImages(pgr, imagePath);
 
 
 for i=1:size(stateQuantification,2)
@@ -180,8 +180,14 @@ end
 % % to : Array-Spot-QuantitationType
 qTypes = permute(qTypes, [3,1,2]);
 
-if qntShowPamGridViewer ~=0
-    hViewer = showInteractive(stateQuantification, I, 1:nImages);
+if qntShowPamGridViewer ~=0 
+    if length(unique(exp))> 1
+        x = exp;
+    else
+        x = cycles;
+    end
+
+    hViewer = showInteractive(stateQuantification, I, x);
     set(hViewer, 'Name', 'PamGridViewer');
     if qntShowPamGridViewer == 1
         uiwait(hViewer);

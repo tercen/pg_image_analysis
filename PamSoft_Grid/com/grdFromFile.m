@@ -32,6 +32,9 @@ global qntOutlierMeasure
 global qntShowPamGridViewer
 global stateQuantification
 
+if nargin < 2
+    grdRefMarker = [];
+end
 
 oArray =  fromFile(array, templatePath, grdRefMarker);
 qntSpotID = get(oArray, 'ID');

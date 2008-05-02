@@ -28,16 +28,16 @@ I = I(:, :, iSort);
 switch pgr.useImage
     case 'Last'
         Iseg = I(:,:, end);
-    case 'First then Last'
+    case 'Refs on First then Last'
         Iseg = I(:,:,end);
     case 'First'
         Iseg = I(:,:,1);
-    case ' All'
+    case 'All'
         % combined segmentation image
         spgr = pgr;
-        spgr.gridImageResize = size(I(:,:,1));
-        spgr.oPreprocessing = preProcess('nSmallDisk', -1, ...
-                                         'nLargeDisk', -1);
+        spgr.gridImageSize = size(I(:,:,1));
+        spgr.oPreprocessing = preProcess('nSmallDisk', 0, ...
+                                         'nLargeDisk', 0);
  
         Iseg = createGridImage(spgr, I, 'exposure', exp, ...
                                         'cycle', cycle);

@@ -77,8 +77,8 @@ for i=1:length(oq(:))
             
             nPix = length(sigPix(~iOutSignal));
             oq(i).signalSaturation = length(find(sigPix(~iOutSignal) >= oq(i).saturationLimit))/nPix;     
-            oq(i).spotAlignment = corr(zscore(double(bwSignal(:))), zscore(double(imLocal(:))), 'type', 'spearman');
-            oq(i).backgroundAlignment = corr(zscore(double(bgMask(:))), zscore(double(imLocal(:))), 'type', 'spearman');
+            oq(i).spotAlignment = 1;%corrcoef(zscore(double(bwSignal(:))), zscore(double(imLocal(:))));
+            oq(i).backgroundAlignment = 1;%corrcoef(zscore(double(bgMask(:))), zscore(double(imLocal(:))));
         end
 end
 

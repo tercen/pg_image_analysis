@@ -7,7 +7,7 @@ op = setVarArginOptions(opdef, [], varargin{:});
 
 % generate dft cycle and exposure vectors, if not on input.
 if isempty(op.cycle)
-    op.cycle = [1:size(I,3)]';
+    op.cycle = (1:size(I,3))';
 end
 if isempty(op.exposure)
     op.exposure = ones(size(I,3), 1);
@@ -32,11 +32,13 @@ switch pgr.useImage
         I = I(:,:,end);
     case 'First'
         I = I(:,:,1);
-    case 'First then Last'
+    case 'Refs on First then Last'
         I = I(:,:,1);
     case 'All'
         sl = get(pgr.oSpotQuantification, 'saturationLimit');
         I = combineExposures(I, op.exposure,sl);
+    otherwise
+        error(['Unknown option for pamgrid.useImage: ', pgr.useImage]);
 end
 
 rsizFactor = pgr.gridImageSize./size(I);

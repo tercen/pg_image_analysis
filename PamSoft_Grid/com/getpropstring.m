@@ -1,4 +1,4 @@
-function dftValue = getPropDefault(parName);
+function propstr = getpropstring(parName);
 global prpContrast
 global prpLargeDisk
 global prpSmallDisk
@@ -36,9 +36,9 @@ pdef = getProperties();
 [pnames{1:length(pdef)}] = deal(pdef.name);
 iMatch = strmatch(parName, pnames, 'exact');
 if ~isempty(iMatch)
-    dftValue = pdef(iMatch).string;
+    propstr = pdef(iMatch).string;
 else
-    dftValue = [];
+    propstr = [];
 end
 
 
