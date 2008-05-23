@@ -1,4 +1,4 @@
-function [x,y,rot] = globalGrid(pgr, I, varargin)
+function [x,y,rot,sp] = globalGrid(pgr, I, varargin)
 %[x,y,rot] = globalGrid(pgr, I, varargin)
 opdef.cycle = [];
 opdef.exposure = [];
@@ -11,7 +11,7 @@ op = setVarArginOptions(opdef, [], varargin{:});
 arsc = rescale(pgr.oArray, rsf);
                                     
 % call the grid finding method
-[x,y,rot] = gridFind(arsc, Igrid);
+[x,y,rot, sp] = gridFind(arsc, Igrid);
 
 % scale back to the origibal size and return
 x = x/rsf(1);
