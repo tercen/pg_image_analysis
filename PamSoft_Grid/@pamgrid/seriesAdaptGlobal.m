@@ -26,6 +26,7 @@ end
 [x,y,rot] = globalGrid(pgr, I, 'exposure', exp, ...
                                'cycle', cycle);
 % produce the segmentation image
+
 switch pgr.useImage
     case 'Last'
         Iseg = I(:,:, end);
@@ -58,11 +59,12 @@ for i=1:size(I,3)
      % re-segment the refs only, find the midpoint associated with this
      % segmentation. Note that the midpoint will be calculated based on the
      % refs only (standard behaviour of array.midPoint)
-     s0(bRef) = segment(os, I(:,:,i), x(bRef), y(bRef), rot);
-     [x1, y1] = getPosition(s0);
+     s0s = s0;
+     s0s(bRef)= segment(os, I(:,:,i), x(bRef), y(bRef), rot);
+     [x1, y1] = getPosition(s0s);
      mp1 = midPoint(pgr.oArray, x1, y1);
-     %shift the entire principal segmentation based on mp shift found
-     s0s = shift(s0,mp1 - mp0);
+     %shift the non-ref principal segmentation based on mp shift found
+     s0s(~bRef) = shift(s0(~bRef),mp1 - mp0);
      qImage = setSet(qFixed,'oSegmentation', s0s);
      % and quantify for final output
      q(:,i) = quantify(qImage, I(:,:,i));
