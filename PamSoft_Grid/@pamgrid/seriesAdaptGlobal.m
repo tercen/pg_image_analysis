@@ -30,13 +30,14 @@ end
 switch pgr.useImage
     case 'Last'
         Iseg = I(:,:, end);
-    case 'First then Last'
+    case 'Refs on First then Last'
         Iseg = I(:,:,end);
     case 'First'
         Iseg = I(:,:,1);
     case ' All'
         error('property ''useImage'' can not be ''All'' when using adaptive gridding, use ''seriesMode'' = ''Fixed''');   
-                                    
+    otherwise
+        error('unknown option for pgr.useImage');
 end
 qFixed = segmentImage(pgr, Iseg, x, y, rot);
 % get this principal segmentation from the fixed data
