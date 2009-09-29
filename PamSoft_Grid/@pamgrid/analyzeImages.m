@@ -21,14 +21,17 @@ end
 % get the image parameters from file, and sort the images to exposure time
 % and cycle
 [expTime, cycles]  = getImageInfo(imFiles);
-if ~isempty(expTime)&& ~isempty(cycles)
+bImageInfoFound = ~isempty(expTime)&& ~isempty(cycles);
+if bImageInfoFound
     [ec, iSort] = sortrows( [expTime', cycles'], [2,1]);
     expTime = ec(:,1);
     cycles = ec(:,2);
     I = I(:,:, iSort);
+
 elseif isequal(pgr.useImage, 'All')
     error('Could not find embedded image information for use with ''useImage'' option ''All''');
-end   
+end
+
 % call the appropriate segmentation/quantification method
 switch pgr.seriesMode
     case 'Fixed'        
@@ -55,9 +58,12 @@ end
 % unsort the output such that the columns order of q, the order of images
 % in I, and the order of expTime and cycles corresponds to the order in
 % imFiles
-idxUnsort(iSort) = 1:size(q,2);
-q = q(:, idxUnsort);
-I = I(:,:,idxUnsort);
-expTime = expTime(idxUnsort);
-cycles = cycles(idxUnsort);
+if bImageInfoFound
+    idxUnsort(iSort) = 1:size(q,2);
+    q = q(:, idxUnsort);
+    I = I(:,:,idxUnsort);
+    expTime = expTime(idxUnsort);
+    cycles = cycles(idxUnsort);
+end
+
 

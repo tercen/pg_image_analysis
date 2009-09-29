@@ -26,15 +26,15 @@ end
 qTable =    {   'Row'               , [oQ.arrayRow]'; 
                 'Column'            , [oQ.arrayCol]'; 
                 'Mean_SigmBg'       , [oQ.meanSignal]' - [oQ.meanBackground]';
-                'Median_SigmBg'     , [oQ.medianSignal]'-[oQ.medianBackground]';
+                'Median_SigmBg'     , double([oQ.medianSignal]')-double([oQ.medianBackground]');
                 'Mean_Signal'       , [oQ.meanSignal]'; 
                 'Median_Signal'     , [oQ.medianSignal]'; 
                 'Std_Signal'        , [oQ.stdSignal]'; 
                 'Mean_Background'   , [oQ.meanBackground]'; 
                 'Median_Background' , [oQ.medianBackground]'; 
                 'Std_Background'    , [oQ.stdBackground]'; 
-                'Spot_Alignment'     , [oQ.spotAlignment]'; 
-                'Background_Alignment', [oQ.backgroundAlignment]';
+%                 'Spot_Alignment'     , [oQ.spotAlignment]'; 
+%                'Background_Alignment', [oQ.backgroundAlignment]';
                 'Signal_Saturation' , [oQ.signalSaturation]';
                 'Fraction_Ignored'  , [oQ.fractionIgnored]'; 
                 'Diameter'          , diameter;
