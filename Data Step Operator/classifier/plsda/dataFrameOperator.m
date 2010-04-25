@@ -1,8 +1,10 @@
 function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
 global MaxComponents
-global CrossValidationType
 global AutoScale
+global CrossValidationType
+global NumberOfPermutations
 global SaveClassifier
+
 %% input checking
 iMatch = strmatch('Color', metaData(:,2));
 if length(iMatch) == 1
@@ -38,8 +40,10 @@ if any(isnan(X))
     error('Missing values are not allowed');
 end
 iy = strmatch(aGroupLabelName, hdr);
-y = fCubeIn(rowSeq == 1, iy); y = y(colSeq(rowSeq ==1)); y = nominal(y);
 
+y = fCubeIn(rowSeq == 1, iy); 
+y = y(colSeq(rowSeq ==1)); 
+y = nominal(cell2mat(y));
 nGroups = length(unique(y));
 if nGroups < 2
     error('Grouping should contain as least two different levels')
@@ -60,6 +64,9 @@ switch CrossValidationType
         p.partition = cvpartition(y, 'k', 10);
     case '20-fold'
         p.partition = cvpartition(y, 'k', 20);
+    case 'resub'
+        % option available for test
+        p.partition = cvpartition(y, 'resub');
     otherwise
         error(['Invalid value for ''CrossValidationType'': ', CrossValidationType])
 end
@@ -74,6 +81,12 @@ c.verbose = false;
 %% finalModel
 finalModel = p.train(X,y);
 
+%% runpermutations
+[perMcr, perCvRes] = c.runPermutations(X, y, NumberOfPermutations);
+
+%% save runData
+save(fullfile(folder, 'runData.mat'), 'cvRes', 'cvcPred','y', 'cvyPred', 'perMcr', 'perCvRes', 'finalModel');
+
 %% save classifier
 if isequal(SaveClassifier, 'yes')
     saveName = uiputfile('*.mat', 'Save Classifier As ...');
@@ -83,7 +96,7 @@ if isequal(SaveClassifier, 'yes')
 end
 %prepare output table in case of 2 group DA
 if nGroups == 2
-    yPred = repmat(cvyPred(:,1)', size(X,2), 1);
+    yPred = repmat(cvyPred(:,2)', size(X,2), 1);
     pamIndex = 2 * yPred -1;
     beta = repmat(finalModel.beta(2:end,1), 1, size(X,1));
     lIdx = sub2ind(size(X'), rowSeq, colSeq);
@@ -95,7 +108,7 @@ if nGroups == 2
     fCubeOut(2:length(rowSeq)+1,1:2  ) = arrayfun(@(x){x}, [rowSeq, colSeq]);
     fCubeOut(2:length(rowSeq)+1,3:end) = arrayfun(@(x){x}, [yPred, pamIndex, beta]);
 else
-    error('Under construction')
+    error('Multi group output is still under construction')
 end
 
 
