@@ -64,13 +64,8 @@ global NumberOfPermutations
 global SaveClassifier
 global ShowGraphicalOutput
 
-%% input checking
-iMatch = strmatch('Color', metaData(:,2));
-if length(iMatch) == 1
-    aGroupLabelName = metaData{iMatch,1};
-else
-    error('Grouping must be defined using exactly 1 data color');
-end
+%% input checking and formatting
+
 % strip off header
 hdr = fCubeIn(1,:);
 fCubeIn = fCubeIn(2:end,:);
@@ -79,35 +74,36 @@ iRs = strmatch('rowSeq', hdr);
 rowSeq = cell2mat(fCubeIn(:, iRs));
 iCs = strmatch('colSeq', hdr);
 colSeq = cell2mat(fCubeIn(:, iCs));
-mxRow = max(rowSeq);
-mxCol = max(colSeq);
 
-iMatch = strmatch('value', metaData(:,2));
-if length(iMatch) ==1
-    aDataLabelName = metaData{iMatch,1};
+iX = -1+strmatch('value', metaData(:,2));
+if length(iX) ==1
+    X = flat2mat(fCubeIn(:, iX), rowSeq, colSeq);
+    X = X';
 else
     error('Only a single quantitation type allowed');
 end
-
-iX = strmatch(aDataLabelName, hdr);
-X = nan(mxRow, mxCol);
-
-X(sub2ind(size(X), rowSeq, colSeq)) = cell2mat(fCubeIn(:, iX)); X = X';
-
 if any(isnan(X))
     error('Missing values are not allowed');
 end
-iy = strmatch(aGroupLabelName, hdr);
 
-y = fCubeIn(rowSeq == 1, iy);
-y = y(colSeq(rowSeq ==1));
+iy = -1 + strmatch('Color', metaData(:,2));
+if length(iy) == 1
+   y = flat2ColumnAnnotation(fCubeIn(:, iy), rowSeq, colSeq);
+else
+    error('Grouping must be defined using exactly 1 data color');
+end
 y = cellstr(cellfun(@cnv, y,'uniform', false));
 y = nominal(y);
 nGroups = length(unique(y));
 if nGroups < 2
     error('Grouping should contain as least two different levels')
 end
-
+%% retrieve the spot IDs
+iSpotID = -1 + find(strcmp('ID', metaData(:,1)) & strcmp('Spot', metaData(:,2) ) );
+if isempty(iSpotID)
+    error(' No spotID''s found')
+end
+spotID = flat2RowAnnotation(fCubeIn(:,iSpotID), rowSeq,colSeq);
 %% construct sample names
 arrayAnnotationLabels = metaData( strmatch('Array', metaData(:,2)), 1);
 arrayIdx = cell2mat(cellfun(@(x)matchNames(x, hdr), arrayAnnotationLabels, 'uniform', false));
@@ -142,6 +138,10 @@ c.partition = p.partition;
 c.verbose = false;
 
 %% run CV
+% X sorted by spotID 
+[~, sIdx] = sort(spotID);
+revIdx = reverseSortIdx(sIdx);
+X = X(:, sIdx);
 cvRes = c.run(X,y, names);
 
 %% finalModel
@@ -157,7 +157,7 @@ save(fullfile(folder, 'runData.mat'), 'cvRes','y', 'perMcr', 'perCvRes', 'finalM
 if isequal(SaveClassifier, 'yes')
     saveName = uiputfile('*.mat', 'Save Classifier As ...');
     if saveName ~= 0
-        save(saveName, 'finalModel');
+        save(saveName, 'finalModel', 'spotID');
     end
 end
 hdr = createOutputHeaders(unique(y));
@@ -173,7 +173,10 @@ for i=1:nGroups
  n = n+nGroups;
  for i=1:nGroups
      % beta
-     beta = repmat(finalModel.beta(2:end,i),1,size(X,1));
+     % don't forget to unsort according to spotID
+     beta = finalModel.beta(2:end,i);
+     beta = beta(revIdx);
+     beta = repmat(beta,1,size(X,1));
      fCubeOut(2:length(rowSeq)+1, n+i) = arrayfun(@(x){x}, beta(lIdx));
  end
  if nGroups == 2

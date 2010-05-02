@@ -17,6 +17,10 @@ ShowGraphicalOutput = 'yes';
 %load cmlMarrow.mat
 load cml_multiclass.mat
 
+p = path;
+path(path, '..')
 
 cOut = dataFrameOperator(fCubeIn, metaData, pwd);
 showResults(pwd);
+
+path(p);
