@@ -1,3 +1,5 @@
 function s= about
 global ShowGraphicalOutput
-s = 'No Help, you''re on your own ...';
+data = load('aboutPredict.mat');
+s = data.about;
+
