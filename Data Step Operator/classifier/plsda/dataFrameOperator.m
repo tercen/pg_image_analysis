@@ -101,7 +101,7 @@ end
 %% retrieve the spot IDs
 iSpotID = -1 + find(strcmp('ID', metaData(:,1)) & strcmp('Spot', metaData(:,2) ) );
 if isempty(iSpotID)
-    error(' No spotID''s found')
+    error('No spotID''s found in data cube')
 end
 spotID = flat2RowAnnotation(fCubeIn(:,iSpotID), rowSeq,colSeq);
 %% construct sample names
@@ -155,9 +155,9 @@ save(fullfile(folder, 'runData.mat'), 'cvRes','y', 'perMcr', 'perCvRes', 'finalM
 
 %% save classifier
 if isequal(SaveClassifier, 'yes')
-    saveName = uiputfile('*.mat', 'Save Classifier As ...');
+    [saveName, path] = uiputfile('*.mat', 'Save Classifier As ...');
     if saveName ~= 0
-        save(saveName, 'finalModel', 'spotID');
+        save(fullfile(path,saveName), 'finalModel', 'spotID');
     end
 end
 hdr = createOutputHeaders(unique(y));

@@ -10,12 +10,12 @@ global NumberOfPermutations
 global ShowGraphicalOutput
 NumberOfPermutations = 0;
 MaxComponents = 10;
-CrossValidationType = 'LOOCV';
+CrossValidationType = 'resub';
 AutoScale = 'no';
-SaveClassifier = 'yes';
+SaveClassifier = 'no';
 ShowGraphicalOutput = 'yes';
+%load cmlMarrow.mat
 load cmlMarrow.mat
-%load cml_multiclass.mat
 
 p = path;
 path(path, '..')
