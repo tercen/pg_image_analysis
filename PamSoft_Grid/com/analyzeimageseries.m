@@ -22,8 +22,6 @@ global segAreaSize
 global sqcMaxDiameter
 global sqcMinDiameter
 global sqcMaxPositionOffset
-global sqcMinSignalToNoiseRatio
-global sqcMinSpotAlignment
 global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
@@ -138,9 +136,7 @@ oQ0 = spotQuantification('backgroundMethod', strQntBackgroundMethod, ...
 % construct a spotQualityAssessment object                      
 sqc = spotQualityAssessment(    'maxDiameter'       , sqcMaxDiameter, ...
                                 'minDiameter'       , sqcMinDiameter, ...
-                                'maxOffset'         , sqcMaxPositionOffset, ...
-                                'minSnr'            , sqcMinSignalToNoiseRatio, ... 
-                                'minSignalAlignment', sqcMinSpotAlignment) % not used
+                                'maxOffset'         , sqcMaxPositionOffset );
                             
 % finaly construct a pamgrid object 
 

@@ -22,14 +22,13 @@ global segAreaSize
 global sqcMaxDiameter
 global sqcMinDiameter
 global sqcMaxPositionOffset
-global sqcMinSignalToNoiseRatio
-global sqcMinSpotAlignment
 global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
 global qntOutlierMethod
 global qntOutlierMeasure
 global qntShowPamGridViewer
+global stateQuantification
 global stateQuantification
 
 if ~iscell(imagePath)

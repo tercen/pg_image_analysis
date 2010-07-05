@@ -22,8 +22,6 @@ function pdef = getProperties
 % global sqcMaxDiameter
 % global sqcMinDiameter
 % global sqcMaxPositionOffset
-% global sqcMinSignalToNoiseRatio
-% global sqcMinSpotAlignment
 % global qntSpotID
 % global qntSeriesMode
 % global qntSaturationLimit
@@ -31,8 +29,6 @@ function pdef = getProperties
 % global qntOutlierMeasure
 % global qntShowPamGridViewer
 % global stateQuantification
-
-
 %
 pdef(1).name    = 'prpContrast';
 pdef(1).string  = 'Preprocessing, contrast';
@@ -182,18 +178,18 @@ pdef(end).dft   = 0.4;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-pdef(end+1).name = 'sqcMinSignalToNoiseRatio';
-pdef(end).string = 'Spot QC, minimal signal to noise ratio';
-pdef(end).dft = 1;
-pdef(end).enumVal = [];
-pdef(end).enumMap = [];
-%
-pdef(end+1).name = 'sqcMinSpotAlignment';
-pdef(end).string = 'Spot QC, minimal spot alignment';
-pdef(end).dft = -1;
-pdef(end).enumVal = [];
-pdef(end).enumMap = [];
-%
+% pdef(end+1).name = 'sqcMinSignalToNoiseRatio';
+% pdef(end).string = 'Spot QC, minimal signal to noise ratio';
+% pdef(end).dft = 1;
+% pdef(end).enumVal = [];
+% pdef(end).enumMap = [];
+% %
+% pdef(end+1).name = 'sqcMinSpotAlignment';
+% pdef(end).string = 'Spot QC, minimal spot alignment';
+% pdef(end).dft = -1;
+% pdef(end).enumVal = [];
+% pdef(end).enumMap = [];
+% %
 pdef(end+1).name = 'qntSpotID';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
