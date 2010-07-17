@@ -8,11 +8,11 @@ global AutoScale
 global SaveClassifier
 global NumberOfPermutations
 global ShowGraphicalOutput
-NumberOfPermutations = 0;
+NumberOfPermutations = 5;
 MaxComponents = 10;
 CrossValidationType = 'LOOCV';
 AutoScale = 'no';
-SaveClassifier = 'yes';
+SaveClassifier = 'no';
 ShowGraphicalOutput = 'yes';
 load cmlMarrow.mat
 %load cml_multiclass.mat

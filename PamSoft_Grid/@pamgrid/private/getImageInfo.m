@@ -1,7 +1,14 @@
 function [T, C] = getImageInfo(fnames)
 
 for i=1:length(fnames)
-    sInfo(i) = pg_imtifinfo(fnames{i});
+    try
+        sInfo(i) = pg_imtifinfo(fnames{i});
+    catch tifInfoException
+        [~,name,ext] = fileparts(fnames{i});
+        errstr = ['Error reading info from: ', name,ext,': ',tifInfoException.message];
+        error(errstr);
+    end
+    
 end
 if isfield(sInfo, 'ExposureTime')
     [st{1:length(sInfo)}] = deal(sInfo.ExposureTime);

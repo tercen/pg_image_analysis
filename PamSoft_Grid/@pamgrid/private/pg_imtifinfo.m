@@ -9,7 +9,7 @@ function info = imtifinfo(filename)
 %   See also IMREAD, IMWRITE, IMFINFO.
 
 %   Copyright 1984-2007 The MathWorks, Inc.
-%   $Revision: 1.1 $  $Date: 2008/05/02 11:32:57 $
+%   $Revision: 1.2 $  $Date: 2010/07/17 18:02:20 $
 
 % This function is an M-file that does *not* use a libtiff-based
 % MEX-file because the im*info functions are used when trying to
@@ -468,12 +468,16 @@ while (nextIFDOffset ~= 0)
                     info(k).Software = char(fread(fid, count, 'uint8')');
                 end
 
-            case 306
-                % DateTime
-                fseek(fid, 6, 'cof');
-                offset = fread(fid, 1, 'uint32');
-                fseek(fid, offset, 'bof');
-                info(k).DateTime = char(fread(fid, 20, 'uint8')');
+%            case 306
+%%              reading of this field is skipped because it appears
+%%              inconsistently in evolve images.
+%%              RDW (100709)
+% DateTime
+%                disp('skip')
+%                fseek(fid, 6, 'cof');
+%                offset = fread(fid, 1, 'uint32');
+%                fseek(fid, offset, 'bof');
+%                info(k).DateTime = char(fread(fid, 20, 'uint8')');
 
             case 315
                 % Artist

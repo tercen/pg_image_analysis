@@ -99,8 +99,10 @@ fMatch = false(size(fLine));
 for i = 1:length(labels)
     iMatch = strmatch(labels{i}, fLine, 'exact');
     if isempty(iMatch) && KeyWord.(labels{i})
+        fclose(fid);
         error(['Error reading: ', fName,'. Cannot find required columns header: ', labels{i}]);
     elseif length(iMatch) > 1
+        fclose(fid);
         error(['Error reading: ', fName,'. Cannot uniquely identify column header: ',labels{i}]);
     elseif isempty(iMatch) && ~KeyWord.(labels{i})
         Match.(labels{i}) = 0;
@@ -143,6 +145,7 @@ while(1)
             extraColumns(n,:) = clLine(~fMatch);
             %[row(n), col(n), strID, xOff(n), yOff(n)]  = strread(strLine, '%f%f%s%f%f', 'delimiter', '\t');                        
         catch
+            fclose(fid);
             eStr = [lasterr,' On line ',num2str(n),': ',strLine];
             error(eStr, 'error reading template file');
         end

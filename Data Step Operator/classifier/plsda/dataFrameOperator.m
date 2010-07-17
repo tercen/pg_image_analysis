@@ -1,11 +1,12 @@
 function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
-%ProgID: classifier.plsda
-%Version: 1.0
+%PLS-DA Class Prediction 
+%Version: 1.2 (MCR R2010A)
 %Creator: Rik de Wijn
-%Last Modification Date: May 5, 2010
+%Last Modification Date: June 23, 2010
+%--Fixed a bug in calculation of predictive value
 %Support Status: Supported
 %Description: Partial Least Squared Discriminant Analysis
-%Type: Matlab Operator Step (requires R2009B version of Matlab runtime)
+%Type: Matlab Operator Step
 %Performs partial least squares discriminant analysis. The method has been
 %slightly adapted compared to previous versions following some of the
 %recommendations in [...]. Multiple group analysis is supported, but
@@ -15,7 +16,7 @@ function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
 %Bionavigator spreadsheet and known grouping. Training involves determining
 %the optimal number of PLS components by (inner) cross validation. The
 %classifier may be stored for later use with new data (see
-%classifier.predict).
+%predict.classification).
 %In addition the classifier performance is estimated by (outer) cross validation.
 %Here, the optimization of the number of PLS components is repeated for
 %each fold of the cross validation using the training set only (double
@@ -24,6 +25,7 @@ function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
 %INPUT:
 %Array data from Bionavigator Spreadsheet with grouping defined using a single DataColor. 
 %Using more than a single value per cell results in an error, missing values are not allowed.
+%SpotID's have to specified in the BN spreadsheet
 %
 %PARAMETERS
 %1. MaxComponents [10(dft)], the maximum number of PLS-components allowed. 
@@ -37,14 +39,14 @@ function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
 %
 %OUTPUT (RETURNED TO BIONAVIGATOR):
 %Per sample: 
-%y<ClassName>, class affinity p for each class predicted using the outer
+%y<ClassName>, class affinity for each class predicted using the outer
 %cross validation, the predicted class is the one with largest affinity.
 %pamIndex (2 class prediction only): y predictions converted to the "PamIndex" format.
 %Per spot:
 %beta(1..N), were N is the number of groups. Relative weights of spots in the class
 %prediction rule. Beta(1..N-1) is usually sufficient. Do not use these
-%weights for predicting new samples, use the complimentary classifier.predict
-%operator!
+%weights for predicting new samples, use the complimentary
+%predict.classification operator!
 %
 %OUTPUT (SHOWRESULTS)
 %1. Plot of cross validated y predictions in "PamIndex" format (2-group
@@ -55,7 +57,7 @@ function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
 %model and in the succesive cross validation folds.
 %4. Cumulative distribution plot showing the distribution of error rate and <ClassName> 
 %predictive value obtained from label permutations (if any).
-%5. Tab delimited text file (best viewed using MS-Excel) with details on
+%5. Tab delimited text file (.xls, best viewed using MS-Excel) with details on
 %classifier performance and cross validated predictions.
 global MaxComponents
 global AutoScale
@@ -148,6 +150,7 @@ cvRes = c.run(X,y, names);
 finalModel = p.train(X,y);
 
 %% runpermutations
+c.verbose = true;
 [perMcr, perCvRes] = c.runPermutations(X, y, NumberOfPermutations);
 
 %% save runData

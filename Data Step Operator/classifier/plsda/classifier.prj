@@ -35,6 +35,12 @@
          <file>$(PROJECTDIR)\operatorProperties.m</file>
          <file>$(PROJECTDIR)\showResults.m</file>
       </category>
+      <category name="predict">
+         <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\predict\dataFrameOperator.m</file>
+         <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\predict\forTest.m</file>
+         <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\predict\operatorProperties.m</file>
+         <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\predict\showResults.m</file>
+      </category>
       <category name="Other files"><!--Do not modify the value of the name attribute, unless it is a class name.-->
          <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\catAnnotation.m</file>
          <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\cnv.m</file>
@@ -42,7 +48,7 @@
          <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\flat2mat.m</file>
          <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\flat2RowAnnotation.m</file>
          <file>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\matchNames.m</file>
-         <file>$(PROJECTDIR)\about.mat</file>
+         <file>$(PROJECTDIR)\aboutPlsda.mat</file>
       </category>
       <category name="C/C++ files"><!--Do not modify the value of the name attribute, unless it is a class name.--></category>
    </file_info>
@@ -51,14 +57,13 @@
       <additional_files/>
    </packaging>
    <MATLABPath>
+      <Directory>C:\PamSoft\toolbox\nway310</Directory>
       <Directory>C:\PamSoft\toolbox\nway310\ver3.1</Directory>
       <Directory>C:\PamSoft\DataAnalysis\PamSoft_Grid</Directory>
-      <Directory>C:\PamSoft\DataAnalysis\PamSoft_Grid\com</Directory>
-      <Directory>C:\PamSoft\toolbox\VChooseK</Directory>
       <Directory>C:\PamSoft\DataAnalysis\classes</Directory>
-      <Directory>C:\PamSoft\DataAnalysis\common</Directory>
-      <Directory>C:\PamSoft\toolbox\lars</Directory>
+      <Directory>C:\pamsoft\DataAnalysis\PamSoft_Grid\com</Directory>
       <Directory>C:\PamSoft\DataAnalysis\PamSoft_Grid\gridPresenter</Directory>
+      <Directory>C:\PamSoft\DataAnalysis\common</Directory>
       <Directory>$(MATLABROOT)\toolbox\matlab\general</Directory>
       <Directory>$(MATLABROOT)\toolbox\matlab\ops</Directory>
       <Directory>$(MATLABROOT)\toolbox\matlab\lang</Directory>
@@ -94,10 +99,13 @@
       <Directory>$(MATLABROOT)\toolbox\matlab\guide</Directory>
       <Directory>$(MATLABROOT)\toolbox\matlab\plottools</Directory>
       <Directory>$(MATLABROOT)\toolbox\local</Directory>
-      <Directory>$(MATLABROOT)\toolbox\shared\controllib</Directory>
       <Directory>$(MATLABROOT)\toolbox\shared\dastudio</Directory>
       <Directory>$(MATLABROOT)\toolbox\matlab\datamanager</Directory>
+      <Directory>$(MATLABROOT)\toolbox\shared\simulink</Directory>
+      <Directory>$(MATLABROOT)\toolbox\shared\instrument</Directory>
       <Directory>$(MATLABROOT)\toolbox\compiler</Directory>
+      <Directory>$(MATLABROOT)\toolbox\shared\controllib\general</Directory>
+      <Directory>$(MATLABROOT)\toolbox\shared\controllib\graphics</Directory>
       <Directory>$(MATLABROOT)\toolbox\dotnetbuilder\dotnetbuilder</Directory>
       <Directory>$(MATLABROOT)\toolbox\images\colorspaces</Directory>
       <Directory>$(MATLABROOT)\toolbox\images\images</Directory>
@@ -113,92 +121,5 @@
       <Directory>$(MATLABROOT)\toolbox\shared\optimlib</Directory>
       <Directory>$(MATLABROOT)\toolbox\stats</Directory>
       <Directory>$(MATLABROOT)\toolbox\shared\statslib</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\bayes</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\anderson_task</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\binary_separable</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\gmm_samples</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\iris_data</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\mm_samples</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\multi_separable</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\ocr_numerals</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\riply_data</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\data\svm_samples</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\demos</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\demos\image_denoising</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\demos\ocr</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\demos\ocr\models</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\demos\ocr\models\bsvm2</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\demos\ocr\models\oaosvm</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\bayes</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\bayes\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\data</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\data\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\demos</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\demos\image_denoising</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\demos\image_denoising\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\demos\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\demos\ocr</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\demos\ocr\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\kernels</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\kernels\extraction</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\kernels\extraction\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\kernels\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\kernels\preimage</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\kernels\preimage\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\anderson</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\anderson\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\extraction</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\extraction\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\finite</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\finite\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\fisher</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\fisher\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\linear\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\misc</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\misc\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\probab</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\probab\estimation</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\probab\estimation\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\probab\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\quadrat</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\quadrat\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\root</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\root\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\svm</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\svm\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\visual</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\visual\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\xtal_regression</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\doc\manual\xtal_regression\list</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\kernels</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\kernels\extraction</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\kernels\preimage</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\linear</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\linear\anderson</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\linear\extraction</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\linear\finite</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\linear\fisher</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\misc</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\optimization</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\probab</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\probab\estimation</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\quadrat</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\svm</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\visual</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\source</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\source\ANN</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\source\CTM</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\source\MARS</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\source\PPR</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\source\XTAL_V51</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\xtal_linux</Directory>
-      <Directory>C:\PamSoft\toolbox\stprtool\xtal_regression\xtal_win32</Directory>
-      <Directory>C:\PamSoft\DataAnalysis\Data Step Operator\classifier\..</Directory>
    </MATLABPath>
 </project>
