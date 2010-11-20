@@ -1,4 +1,19 @@
 function props = operatorProperties()
 global data
-global outlierSpec
-props = { 'outlierSpec',2}; 
+global MaxComponents
+global AutoScale
+global BalanceBags
+global CrossValidation
+global Optimization
+global Permutations
+global SaveClassifier
+props = {   'MaxComponents', 10; ...
+            'AutoScale', {'No', 'Yes'}; ...
+            'BalanceBags', 0; ...
+            'CrossValidation',{'LOOCV', '10-fold', '20-fold', 'none'}; ...
+            'Optimization', {'auto', 'LOOCV', '10-fold', '20-fold','none'}; ...
+            'Permutations', 0; ...
+            'SaveClassifier', {'No', 'Yes'}
+        };
+     
+            

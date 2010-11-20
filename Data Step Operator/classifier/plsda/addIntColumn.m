@@ -1,6 +1,5 @@
 function addIntColumn(dataColumn, name, type)
 global data
-global outlierSpec
 if isempty(data)
     data = dataset;
 end
