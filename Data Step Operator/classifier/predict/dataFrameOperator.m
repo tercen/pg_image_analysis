@@ -1,92 +1,57 @@
-function fCubeOut = dataFrameOperator(fCubeIn, metaData, folder)
-% Class Predictor
-% Version 1.0 (R2009B MCR)
-% Creator: Rik de Wijn
-% Last Modification Data: May-7-2010
-% Support status: supported
-% Type: Matlab Operator Step
-% Description: Predicts the class of new samples based on a previously
-% stored classifier. The Operator prompts the user for selecting this
-% classifier from the file system. This is a generic operator supporting
-% all classifiers that created using the BN - Matlab Operator
-% interface. The Operator relies on the spotID's to verify that the stored
-% classifier is consistent with the new input data.
-% 
-%INPUT:
-%Array data from Bionavigator Spreadsheet. Optionally, grouping can be defined using a single DataColor. 
-%Using more than a single value per cell results in an error, missing values are not allowed.
-%SpotID's have to specified in the BN spreadsheet
-%
-%PARAMETERS
-%1. ShowGraphicalOutput [yes(dft), no], if no the graphical SHOWRESULTS
-%output is suppressed.
-%
-%OUTPUT (RETURNED TO BIONAVIGATOR):
-%Per sample: 
-%y<ClassName>, class affinity p for each class predicted using the
-%classifier. The predicted class is the one with the largest affinity.
-%pamIndex (2 class prediction only): y predictions converted to the "PamIndex" format.
-%
-%OUTPUT (SHOWRESULTS)
-%1. Plot of cross validated y predictions in "PamIndex" format (Only for 2-class prediction when grouping is available). 
-%2. Tab delimited text file (.xls, best viewed using MS-Excel) with details
-% on predictions and classifier performance (only when grouping is
-% available).
-global ShowGraphicalOutput
-%% check and reformat inputs
-% strip off header
-hdr = fCubeIn(1,:);
-fCubeIn = fCubeIn(2:end,:);
-
-iRs = strmatch('rowSeq', hdr);
-rowSeq = cell2mat(fCubeIn(:, iRs));
-iCs = strmatch('colSeq', hdr);
-colSeq = cell2mat(fCubeIn(:, iCs));
-iMatch = -1 + strmatch('value', metaData(:,2));
-if length(iMatch) ==1
-    X = flat2mat(fCubeIn(:, iMatch), rowSeq, colSeq);
-    X = X';
-    if any(isnan(X))
-        error('Missing values are not allowed');
-    end
-else
-    error('Only a single quantitation type allowed');
+function [aNumeric, aHeader] = dataFrameOperator(folder)
+global data
+%% Predict
+%# function mgPlsda
+%%warning 'off'
+%% input formatting and checking
+if length(unique(data.QuantitationType)) ~= 1
+    error('Predict cannot handle multiple quantitation types');
 end
-
-% y, if any
-iGroup = -1 + strmatch('Color', metaData(:,2));
-if isempty(iGroup)
+% predictor matrix
+X = flat2mat(data.value, data.rowSeq, data.colSeq)';
+if any(isnan(X(:)))
+    error('Missing values are not allowed');
+end
+% response variable
+varType     = get(data, 'VarDescription');
+varNames    = get(data, 'VarNames');
+yName = varNames(contains(varType, 'Color'));
+if length(yName) > 1 
+    error('Grouping must be defined using exactly one data color');
+end
+if ~isempty(yName)
+    yName = char(yName);
+    y = flat2columnAnnotation(data.(yName), data.rowSeq, data.colSeq);
+else
     y = [];
-elseif length(iGroup) == 1
-    y = flat2ColumnAnnotation(fCubeIn(:, iGroup),rowSeq, colSeq);
-    y = cellstr(cellfun(@cnv, y,'uniform', false));
-    y = nominal(y);
-else
-    error('Grouping must be defined using a single data color')
 end
-
-%% retrieve the spot IDs
-iSpotID = -1 + find(strcmp('ID', metaData(:,1)) & strcmp('Spot', metaData(:,2) ) );
-if ~isempty(iSpotID)
-    spotID = flat2RowAnnotation(fCubeIn(:, iSpotID), rowSeq, colSeq);
-else
-    error('No spotID''s found in data cube');
+% retrieve spot ID's for later use
+bID = strcmp('Spot', varType) & strcmp('ID', varNames);
+if sum(bID) ~= 1
+    error('Spot ID could not be retrieved')
 end
-
-%% construct sample names
-arrayAnnotationLabels = metaData( strmatch('Array', metaData(:,2)), 1);
-arrayIdx = cell2mat(cellfun(@(x)matchNames(x, hdr), arrayAnnotationLabels, 'uniform', false));
-arrayAnnotation = fCubeIn(rowSeq == 1, arrayIdx);
-arrayAnnotation = arrayAnnotation(colSeq(rowSeq ==1), :);
-names = catAnnotation(arrayAnnotation);
-
-%% prompt user for saved classifier
-
+spotID = flat2rowAnnotation(data.ID, data.rowSeq, data.colSeq);
+% create sample labels
+labelIdx = find(contains(varType, 'Array'));
+for i=1:length(labelIdx)
+    label(:,i) = nominal(flat2ColumnAnnotation(data.(varNames{labelIdx(i)}), data.rowSeq, data.colSeq));
+    % (creating a nominal nicely handles different types of experimental
+    % factors)
+end
+for i=1:size(label,1)
+    strLabel{i} =paste(cellstr(label(i,:)), '/');
+end
+%% Propmt for saved classifier and load
 fpath = fullfile(folder, 'classPredictRunData.mat');
 if exist(fpath, 'file')
     runData = load(fpath);
-    dftName = runData.lastUsed;
-    filter = '*.*';
+    if isfield(runData, 'lastUsed')
+        dftName = runData.lastUsed;
+        filter = '*.*';
+    else
+         dftName = pwd;
+         filter = '*.mat';
+    end
 else
     dftName = pwd;
     filter = '*.mat';
@@ -95,46 +60,62 @@ end
 if name == 0
     error('A classifier must be selected');
 end
-%#function mgPlsda
 lastUsed = fullfile(path,name);
-
-classifier = load(lastUsed);
-[spotID, sIdx] = sort(spotID);
-if ~isequal(sort(classifier.spotID), spotID)
-    error('The spot ID''s of the new data do not correspond to that used for the saved classifier');
+try
+    classifier = load(lastUsed);
+catch
+    error(['Error while loading: ',lastUsed])
 end
-%use the spotID sorted to X to get the predictions
+if ~isfield(classifier, 'spotID') || ~isfield(classifier, 'finalModel')
+    error('The selected file does not appear to contain a valid classifier');
+end
+if ~isequal(spotID, classifier.spotID)
+    error('Spot ID''s of the saved classifier do not correspond to that of the new data');
+end
+%% Set-up and get the predictions
 cr = cvResults;
-
 cr.partitionType = 'Not applicable';
 cr.models = classifier.finalModel;
-cr.sampleNames = names;
+cr.sampleNames = strLabel;
 cr.group = y;
-
 if ~isempty(cr.group)
     cr.title = 'Test set validation results';
 else
     cr.title = 'New sample prediction results';
 end
-[cr.yPred, cr.cPred] = classifier.finalModel.predict(X(:, sIdx));
-cr.y = round(cr.yPred); % serves as a template for the format of y
-%% format ypred for output to BN'
-fCubeOut = cell(length(rowSeq)+1, size(cr.yPred,2) + 2);
-fCubeOut(2:length(rowSeq)+1,1:2  ) = arrayfun(@(x){x}, [rowSeq, colSeq]);
-lIdx = sub2ind(size(X'), rowSeq, colSeq);
-outHdr{1} = 'rowSeq';
-outHdr{2} = 'colSeq';
-n = 2;
+[cr.yPred, cr.cPred] = classifier.finalModel.predict(X);
+cr.y = round(cr.yPred);
+%% text output to file
+fname = [datestr(now,30),'PredictionResults.xls'];
+fpath = fullfile(folder, fname);
+fid = fopen(fpath, 'w');
+if fid == -1
+    error('Unable to open file for writing results')
+end
+try
+    cr.print(fid);
+    fclose(fid);
+catch
+    fclose(fid);
+    error(lasterr)
+end
+%% save run data
+runDataFile = fullfile(folder, 'classPredictRunData.mat');
+save(runDataFile, 'cr', 'lastUsed');
+%% output formatting for return to BN
+aHeader{1} = 'rowSeq';
+aNumeric(:,1) = double(data.rowSeq);
+aHeader{2} = 'colSeq';
+aNumeric(:,2) = double(data.colSeq);
+lIdx = sub2ind(size(X'), data.rowSeq, data.colSeq); % linear index for converting matrix to flat output
 for i=1:length(classifier.finalModel.uGroup)
-    outHdr{n+i} = ['y',classifier.finalModel.uGroup{i}];
-    yp = repmat(cr.yPred(:,i)', size(X,2),1);
-    fCubeOut(2:length(rowSeq)+1, n+i) = arrayfun(@(x){x}, yp(lIdx));
+    aHeader{2+i} = ['y', char(classifier.finalModel.uGroup(i))];
+    yPred = repmat(cr.yPred(:,i)', size(X,2),1);
+    aNumeric(:, 2 + i) = yPred(lIdx);
 end
 if length(classifier.finalModel.uGroup) == 2
-    n = length(outHdr);
-    outHdr{n+1} = 'pamIndex';
-    fCubeOut(2:length(rowSeq)+1, n+1) = arrayfun(@(x){x}, 2*yp(lIdx) - 1);
+    aHeader{size(aNumeric,2)+ 1} = 'PamIndex';
+    yPred = repmat(cr.yPred(:,2)', size(X,2), 1);
+    pamIndex = 2 * yPred -1;
+    aNumeric(:, size(aNumeric,2)+1) = pamIndex(lIdx);
 end
-fCubeOut(1,:) = outHdr;
-%% save runData for showResults
-save(fullfile(folder, 'classPredictRunData.mat'), 'cr', 'lastUsed');

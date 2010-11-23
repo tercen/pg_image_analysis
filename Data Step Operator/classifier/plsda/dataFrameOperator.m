@@ -1,6 +1,6 @@
 function [aNumeric, aHeader] = dataFrameOperator(folder)
 %PLS-DA Class Prediction 
-%Version: 2.0 (MCR R2010A)
+%Version: 2.1 (MCR R2010A)
 %Creator: Rik de Wijn
 %Last Modification Date: November 16, 2010
 %Support Status: Supported
@@ -49,7 +49,7 @@ function [aNumeric, aHeader] = dataFrameOperator(folder)
 %pamIndex (2 class prediction only): y predictions converted to the "PamIndex" format.
 %Per spot:
 %beta(1..N), were N is the number of groups. Relative weights of spots in the class
-%prediction rule. Beta(1..N-1) is usually sufficient. Do not use these
+%prediction rule. Beta(1..N-1) is usually sufficient. These are scaled to unit variance, Therefore do not use these
 %weights for predicting new samples, use the complimentary
 %predict.classification operator!
 %
@@ -197,9 +197,9 @@ aNumeric(:,2) = double(data.colSeq);
 lIdx = sub2ind(size(X'), data.rowSeq, data.colSeq); % linear index for converting matrix to flat output
 for i=1:length(aTrainedPls.uGroup)
     aHeader{2+i}    = ['beta',char(aTrainedPls.uGroup(i))];
+    keyboard
     beta = median(aTrainedPls.beta(2:end,i,:),3); % The median beta is returned when balanceBags are applied 
-    beta = repmat(beta, 1, size(X,1));
-    beta = ones(size(X));
+    beta = repmat(beta, 1, size(X,1))/std(beta);
     beta = beta(lIdx);
     aNumeric(:, 2+i) = beta;
 end
