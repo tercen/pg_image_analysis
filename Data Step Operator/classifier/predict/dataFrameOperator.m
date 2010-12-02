@@ -1,8 +1,36 @@
 function [aNumeric, aHeader] = dataFrameOperator(folder)
+% Class Predictor
+% Version 1.1 (R2010A MCR)
+% Creator: Rik de Wijn
+% Last Modification Data: May-7-2010
+% Support status: supported
+% Type: Matlab Operator Step
+% Description: Predicts the class of new samples based on a previously
+% stored classifier. The Operator prompts the user for selecting this
+% classifier from the file system. This is a generic operator supporting
+% all classifiers that created using the BN - Matlab Operator
+% interface. The Operator relies on the spotID's to verify that the stored
+% classifier is consistent with the new input data.
+% 
+%INPUT:
+%Array data from Bionavigator Spreadsheet. Optionally, grouping can be defined using a single DataColor. 
+%Using more than a single value per cell results in an error, missing values are not allowed.
+%SpotID's have to specified in the BN spreadsheet
+%
+%OUTPUT (RETURNED TO BIONAVIGATOR):
+%Per sample: 
+%y<ClassName>, class affinity p for each class predicted using the
+%classifier. The predicted class is the one with the largest affinity.
+%pamIndex (2 class prediction only): y predictions converted to the "PamIndex" format.
+%
+%OUTPUT (SHOWRESULTS)
+%1. Plot of cross validated y predictions in "PamIndex" format (Only for 2-class prediction when grouping is available). 
+%2. Tab delimited text file (.xls, best viewed using MS-Excel) with details
+% on predictions and classifier performance (only when grouping is
+% available).
 global data
 %% Predict
 %# function mgPlsda
-%%warning 'off'
 %% input formatting and checking
 if length(unique(data.QuantitationType)) ~= 1
     error('Predict cannot handle multiple quantitation types');

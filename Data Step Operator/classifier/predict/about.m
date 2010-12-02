@@ -1,2 +1,4 @@
 function txt = about
-txt = 'classifier.predict';
+txt = load('aboutPredict.mat');
+txt = txt.about;
+
