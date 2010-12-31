@@ -68,7 +68,7 @@ pdef(end+1).name = 'grdIsReference';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
-
+%
 pdef(end+1).name = 'grdRotation';
 pdef(end).string = 'Global grid, rotation'; 
 pdef(end).dft   = [-2:0.25:2];
@@ -130,13 +130,6 @@ pdef(end).string = 'Global grid, optimize reference vs. substrate array';
 pdef(end).dft = uint8(1);
 pdef(end).enumVal = uint8([0,1]);
 pdef(end).enumMap = {'no', 'yes'};
-
-
-
-% pdef(end+1).name = 'segMethod';
-% pdef(end).dft   = uint8(1);
-% pdef(end).enumVal = int8([0,1]);
-% pdef(end).enumMap = {'Threshold', 'Edge'};
 %
 pdef(end+1).name = 'segEdgeSensitivity';
 pdef(end).string = 'Segmentation, edge sensitivity';
@@ -162,34 +155,18 @@ pdef(end).dft   = 0.85;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-% pdef(end+1).name = 'sqcMinFormFactor';
-% pdef(end).dft   = 0.7;
-% pdef(end).enumVal = [];
-% pdef(end).enumMap = [];
-% %
-% pdef(end+1).name = 'sqcMaxAspectRatio';
-% pdef(end).dft   = 1.4;
-% pdef(end).enumVal = [];
-% pdef(end).enumMap = [];
-%
-pdef(end+1).name = 'sqcMaxPositionOffset';
-pdef(end).string = 'Spot QC, maximal position offset';
-pdef(end).dft   = 0.4;
+pdef(end+1).name = 'sqcMinSnr';
+pdef(end).string = 'Spot QC, minimal signal to noise ratio';
+pdef(end).dft = 1;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-% pdef(end+1).name = 'sqcMinSignalToNoiseRatio';
-% pdef(end).string = 'Spot QC, minimal signal to noise ratio';
-% pdef(end).dft = 1;
-% pdef(end).enumVal = [];
-% pdef(end).enumMap = [];
-% %
-% pdef(end+1).name = 'sqcMinSpotAlignment';
-% pdef(end).string = 'Spot QC, minimal spot alignment';
-% pdef(end).dft = -1;
-% pdef(end).enumVal = [];
-% pdef(end).enumMap = [];
-% %
+pdef(end+1).name = 'sqcMaxPositionOffset';
+pdef(end).string = 'Spot QC, maximal deviation from exoected position';
+pdef(end).dft = 0.4;
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+%
 pdef(end+1).name = 'qntSpotID';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];
@@ -207,11 +184,6 @@ pdef(end).dft   = -1 + 2^16;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
-% pdef(end+1).name = 'qntBackgroundMethod';
-% pdef(end).dft   = uint8(0);
-% pdef(end).enumVal = uint8([0]);
-% pdef(end).enumMap = {'localCorner'};
-% %
 pdef(end+1).name = 'qntOutlierMethod';
 pdef(end).string = 'Quantification, method for outlier detection';
 pdef(end).dft   = uint8(1);

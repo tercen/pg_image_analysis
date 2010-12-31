@@ -42,6 +42,7 @@ for i=1:length(oq(:))
             end
             oq(i).medianSignal = median(sigPix(~iOutSignal));
             oq(i).meanSignal = mean(sigPix(~iOutSignal));
+            oq(i).sumSignal  = sum(sigPix(~iOutSignal));
             % As of R2007A std does not support integer data
             oq(i).stdSignal = std(single(sigPix(~iOutSignal))); 
             
@@ -56,6 +57,7 @@ for i=1:length(oq(:))
             end
             oq(i).medianBackground    = median(bgPix(~iOutBackground));
             oq(i).meanBackground      = mean(bgPix(~iOutBackground));
+            oq(i).sumBackground       = sum(bgPix(~iOutBackground));
             oq(i).stdBackground       = std(single(bgPix(~iOutBackground)));
             oq(i).minBackground       = min(bgPix(~iOutBackground));
             oq(i).maxBackground       = max(bgPix(~iOutBackground));
@@ -73,12 +75,9 @@ for i=1:length(oq(:))
             % in MW test below by adding 0.5 to one of the
             % distributions (here: sigPix)
             %oq(i,j).pSignal = test2r(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'n');
-            %oq(i).pSignal = ranksum(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'method', 'approximate');
-            
+            %oq(i).pSignal = ranksum(double(sigPix(~iOutSignal))+0.5, double(bgPix(~iOutBackground)), 'method', 'approximate'); 
             nPix = length(sigPix(~iOutSignal));
             oq(i).signalSaturation = length(find(sigPix(~iOutSignal) >= oq(i).saturationLimit))/nPix;     
-            oq(i).spotAlignment = 1;%corrcoef(zscore(double(bwSignal(:))), zscore(double(imLocal(:))));
-            oq(i).backgroundAlignment = 1;%corrcoef(zscore(double(bgMask(:))), zscore(double(imLocal(:))));
         end
 end
 

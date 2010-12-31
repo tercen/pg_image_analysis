@@ -22,6 +22,7 @@ global segAreaSize
 global sqcMaxDiameter
 global sqcMinDiameter
 global sqcMaxPositionOffset
+global sqcMinSnr
 global qntSpotID
 global qntSeriesMode
 global qntSaturationLimit
@@ -136,7 +137,8 @@ oQ0 = spotQuantification('backgroundMethod', strQntBackgroundMethod, ...
 % construct a spotQualityAssessment object                      
 sqc = spotQualityAssessment(    'maxDiameter'       , sqcMaxDiameter, ...
                                 'minDiameter'       , sqcMinDiameter, ...
-                                'maxOffset'         , sqcMaxPositionOffset );
+                                'maxOffset'         , sqcMaxPositionOffset, ...
+                                'minSnr'            , sqcMinSnr );
                             
 % finaly construct a pamgrid object 
 
@@ -164,9 +166,15 @@ pgr = pamgrid(  'oPreProcessing',   oPrep, ...
                 'seriesMode', strSeriesMode, ...
                 'useImage', strUseImage);
             
-
-[stateQuantification, I, exp, cycles] = analyzeImages(pgr, imagePath);
-
+try
+    [stateQuantification, I, exp, cycles] = analyzeImages(pgr, imagePath);
+catch anAnalysisFailure
+    aMsg = [anAnalysisFailure.message,''... 
+           ,anAnalysisFailure.identifier,'.'...
+           ,anAnalysisFailure.stack(1).name,'('...
+           ,num2str(anAnalysisFailure.stack(1).line),')'];
+    error(aMsg);
+end
 %stateQuantification = analyzeImages(pgr, imagePath);
 for i=1:size(stateQuantification,2)
      [qn, qTypes(:,:, i)] = parseResults(stateQuantification(:,i));
