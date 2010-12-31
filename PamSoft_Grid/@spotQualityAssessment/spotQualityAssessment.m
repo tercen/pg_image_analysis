@@ -19,6 +19,5 @@ propdef.maxDiameter = 1.5;
 propdef.minDiameter = 0.5;
 propdef.maxOffset   = 0.4;
 propdef.minSnr      = 1;
-propdef.minSignalAlignment   = 0;
 
 stro = setVarArginOptions(propdef, stro, varargin{:});

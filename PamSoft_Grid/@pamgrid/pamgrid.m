@@ -20,6 +20,7 @@ propdef.oArray = array;
 propdef.oSegmentation = segmentation;
 propdef.oSpotQuantification = spotQuantification;
 propdef.oSpotQualityAssessment = spotQualityAssessment;
+propdef.oRefQualityAssessment  = spotQualityAssessment;
 propdef.gridImageSize = [256, 256];
 propdef.optimizeSpotPitch = {'yes', 'no'};
 propdef.optimizeRefVsSub = {'yes', 'no'};

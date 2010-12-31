@@ -102,18 +102,10 @@ for i=1:length(cx(:))
         end
         Ilocal = false(size(Ilocal));
         if spotFound            
-            s(i).finalMidpoint = s(i).bsLuIndex + [x0, y0];
-            
-         
-            
+            s(i).finalMidpoint = s(i).bsLuIndex + [x0, y0];         
             s(i).diameter = 2*r;
             s(i).chisqr = nChiSqr;
-            
-%             % the below if statement is a fu
-%             if rand > 0.5
-%                 s(i).finalMidpoint = s(i).finalMidpoint + 17.3*(rand(size(s(i).finalMidpoint))-0.5);
-%                 s(i).chisqr = -2;
-%             end
+
             
             
             [xFit, yFit] = circle(x0,y0,r,round(pi*r)/2);

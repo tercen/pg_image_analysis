@@ -167,6 +167,12 @@ pdef(end).dft = 0.4;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
+pdef(end+1).name = 'sqcMaxPositionOffsetRefs';
+pdef(end).string = 'Spot QC, maximal deviation from exoected position';
+pdef(end).dft = 0.6;
+pdef(end).enumVal = [];
+pdef(end).enumMap = [];
+%
 pdef(end+1).name = 'qntSpotID';
 pdef(end).dft   = [];
 pdef(end).enumVal = [];

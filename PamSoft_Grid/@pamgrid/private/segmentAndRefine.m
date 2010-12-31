@@ -1,5 +1,9 @@
-function [q, spotPitch, mp] = segmentAndRefine(pgr, I, x, y, rot)
+function [q, spotPitch, mp] = segmentAndRefine(pgr, I, x, y, rot, asRef)
 % Segments and attempts to refine the spotpitch
+if nargin == 5
+    asRef = false;
+end
+
 if isequal(pgr.optimizeSpotPitch', 'yes')
     % this determines if (a) spotPitch refinement iteration(s) will be
     % performed
@@ -13,7 +17,6 @@ if isequal(pgr.verbose, 'on')
 else
     bVerb = false;
 end
-
 
 maxDelta = 0.3;
 spotPitch = get(pgr.oArray, 'spotPitch');
@@ -33,8 +36,11 @@ while delta > maxDelta
     end
     pgr.oSegmentation = set(pgr.oSegmentation, 'spotPitch', spotPitch);
     oS = segment(pgr.oSegmentation, I, x, y,rot);
-    
-    flags = checkSegmentation(pgr.oSpotQualityAssessment, oS);
+    if asRef
+        flags = checkSegmentation(pgr.oRefQualityAssessment, oS);
+    else
+        flags = checkSegmentation(pgr.oSpotQualityAssessment, oS);
+    end
     % replace empty spots by the default spot
     oS(flags == 2) = setAsDftSpot(oS(flags == 2));
     if all(bFixedSpot)
@@ -48,8 +54,6 @@ while delta > maxDelta
     end
     % Use the spots found to refine the pitch and array midpoint
     % exclude fixed points from the refinement
-    
- 
     [xPos, yPos] = getPosition(oS);
     array2fit = set(pgr.oArray, 'isreference',bUse);
     arrayRefined = refinePitch(array2fit, xPos, yPos);

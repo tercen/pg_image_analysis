@@ -34,7 +34,17 @@ oaRef = removePositions(pgr.oArray, '~isreference');
 oaSub = removePositions(pgr.oArray, 'isreference');
 pgrRef = set(pgr, 'oArray', oaRef);
 pgrSub = set(pgr, 'oArray', oaSub);
-[qRefs, spRefs, mpRefs] = segmentAndRefine(pgrRef, I, x(isRef), y(isRef), rot);
+if any(~isRef)
+    % segment as separate reference array (different quality settings)
+    [qRefs,~, mpRefs] = segmentAndRefine(pgrRef, I, x(isRef), y(isRef), rot, true);
+else
+    [qRefs,~, mpRefs] = segmentAndRefine(pgrRef, I, x(isRef), y(isRef), rot, false);
+end
+
+if all(get(qRefs, 'isBad'))
+   % none of the references was properly found: gridding failure
+   error('None of the reference spots was properly found')
+end
 qOut(isRef) = qRefs; % refs are segmented!
 
 % if any, segment and quantify the substrates (non refs), allow for another
@@ -55,13 +65,19 @@ if any(~isRef)
     % midpoint
     [xSub, ySub] = coordinates(arrayRefined, mpRefs);
     for pass = 1:maxSubIter
-        
+
         [qSub, spotPitch, mpSub] = segmentAndRefine(pgrSub, I, xSub,ySub, rot); 
         if all(bFixedSpot(~isRef)) || ~bOptimize
             break;
         end
-        delta = norm(mpSub - mpRefs)/spotPitch;           
-        if bVerbose
+        if ~isempty(mpSub)
+            delta = norm(mpSub - mpRefs)/spotPitch;
+        else
+            % this handles the case when to little substrates have been
+            % properly found: no further optiization
+            break;
+        end
+       if bVerbose
             disp('Ref Vs Sub optimization')
             disp(['Delta: ', num2str(delta)])
             if delta > maxRefSubOffset && pass < maxSubIter

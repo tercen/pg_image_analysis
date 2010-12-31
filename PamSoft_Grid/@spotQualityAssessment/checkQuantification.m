@@ -6,12 +6,6 @@ snr = ([qs.meanSignal] - [qs.meanBackground])./sqrt([qs.stdSignal].^2 + [qs.stdB
 bEmpty = snr < sa.minSnr;
 flag(bEmpty) = 2;
 
-% 2. find bad aligned, take previous flags stored in q into
-% account
-bBad = [qs.spotAlignment] < sa.minSignalAlignment;
-bBad = bBad | ([qs.isBad] & ~bEmpty);
-
-flag(bBad) = 1;
 
 
 
