@@ -22,6 +22,7 @@ global segAreaSize
 global sqcMaxDiameter
 global sqcMinDiameter
 global sqcMaxPositionOffset
+global sqcMaxPositionOffsetRefs
 global sqcMinSnr
 global qntSpotID
 global qntSeriesMode

@@ -1,4 +1,5 @@
 function q = seriesAdaptLocal(pgr, I, varargin)
+% obsolete as off PamGrid 4.2!
 % function q = seriesAdaptLocal(pgr, I, varargin)
 % analysis of image series with:
 % global grid finding on fixed image
@@ -19,16 +20,24 @@ end
 exp = op.exposure(iSort);
 I = I(:, :, iSort);
 
-switch pgr.useImage
-    case 'All'
-        error('property ''useImage'' can not be ''All'' when using adaptive gridding, use ''seriesMode'' = ''Fixed''');        
-end
-[x,y,rot] = globalGrid(pgr, I, 'exposure', exp, ...
-                               'cycle', cycle);
-
-for i=1:size(I,3)
-    qSegmented = segmentImage(pgr, I(:,:,i), x, y, rot);
-    q(:,i) = quantify(qSegmented, I(:,:,i));
+[~,x,y,rot] = seriesFixed(pgr, I, 'exposure', exp, ...
+                                  'cycle', cycle, ...
+                                  'action', 'global');
+uCycle = unique(cycle);
+sl = get(pgr.oSpotQuantification, 'saturationLimit');
+keyboard
+q = repmat(spotQuantification, numel(x), size(I,3));
+for i=1:length(uCycle)
+    bThis = cycle == uCycle(i); 
+    Iseg = I(:,:,bThis);
+    if sum(bThis) > 1
+        Iseg = combineExposures(Iseg, exp(bThis), sl);
+    end
+    qSegmented = segmentImage(pgr, Iseg, x, y, rot);
+    idxThis = find(bThis);
+    for j=1:idxThis
+        q(:,idxThis(j)) = quantify(qSegmented, I(:,:,idxThis(j)));
+    end
 end
                            
 

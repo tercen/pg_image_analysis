@@ -58,7 +58,11 @@ handles.I = varargin{1};
 handles.oQ = varargin{2};
 
 if length(varargin) == 3
-    handles.xSeries = varargin{3};
+
+    [handles.xSeries, xSort] = sort(varargin{3});
+    handles.I = handles.I(:,:, xSort);
+    handles.oQ = handles.oQ(:,:,xSort);
+
 else
     handles.xSeries = 1:size(handles.I,3);
 end
@@ -180,7 +184,7 @@ hOldFocus = handles.hSpots(iOld, jOld);
 [iNew, jNew] = find(handles.hSpots == hObject);
 qNew = handles.oQ(iNew, jNew,:);
 
-qq = qNew(:); get(qq(end))
+qq = qNew(:); get(qq(end));
 
 hAx = [handles.axImage, handles.axSegSpot, handles.axTrueSpot, handles.axQuantification];
 [handles.hFocusPlot, handles.hSpot] = focalSpot(hAx, handles.I(:,:,handles.xFocus), hObject, qNew, hOldFocus, qOld, handles.xFocus, handles.xSeries, handles.fullRange);

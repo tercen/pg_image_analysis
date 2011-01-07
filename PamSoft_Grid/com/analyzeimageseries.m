@@ -185,28 +185,23 @@ catch anAnalysisFailure
 end
 %stateQuantification = analyzeImages(pgr, imagePath);
 for i=1:size(stateQuantification,2)
-     [qn, qTypes(:,:, i)] = parseResults(stateQuantification(:,i));
+     [~, qTypes(:,:, i)] = parseResults(stateQuantification(:,i));
 end
-
 %permute qTypes from: Spot-QuantitationType-Array 
 % % to : Array-Spot-QuantitationType
 qTypes = permute(qTypes, [3,1,2]);
-
 if qntShowPamGridViewer ~=0 
-    if length(unique(exp))> 1
-        x = exp;
-    else
+    if length(unique(cycles))> 1
         x = cycles;
+    else
+        x = exp;
     end
-
     hViewer = showInteractive(stateQuantification, I, x);
     set(hViewer, 'Name', 'PamGridViewer');
     if qntShowPamGridViewer == 1
         uiwait(hViewer);
     end
 end
-
-
 %EOF
 
 function assignval(varName, value)

@@ -37,18 +37,13 @@ switch pgr.seriesMode
     case 'Fixed'        
         q = seriesFixed(pgr, I, 'exposure', expTime,...
                                 'cycle', cycles);
-    case 'Adapt Local'
-        q = seriesAdaptLocal(pgr, I, 'exposure', expTime,...
-                                    'cycle', cycles);
     case 'Adapt Global'
           q = seriesAdaptGlobal(pgr, I, 'exposure', expTime,...
                                  'cycle', cycles);
-    case 'Adapt All'
-         q = seriesAdapt(pgr, I, 'exposure', expTime,...
-                                 'cycle', cycles);
+    otherwise
+        error('Invalid value for ''pgr.seriesMode''')
 end
-for i=1:size(q,2)
-    
+for i=1:size(q,2)  
     flags = checkQuantification(pgr.oSpotQualityAssessment, q(:,i));
    
     q(:,i) = setSet(q(:,i), ...

@@ -49,7 +49,7 @@ while delta > maxDelta
     % if too little spots are correctly found, skip spot pitch refinement
     % here:
     bUse = flags == 0 & ~bFixedSpot;
-    if length(find(bUse)) < 5
+    if sum(bUse) < 5
         break;
     end
     % Use the spots found to refine the pitch and array midpoint

@@ -1,5 +1,4 @@
 function s = segmentByEdge(oS, I, cx, cy, rotation)
-
 spotPitch = oS.spotPitch;
 %  get the left upper coordinates and right lower coordinates
 xLu = round(cx - spotPitch);

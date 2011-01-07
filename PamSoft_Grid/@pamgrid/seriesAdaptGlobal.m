@@ -2,44 +2,20 @@ function q = seriesAdaptGlobal(pgr, I, varargin)
 opdef.cycle = [];
 opdef.exposure = [];
 op = setVarArginOptions(opdef, [], varargin{:});
-% function q = seriesAdaptGlobal(pgr, I, varargin)
-% analysis of image series with:
-% global grid repeated on each image of the series
-% local spot finding on a fixed image
+
+% sort images to cycle and exposure
 if isempty(op.cycle)
     op.cycle = 1:size(I,3);
 end
 if isempty(op.exposure)
     op.exposure = ones(size(op.cycle));
 end
-
-[cycle, iSort] = sort(op.cycle);
+[~, iSort] = sortrows([op.cycle, op.exposure]);
 exp = op.exposure(iSort);
+cycle = op.cycle(iSort);
 I = I(:, :, iSort);
-
-switch pgr.useImage
-    case 'All'
-        error('property ''useImage'' can not be ''All'' when using adaptive gridding, use ''seriesMode'' = ''Fixed''');        
-end
-
-% first perform a standard fixed segmentation
-[x,y,rot] = globalGrid(pgr, I, 'exposure', exp, ...
-                               'cycle', cycle);
-% produce the segmentation image
-
-switch pgr.useImage
-    case 'Last'
-        Iseg = I(:,:, end);
-    case 'Refs on First then Last'
-        Iseg = I(:,:,end);
-    case 'First'
-        Iseg = I(:,:,1);
-    case ' All'
-        error('property ''useImage'' can not be ''All'' when using adaptive gridding, use ''seriesMode'' = ''Fixed''');   
-    otherwise
-        error('unknown option for pgr.useImage');
-end
-qFixed = segmentImage(pgr, Iseg, x, y, rot);
+% produce the fixed segmentation in the standard way.
+qFixed = seriesFixed(pgr, I, 'cycle', cycle, 'exp', exp, 'action', 'segment');
 % get this principal segmentation from the fixed data
 s0 = get(qFixed, 'oSegmentation');
 s0 = [s0{:}]';% convert to array of segmentation objects
@@ -52,24 +28,32 @@ mp0 = midPoint(pgr.oArray, x0, y0);
 bRef = get(pgr.oArray, 'isreference');
 spPitch = get(pgr.oArray, 'spotPitch');
 os = set(pgr.oSegmentation, 'spotPitch',spPitch); 
-
-for i=1:size(I,3)
+uCycle = unique(cycle);
+sl = get(pgr.oSpotQuantification, 'saturationLimit');
+q = repmat(spotQuantification, length(qFixed), size(I,3));
+for i=1:length(uCycle)
+    bThis = cycle == uCycle(i);
     % global grid finding 
-    [x,y,rot] = globalGrid(pgr, I(:,:,i), 'exposure', exp(i), ...
-                               'cycle', cycle(i));
+    Igrid = I(:,:,bThis);
+    if sum(bThis) > 1
+        Igrid = combineExposures(I(:,:,bThis),exp(bThis), sl);
+    end   
+    [x,y,rot] = globalGrid(pgr, Igrid);
      % re-segment the refs only, find the midpoint associated with this
      % segmentation. Note that the midpoint will be calculated based on the
      % refs only (standard behaviour of array.midPoint)
      s0s = s0;
-     s0s(bRef)= segment(os, I(:,:,i), x(bRef), y(bRef), rot);
+     s0s(bRef)= segment(os, Igrid, x(bRef), y(bRef), rot);
      [x1, y1] = getPosition(s0s);
      mp1 = midPoint(pgr.oArray, x1, y1);
      %shift the non-ref principal segmentation based on mp shift found
      s0s(~bRef) = shift(s0(~bRef),mp1 - mp0);
      qImage = setSet(qFixed,'oSegmentation', s0s);
      % and quantify for final output
-     q(:,i) = quantify(qImage, I(:,:,i));
+     idxThis = find(bThis);
+     for j=1:length(idxThis)
+         q(:, idxThis(j)) = quantify(qImage, I(:,:,idxThis(j)) );
+     end
 end
 
-  
 

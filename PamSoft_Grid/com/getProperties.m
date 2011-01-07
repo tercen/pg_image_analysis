@@ -127,7 +127,7 @@ pdef(end).enumMap = {'no', 'yes'};
 %
 pdef(end+1).name = 'grdOptimizeRefVsSub';
 pdef(end).string = 'Global grid, optimize reference vs. substrate array';
-pdef(end).dft = uint8(1);
+pdef(end).dft = uint8(0);
 pdef(end).enumVal = uint8([0,1]);
 pdef(end).enumMap = {'no', 'yes'};
 %
@@ -145,7 +145,7 @@ pdef(end).enumMap = [];
 %
 pdef(end+1).name = 'sqcMinDiameter';
 pdef(end).string = 'Spot QC, minimal spot diameter';
-pdef(end).dft   = 0.5;
+pdef(end).dft   = 0.45;
 pdef(end).enumVal = [];
 pdef(end).enumMap = [];
 %
@@ -181,8 +181,8 @@ pdef(end).enumMap = [];
 pdef(end+1).name = 'qntSeriesMode';
 pdef(end).string = 'Quantification, handling of image series';
 pdef(end).dft   = uint8(0);
-pdef(end).enumVal = uint8([0,1,2,3]);
-pdef(end).enumMap = {'Fixed', 'Adapt Global', 'Adapt Local', 'Adapt All'};
+pdef(end).enumVal = uint8([0,1]);
+pdef(end).enumMap = {'Fixed', 'Adapt Global'};
 %
 pdef(end+1).name = 'qntSaturationLimit';
 pdef(end).string = 'Quantification, saturation limit';

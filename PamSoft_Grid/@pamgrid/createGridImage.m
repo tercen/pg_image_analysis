@@ -25,8 +25,6 @@ end
 I = I(:,:,iSort);
 
 % create the grid image
-
-
 switch pgr.useImage
     case 'Last'
         I = I(:,:,end);

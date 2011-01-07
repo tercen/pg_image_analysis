@@ -45,7 +45,8 @@ for i=1:length(oq(:))
             oq(i).sumSignal  = sum(sigPix(~iOutSignal));
             % As of R2007A std does not support integer data
             oq(i).stdSignal = std(single(sigPix(~iOutSignal))); 
-            
+            nsg = length(sigPix(~iOutSignal));
+            oq(i).rseSignal = (oq(i).stdSignal/sqrt(nsg))/oq(i).meanSignal;
             oq(i).minSignal = min(sigPix(~iOutSignal));
             oq(i).maxSignal = max(sigPix(~iOutSignal));
             % quantify background
@@ -61,6 +62,10 @@ for i=1:length(oq(:))
             oq(i).stdBackground       = std(single(bgPix(~iOutBackground)));
             oq(i).minBackground       = min(bgPix(~iOutBackground));
             oq(i).maxBackground       = max(bgPix(~iOutBackground));
+            nbg = length(bgPix(~iOutBackground));
+            oq(i).rseBackground = (oq(i).stdBackground/sqrt(nbg))/oq(i).meanBackground;
+            
+            
             % set ignored pixels
             oq(i).iIgnored = [];
             if bOut
