@@ -154,11 +154,13 @@ switch Optimization
 end
 %% Train the all sample pls model, if requested open Save dialog
 aTrainedPls = aPls.train(X, y);
+finalModelFile = [];
 if isequal(SaveClassifier, 'Yes')
     finalModel = aTrainedPls;
     [saveName, path] = uiputfile('*.mat', 'Save Classifier As ...');
     if saveName ~= 0
-        save(fullfile(path,saveName), 'finalModel', 'spotID');
+        finalModelFile = fullfile(path, saveName);
+        save(finalModelFile, 'finalModel', 'spotID');
     end
 end
 %% if required perform cross validation
@@ -175,19 +177,25 @@ end
 save(fullfile(folder, 'runData.mat'), 'cvRes', 'aTrainedPls', 'perMcr', 'perCv');
 % text output to file
 fname = [datestr(now,30),'CVResults.xls'];
+if ~isempty(finalModelFile)
+    addInfo = {['The classifier was saved as: ',finalModelFile]};
+else
+    addInfo = {'The classifier was not saved'};
+end
+
 fpath = fullfile(folder, fname);
 fid = fopen(fpath, 'w');
 if fid == -1
     error('Unable to open file for writing results')
 end
-try
-    cvRes.print(fid);
+%try
+    cvRes.print(fid, addInfo);
     fclose(fid);
    
-catch
-    fclose(fid);
+%catch
+%    fclose(fid);
     error(lasterr)
-end
+%end
 
 %% output formatting for return to BN
 aHeader{1} = 'rowSeq';
