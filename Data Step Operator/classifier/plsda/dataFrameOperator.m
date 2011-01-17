@@ -2,7 +2,7 @@ function [aNumeric, aHeader] = dataFrameOperator(folder)
 %PLS-DA Class Prediction 
 %Version: 2.1 (MCR R2010A)
 %Creator: Rik de Wijn
-%Last Modification Date: November 16, 2010
+%Last Modification Date: January 20, 2011
 %Support Status: Supported
 %Description: Partial Least Squared Discriminant Analysis
 %Type: Matlab Operator Step
@@ -188,14 +188,13 @@ fid = fopen(fpath, 'w');
 if fid == -1
     error('Unable to open file for writing results')
 end
-%try
+try
     cvRes.print(fid, addInfo);
     fclose(fid);
-   
-%catch
-%    fclose(fid);
-    error(lasterr)
-%end
+catch aReportFailure
+    fclose(fid);
+    error(aReportFailure.message)
+end
 
 %% output formatting for return to BN
 aHeader{1} = 'rowSeq';
