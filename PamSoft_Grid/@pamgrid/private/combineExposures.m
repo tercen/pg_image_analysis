@@ -6,7 +6,7 @@ szI = size(I);
 I = reshape(I,szI(1)*szI(2), szI(3)); 
 % mask saturated pixels
 I(I >= satLimit) = nan;
-% find and correct for the camera offset based on the 'image average';
+% find and correct for the camera offset based on the 'image average'
 J = nanmean(I)';
 bNan = isnan(J);% exclude any fully saturated images.
 if all(bNan)
