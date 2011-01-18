@@ -51,6 +51,7 @@ switch p.contrast
         % (more robust to failure for arrays with weak spots)
         % get backgroundlevel by mode
         bin = 0:double(max(Ipp(:)));
+        
         cnt = hist(Ipp(:), bin);
         [mx, imx] = max(cnt); bgLevel = bin(imx);
         % get 0.99 quantile

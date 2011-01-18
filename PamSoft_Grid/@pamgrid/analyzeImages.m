@@ -21,6 +21,10 @@ end
 % get the image parameters from file, and sort the images to exposure time
 % and cycle
 [expTime, cycles]  = getImageInfo(imFiles);
+
+if size(unique([expTime', cycles'],'rows'),1) ~= length(expTime)
+    error('Invalid combination of input images to PamGrid: there are multiple images with both equal cycle and exposure time')
+end
 bImageInfoFound = ~isempty(expTime)&& ~isempty(cycles);
 if bImageInfoFound
     [ec, iSort] = sortrows( [expTime', cycles'], [2,1]);
