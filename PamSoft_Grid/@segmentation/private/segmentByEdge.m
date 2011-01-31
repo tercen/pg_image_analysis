@@ -74,7 +74,7 @@ for i=1:length(cx(:))
             % keep the center part of Ilocal only
             Ilocal = false(size(Ilocal));
             Ilocal(pixOff:end-pixOff, pixOff:end-pixOff) = Iinitial;
-          
+            %areaMidpoint = size(Ilocal)/2;
             areaMidpoint = round(size(Ilocal)/2);
             % get the coordinates of foreground pixels
             [x,y] = find(Ilocal);

@@ -202,9 +202,11 @@ if qntShowPamGridViewer ~=0
         uiwait(hViewer);
     end
 end
-%EOF
 
 function assignval(varName, value)
 assignin('caller', varName, value);
 
-
+function [x,y] = circle(mp, r, nPoints)
+dt = 2*pi/nPoints;
+t = [0:dt:2*pi -dt]';
+x = mp(1) + r*sin(t); y = mp(2) + r*cos(t);
