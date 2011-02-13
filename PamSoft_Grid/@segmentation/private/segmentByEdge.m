@@ -15,7 +15,6 @@ imxLu = min(xLu);
 imyLu = min(yLu);
 imxRl = max(xRl);
 imyRl = max(yRl);
-
 J = I(imxLu:imxRl, imyLu:imyRl);
 % apply morphological filtering if required.
 if oS.nFilterDisk >= 1
@@ -30,21 +29,14 @@ I(imxLu:imxRl, imyLu:imyRl) = J;
 pixAreaSize = oS.areaSize * spotPitch;
 pixOff = round(max(spotPitch -0.5*pixAreaSize,0));
 spotPitch = round(spotPitch);
-
 % preallocate the array of segmentation objects
 s = repmat(oS, length(cx(:)), 1);
-
 for i=1:length(cx(:))
-
         s(i) = oS;
         s(i).initialMidpoint = [cx(i), cy(i)];
-        delta = 2;
-        %keyboard
+        delta = 2;        
         xLocal = round(xLu(i) + [0, 2*spotPitch]);
-        yLocal = round(yLu(i) + [0, 2*spotPitch]);
-     
-        
-        
+        yLocal = round(yLu(i) + [0, 2*spotPitch]); 
         % do while delta larger than sqrt(2) 
         deltaIter = 0;
         while delta > sqrt(2) && deltaIter < 3
@@ -53,13 +45,13 @@ for i=1:length(cx(:))
             xLocal(xLocal < 1) = 1;
             xLocal(xLocal > size(I,1)) = size(I,1);
             yLocal(yLocal < 1) = 1;
-            yLocal(yLocal > size(I,2)) = size(I,2);
+            yLocal(yLocal > size(I,2)) = size(I,2);                       
             % get the local image around the spot
-            Ilocal = I(xLocal(1):xLocal(2),yLocal(1):yLocal(2));
-            % center in the local image, keep the center part only.
-            Iinitial = Ilocal(pixOff:end-pixOff, pixOff:end-pixOff);
-            % check the number of objects found:
-            Linitial = bwlabel(Iinitial);
+            Ilocal = false(size(I));          
+            xInitial = xLocal + [pixOff,-pixOff];
+            yInitial = yLocal + [pixOff,-pixOff];
+            Ilocal(xInitial(1):xInitial(2), yInitial(1):yInitial(2)) = I(xInitial(1):xInitial(2),yInitial(1):yInitial(2));
+            Linitial = bwlabel(Ilocal);
             nObjects = max(Linitial(:));
             if nObjects > 1
                 % keep the largest
@@ -68,15 +60,8 @@ for i=1:length(cx(:))
                     a(t) = sum(Linitial(:) == t);
                 end
                 [mx, nLargest] = max(a);
-                Iinitial = Linitial == nLargest(1);
+                Ilocal = Linitial == nLargest(1);
             end
-           
-            % keep the center part of Ilocal only
-            Ilocal = false(size(Ilocal));
-            Ilocal(pixOff:end-pixOff, pixOff:end-pixOff) = Iinitial;
-            %areaMidpoint = size(Ilocal)/2;
-            areaMidpoint = round(size(Ilocal)/2);
-            % get the coordinates of foreground pixels
             [x,y] = find(Ilocal);
             % store the current area left upper
             s(i).bsLuIndex = [xLocal(1), yLocal(1)];
@@ -90,7 +75,8 @@ for i=1:length(cx(:))
             % fit a circle to the foreground pixels
             [x0, y0, r, nChiSqr] = robCircFit(x,y);
             % calculate the difference between area midpoint and fitted midpoint 
-            mpOffset = [x0, y0]- areaMidpoint;
+            s(i).finalMidpoint = [x0, y0];
+            mpOffset = s(i).finalMidpoint - s(i).initialMidpoint;
             delta = norm(mpOffset);        
             % shift area according to mpOffset for next iteration,
             % the loop terminates if delta converges to some low value.
@@ -100,19 +86,16 @@ for i=1:length(cx(:))
             yLocal(1) = max(yLocal(1),1); yLocal(2) = max(yLocal(2), yLocal(1) + 1);
         end
         Ilocal = false(size(Ilocal));
-        if spotFound            
-            s(i).finalMidpoint = s(i).bsLuIndex + [x0, y0];         
+        if spotFound                   
             s(i).diameter = 2*r;
-            s(i).chisqr = nChiSqr;
-
-            
-            
+            s(i).chisqr = nChiSqr;            
             [xFit, yFit] = circle(x0,y0,r,round(pi*r)/2);
             Ilocal = roipoly(Ilocal, yFit, xFit);    
         end
         s(i).bsSize    = size(Ilocal);
-        s(i).bsTrue    = uint16(find(Ilocal));
+        s(i).bsTrue    = find(Ilocal);
 end
+
 
 
 

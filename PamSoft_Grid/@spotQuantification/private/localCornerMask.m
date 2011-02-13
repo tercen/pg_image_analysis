@@ -16,7 +16,8 @@ function iMask = maskFromEdgeSegmentation(oS, bgOffset)
 spotPitch = get(oS, 'spotPitch');
 mSize = get(oS, 'bsSize');
 lcMask = false(mSize);
-lmp = localMidpoint(oS);
+%lmp = localMidpoint(oS);
+lmp = get(oS, 'finalMidpoint');
 % midpoint centered coordinates of mask
 [x, y] = find(~lcMask);
 cc  = [x, y] - repmat(lmp,numel(lcMask),1);
@@ -25,8 +26,7 @@ inSquare =  cc(:,1) >= -bgOffset*spotPitch & cc(:,1) <= bgOffset*spotPitch &  ..
     cc(:,2) >= -bgOffset*spotPitch & cc(:,2) <= bgOffset*spotPitch;
 %       
 inCircle = cc(:,1).^2 + cc(:,2).^2 <= (bgOffset*spotPitch)^2;
-
 lcMask(inSquare&~inCircle) = true;
-iMask = uint16(find(lcMask));
+iMask = find(lcMask);
 
 

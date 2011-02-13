@@ -181,6 +181,7 @@ catch anAnalysisFailure
            ,anAnalysisFailure.identifier,'.'...
            ,anAnalysisFailure.stack(1).name,'('...
            ,num2str(anAnalysisFailure.stack(1).line),')'];
+     rethrow(anAnalysisFailure)
      error(aMsg);
 end
 %stateQuantification = analyzeImages(pgr, imagePath);
@@ -202,7 +203,8 @@ if qntShowPamGridViewer ~=0
         uiwait(hViewer);
     end
 end
-
+    figure
+    show(stateQuantification, I)
 function assignval(varName, value)
 assignin('caller', varName, value);
 
