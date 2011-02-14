@@ -203,8 +203,6 @@ if qntShowPamGridViewer ~=0
         uiwait(hViewer);
     end
 end
-    figure
-    show(stateQuantification, I)
 function assignval(varName, value)
 assignin('caller', varName, value);
 

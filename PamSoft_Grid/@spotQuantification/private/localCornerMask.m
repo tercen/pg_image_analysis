@@ -12,21 +12,18 @@ switch segMethod
 end
 
 function iMask = maskFromEdgeSegmentation(oS, bgOffset)
-
 spotPitch = get(oS, 'spotPitch');
+fmp = get(oS, 'finalMidpoint');
 mSize = get(oS, 'bsSize');
-lcMask = false(mSize);
-%lmp = localMidpoint(oS);
-lmp = get(oS, 'finalMidpoint');
-% midpoint centered coordinates of mask
-[x, y] = find(~lcMask);
-cc  = [x, y] - repmat(lmp,numel(lcMask),1);
-% find coordinates that are in square of +/- 0.5 spotPitch
-inSquare =  cc(:,1) >= -bgOffset*spotPitch & cc(:,1) <= bgOffset*spotPitch &  ...             
-    cc(:,2) >= -bgOffset*spotPitch & cc(:,2) <= bgOffset*spotPitch;
-%       
-inCircle = cc(:,1).^2 + cc(:,2).^2 <= (bgOffset*spotPitch)^2;
-lcMask(inSquare&~inCircle) = true;
-iMask = find(lcMask);
+pxOff = bgOffset*spotPitch;
+sqCorners = [   fmp(1)-pxOff, fmp(2)-pxOff;
+                fmp(1)-pxOff, fmp(2)+pxOff;
+                fmp(1)+pxOff, fmp(2)+pxOff;
+                fmp(1)+pxOff, fmp(2)-pxOff ];
+aSquareMask = poly2mask(sqCorners(:,1), sqCorners(:,2), mSize(1), mSize(2));
+[crx, cry] = circle(fmp(1), fmp(2), pxOff,25);
+aCircleMask = poly2mask(crx, cry, mSize(1), mSize(2));
+iMask = find(aSquareMask & ~aCircleMask);
+
 
 

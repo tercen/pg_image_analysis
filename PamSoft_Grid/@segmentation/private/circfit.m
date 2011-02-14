@@ -14,15 +14,13 @@ function   [xc,yc,R,nChiSqr, a] = circfit(x,y, w)
 %   x^2+y^2+a(1)*x+a(2)*y+a(3)=0
 %
 %  By:  Izhak bucher 25/oct /1991, modified by Rdw dec 2005    
-
    x=x(:); y=y(:);
    if nargin == 2 
        w = ones(size(x));
    end
-   
    A = [x y ones(size(x))];
-   b = [-(x.^2+y.^2)];
-   [a, cn] = linsolve([w,w,w].*A,w.*b , struct('RECT',true));
+   b = -(x.^2+y.^2);
+   a = linsolve([w,w,w].*A,w.*b , struct('RECT',true));
    xc = -.5*a(1);
    yc = -.5*a(2);
    R  =  sqrt((a(1)^2+a(2)^2)/4-a(3));

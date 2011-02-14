@@ -59,7 +59,7 @@ for i=1:length(cx(:))
                 for t = 1:nObjects
                     a(t) = sum(Linitial(:) == t);
                 end
-                [mx, nLargest] = max(a);
+                [~, nLargest] = max(a);
                 Ilocal = Linitial == nLargest(1);
             end
             [x,y] = find(Ilocal);

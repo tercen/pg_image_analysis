@@ -35,7 +35,7 @@ while delta > maxDelta
         break;
     end
     pgr.oSegmentation = set(pgr.oSegmentation, 'spotPitch', spotPitch);
-    oS = segment(pgr.oSegmentation, I, x, y,rot);
+    oS = segment(pgr.oSegmentation, I, x, y,bFixedSpot,rot);
     if asRef
         flags = checkSegmentation(pgr.oRefQualityAssessment, oS);
     else

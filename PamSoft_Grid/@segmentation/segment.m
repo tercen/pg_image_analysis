@@ -1,4 +1,4 @@
-function sOut = segment(s, I, cx, cy, rotation)
+function sOut = segment(s, I, cx, cy, bFxd, rotation)
 % s = segment(s, I, cx, cy, rotation)
 if ~isequal(size(cx),size(cy))
     error('The number of x coordinates must be equal to the number of y coordinates');
@@ -11,9 +11,14 @@ if isempty(s.spotPitch)
     error('Parameter ''spotPitch'' has not been defined');
 end
 
-if nargin < 5
+if nargin < 6
     rotation = [];
 end
+if nargin < 5 || isempty(bFxd)
+    bFxd = false(size(cx));
+end
+    
+
 
 switch s.method
 
@@ -21,5 +26,11 @@ switch s.method
         error('segment by threshold is currently not supported')
         %sOut = segmentByThreshold(s, I, cx, cy, rotation);
     case 'Edge'
-        sOut = segmentByEdge(s, I, cx, cy, rotation);
+        sOut = repmat(s, length(cx(:)),1);
+        if any(~bFxd)
+            sOut(~bFxd) = segmentByEdge(s, I, cx(~bFxd), cy(~bFxd), rotation);
+        end
+        if any(bFxd)
+            sOut(bFxd)  = segmentByEdgeFxdMp(s, I, cx(bFxd), cy(bFxd), rotation); 
+        end
 end
