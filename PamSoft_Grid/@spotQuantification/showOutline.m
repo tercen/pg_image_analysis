@@ -14,7 +14,7 @@ if oQ.isEmpty
 elseif oQ.isBad
     set(hOutline, 'color', 'r');
 end
-bg = get(oQ, 'backgroundMask');
+bg = getBackgroundMask(oQ, size(I));
 L = bwlabel(double(bg));
 B = bwboundaries(L);
 nb = length(B);
@@ -24,6 +24,6 @@ for i=1:nb
 end
 mp = get(oQ.oSegmentation, 'finalMidpoint');
 sp  = get(oQ.oSegmentation, 'spotPitch');
-set(gca, 'xlim', mp(2)+[-sp,sp], 'ylim',mp(1)+[-sp,sp]);
+%set(gca, 'xlim', mp(2)+[-sp,sp], 'ylim',mp(1)+[-sp,sp]);
 
 

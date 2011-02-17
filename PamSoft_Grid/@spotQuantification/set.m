@@ -11,12 +11,7 @@ for i=1:2:length(pArgin)
     switch prop
         case 'ID'
             q.ID = val;       
-        case 'backgroundMethod'
-            if isequal(val, 'localCorner')
-               q.backgroundMethod = val;
-            else
-                bInvalid = 1;
-            end
+      
         case 'saturationLimit'
             if isnumeric(val)
                 q.saturationLimit = val;
@@ -50,13 +45,7 @@ for i=1:2:length(pArgin)
             else
                 bInvalid = true;
             end
-    
-        case 'backgroundDiameter'
-            if isnumeric(val) && length(val) == 1
-                q.backgroundDiameter = val;
-            else
-                bInvalid = 1;
-            end
+  
         case 'cx'
             if isnumeric(val) && length(val) == 1
                 q.cx = val;

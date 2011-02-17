@@ -129,9 +129,7 @@ else
                         'measure', qntOutlierMeasure);
 end
 
-strQntBackgroundMethod = 'localCorner';
-oQ0 = spotQuantification('backgroundMethod', strQntBackgroundMethod, ...
-                          'saturationLimit',  qntSaturationLimit, ...
+oQ0 = spotQuantification('saturationLimit',  qntSaturationLimit, ...
                           'oOutlier', oOut);
 
 

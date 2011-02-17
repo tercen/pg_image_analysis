@@ -30,7 +30,7 @@ s.chisqr            = [];
 s.bsLuIndex         = [];
 s.bsSize            = [];
 s.bsTrue            = [];
-
+s.bbTrue            = [];
 
 s = class(s, 'segmentation');
 if length(varargin) > 1

@@ -1,8 +1,7 @@
 function showBinary(oQ)
 spot = getBinSpot(oQ.oSegmentation);
 ignored = get(oQ, 'ignoredMask');
-bg      = get(oQ, 'backgroundMask');
-
+bg = get(oQ.oSegmentation, 'bbTrue');
 binview = double(spot);
 binview(bg) = 0.5;
 binview(ignored) = 0.25;

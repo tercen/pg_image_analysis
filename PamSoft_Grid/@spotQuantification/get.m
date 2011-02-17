@@ -8,17 +8,14 @@ if nargin == 1
     end
 else
     for i=1:length(clNames)
-        if isequal(strField, 'backgroundMask')
-            value = getBackgroundMask(p);
-            return
-        elseif isequal(strField, 'ignoredMask')
+        if isequal(strField, 'ignoredMask')
             value = getIgnoredMask(p);  
             return
-        elseif isequal(strField, clNames{i}) & ~isequal(clNames{i}, 'private')
+        elseif isequal(strField, clNames{i}) && ~isequal(clNames{i}, 'private')
             %[n, m] = size(p);
             [value{1:length(p(:))}]  = deal(p(:).(clNames{i}));
             value = reshape(value, size(p));
-            if isnumeric(p(1).(clNames{i})) |  islogical(p(1).(clNames{i}))
+            if isnumeric(p(1).(clNames{i})) ||  islogical(p(1).(clNames{i}))
                 value = cell2mat(value);
             end    
             return

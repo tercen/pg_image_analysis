@@ -30,6 +30,8 @@ pixAreaSize = oS.areaSize * spotPitch;
 pixOff = round(max(spotPitch -0.5*pixAreaSize,0));
 spotPitch = round(spotPitch);
 % preallocate the array of segmentation objects
+bgOffset = 0.45;
+oS = setBackgroundMask(oS, size(I), bgOffset);
 s = repmat(oS, length(cx(:)), 1);
 for i=1:length(cx(:))
         s(i) = oS;
@@ -75,8 +77,8 @@ for i=1:length(cx(:))
             % fit a circle to the foreground pixels
             [x0, y0, r, nChiSqr] = robCircFit(x,y);
             % calculate the difference between area midpoint and fitted midpoint 
-            s(i).finalMidpoint = [x0, y0];
-            mpOffset = s(i).finalMidpoint - s(i).initialMidpoint;
+            %s(i).finalMidpoint = [x0, y0];
+            mpOffset = [x0,y0] - s(i).initialMidpoint;
             delta = norm(mpOffset);        
             % shift area according to mpOffset for next iteration,
             % the loop terminates if delta converges to some low value.
@@ -94,6 +96,8 @@ for i=1:length(cx(:))
         end
         s(i).bsSize    = size(Ilocal);
         s(i).bsTrue    = find(Ilocal);
+        s(i) = translateBackgroundMask(s(i),[x0,y0], size(I));
+        s(i).finalMidpoint = [x0, y0];
 end
 
 

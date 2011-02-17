@@ -8,17 +8,13 @@ function oq = quantify(oq, I)
 % oq: array of spotQuantification objects (corresponding to IN) contatining
 % the quantification
 for i=1:length(oq(:))
-        % this sets the mask for the background pixels
-        % (spotQuantification.setBackgroundMask method)
-        if isempty(oq(i).iBackground)
-            oq(i) = setBackgroundMask(oq(i));
-        end   
         if isempty(oq(i).oOutlier)
             bOut = false;
         else
             bOut = true;
         end
         idxSignal = get(oq(i).oSegmentation, 'bsTrue'); % foreground pixel index
+        idxBackground = get(oq(i).oSegmentation, 'bbTrue');
         if ~isempty(idxSignal);
             sigPix = I(idxSignal); % vector of pixels making up the spot
             if bOut
@@ -36,7 +32,9 @@ for i=1:length(oq(:))
             oq(i).minSignal = min(sigPix(~iOutSignal));
             oq(i).maxSignal = max(sigPix(~iOutSignal));
             % quantify background
-            bgPix = I(oq(i).iBackground);
+        
+            bgPix = I(idxBackground);
+          
             if bOut    
                 [iOutBackground, bgLimits] = detect(oq(i).oOutlier, double(bgPix));
             else
@@ -54,7 +52,7 @@ for i=1:length(oq(:))
             oq(i).iIgnored = [];
             if bOut
                 idxSigIgnored = idxSignal(iOutSignal);
-                idxBgIgnored =  oq(i).iBackground(iOutBackground);
+                idxBgIgnored =  idxBackground(iOutBackground);
                 oq(i).iIgnored = union(idxSigIgnored, idxBgIgnored);
                 oq(i).fractionIgnored = length(oq(i).iIgnored)/(length(sigPix ) + length(bgPix));
             end
