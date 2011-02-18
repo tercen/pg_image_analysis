@@ -27,10 +27,10 @@ s.initialMidpoint   = [];
 s.finalMidpoint     = [];
 s.diameter          = [];
 s.chisqr            = [];
-s.bsLuIndex         = [];
-s.bsSize            = [];
-s.bsTrue            = [];
-s.bbTrue            = [];
+s.bsLuIndex         = []; % left upper index of the segmentation area
+s.bsSize            = []; % size of the binary segmentation image (= equal to image size)
+s.bsTrue            = []; % linear index of pixels true in the foreground mask
+s.bbTrue            = []; % linear index of pixels true in the background mask
 
 s = class(s, 'segmentation');
 if length(varargin) > 1

@@ -24,6 +24,6 @@ for i=1:nb
 end
 mp = get(oQ.oSegmentation, 'finalMidpoint');
 sp  = get(oQ.oSegmentation, 'spotPitch');
-%set(gca, 'xlim', mp(2)+[-sp,sp], 'ylim',mp(1)+[-sp,sp]);
+set(gca, 'xlim', mp(2)+[-sp,sp], 'ylim',mp(1)+[-sp,sp]);
 
 

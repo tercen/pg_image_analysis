@@ -79,7 +79,7 @@ for i=1:length(cx(:))
             % calculate the difference between area midpoint and fitted midpoint 
             %s(i).finalMidpoint = [x0, y0];
             mpOffset = [x0,y0] - s(i).initialMidpoint;
-            delta = norm(mpOffset);        
+            delta = norm(mpOffset);   
             % shift area according to mpOffset for next iteration,
             % the loop terminates if delta converges to some low value.
             xLocal = round(xLocal + mpOffset(1));

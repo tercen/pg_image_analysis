@@ -7,11 +7,11 @@ if isempty(fmp)
 end
 fmp = s.finalMidpoint;
 pxOff = bgOffset*spotPitch;
-sqCorners = [   fmp(1)-pxOff, fmp(2)-pxOff;
-                fmp(1)-pxOff, fmp(2)+pxOff;
-                fmp(1)+pxOff, fmp(2)+pxOff;
-                fmp(1)+pxOff, fmp(2)-pxOff ];
+sqCorners = [   fmp(2)-pxOff, fmp(1)-pxOff;
+                fmp(2)-pxOff, fmp(1)+pxOff;
+                fmp(2)+pxOff, fmp(1)+pxOff;
+                fmp(2)+pxOff, fmp(1)-pxOff ];
 aSquareMask = poly2mask(sqCorners(:,1), sqCorners(:,2), imSize(1), imSize(2));
-[crx, cry] = circle(fmp(1), fmp(2), pxOff,25);
+[crx, cry] = circle(fmp(2), fmp(1), pxOff,25);
 aCircleMask = poly2mask(crx, cry, imSize(1), imSize(2));
 s.bbTrue = find(aSquareMask & ~aCircleMask);

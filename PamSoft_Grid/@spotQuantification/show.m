@@ -11,16 +11,16 @@ if ~isempty(oQ)
     oQ = oQ(:);
     hBound = [];
     for i=1:length(oQ)
-            [x,y] = getOutline(oQ(i).oSegmentation);
-            if oQ(i).isEmpty
-                cStr = 'k';
-            elseif oQ(i).isBad
-                cStr = 'r';
-            else
-                cStr = 'w';
-            end
-            [n,m] = ind2sub(szArray,i); 
-            hBound(n,m) = plot(y, x, cStr);
-    end   
+        [x,y] = getOutline(oQ(i).oSegmentation);
+        if oQ(i).isEmpty
+            cStr = 'k';
+        elseif oQ(i).isBad
+            cStr = 'r';
+        else
+            cStr = 'w';
+        end
+        [n,m] = ind2sub(szArray,i);
+        hBound(n,m) = plot(y, x, cStr);
+    end
     hold off
 end

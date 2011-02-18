@@ -1,4 +1,12 @@
 function oS = translateBackgroundMask(oS, newMidpoint, imSize)
-aTranslation = newMidpoint - oS.finalMidpoint;
+aTranslation = round(newMidpoint - oS.finalMidpoint);
 [bgi, bgj] = ind2sub(imSize, oS.bbTrue);
-oS.bbTrue = round(sub2ind(imSize, bgi + aTranslation(1), bgj + aTranslation(2)));
+bgi = bgi + aTranslation(1);
+bgj = bgj + aTranslation(2);
+try
+    oS.bbTrue = sub2ind(imSize, bgi, bgj);
+catch aMidPointOutOfRange
+    % do not translate, leave for the QC to pick-up
+    return
+end
+
