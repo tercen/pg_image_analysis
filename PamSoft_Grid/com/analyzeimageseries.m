@@ -179,7 +179,7 @@ catch anAnalysisFailure
            ,anAnalysisFailure.identifier,'.'...
            ,anAnalysisFailure.stack(1).name,'('...
            ,num2str(anAnalysisFailure.stack(1).line),')'];
-     rethrow(anAnalysisFailure)
+     %
      error(aMsg);
 end
 %stateQuantification = analyzeImages(pgr, imagePath);
