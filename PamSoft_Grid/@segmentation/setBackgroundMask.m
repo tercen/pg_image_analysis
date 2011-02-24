@@ -1,4 +1,4 @@
-function s = setBackgroundMask(s,imSize, bgOffset)
+function s = setBackgroundMask(s,imSize)
 spotPitch = s.spotPitch;
 fmp = s.finalMidpoint;
 if isempty(fmp)
@@ -6,7 +6,7 @@ if isempty(fmp)
     s.finalMidpoint = round(imSize/2);  
 end
 fmp = s.finalMidpoint;
-pxOff = bgOffset*spotPitch;
+pxOff = s.bgOffset*spotPitch;
 sqCorners = [   fmp(2)-pxOff, fmp(1)-pxOff;
                 fmp(2)-pxOff, fmp(1)+pxOff;
                 fmp(2)+pxOff, fmp(1)+pxOff;

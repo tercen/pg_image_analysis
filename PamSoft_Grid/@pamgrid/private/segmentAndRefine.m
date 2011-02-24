@@ -23,7 +23,11 @@ spotPitch = get(pgr.oArray, 'spotPitch');
 
 mp = midPoint(pgr.oArray, x,y);
 fxdx = get(pgr.oArray, 'xFixedPosition');
+fxdy = get(pgr.oArray, 'yFixedPosition');
 bFixedSpot = fxdx ~= 0;
+% For the fixed spots, replace the input x and y by xFixedPosition and yFixedPosition
+x(bFixedSpot) = fxdx(bFixedSpot);
+y(bFixedSpot) = fxdy(bFixedSpot);
 
 % start the refinement loop, terminate when the refinedSpotPitch is close
 % enough to the input spotPitch  (or when maxIter is reached);

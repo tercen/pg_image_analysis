@@ -30,8 +30,7 @@ pixAreaSize = oS.areaSize * spotPitch;
 pixOff = round(max(spotPitch -0.5*pixAreaSize,0));
 spotPitch = round(spotPitch);
 % preallocate the array of segmentation objects
-bgOffset = 0.45;
-oS = setBackgroundMask(oS, size(I), bgOffset);
+oS = setBackgroundMask(oS, size(I));
 s = repmat(oS, length(cx(:)), 1);
 for i=1:length(cx(:))
         s(i) = oS;
@@ -67,7 +66,7 @@ for i=1:length(cx(:))
             [x,y] = find(Ilocal);
             % store the current area left upper
             s(i).bsLuIndex = [xLocal(1), yLocal(1)];
-            if length(x) < 6
+            if length(x) < oS.minEdgePixels
                 % when the number of foreground pixels is too low, abort
                 spotFound = false;
                 break;
