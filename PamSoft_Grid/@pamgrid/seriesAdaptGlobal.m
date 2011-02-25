@@ -43,7 +43,7 @@ for i=1:length(uCycle)
      % segmentation. Note that the midpoint will be calculated based on the
      % refs only (standard behaviour of array.midPoint)
      s0s = s0;
-     s0s(bRef)= segment(os, Igrid, x(bRef), y(bRef), rot);
+     s0s(bRef)= segment(os, Igrid, x(bRef), y(bRef), [], rot);
      [x1, y1] = getPosition(s0s);
      mp1 = midPoint(pgr.oArray, x1, y1);
      %shift the non-ref principal segmentation based on mp shift found
