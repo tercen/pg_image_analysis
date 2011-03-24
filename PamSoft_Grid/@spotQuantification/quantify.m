@@ -58,6 +58,25 @@ for i=1:length(oq(:))
             end
             nPix = length(sigPix(~iOutSignal));
             oq(i).signalSaturation = length(find(sigPix(~iOutSignal) >= oq(i).saturationLimit))/nPix;     
+        else
+            % no spot found
+            oq(i).medianSignal      = NaN;
+            oq(i).meanSignal        = NaN;
+            oq(i).sumSignal         = NaN;
+            oq(i).stdSignal         = NaN; 
+            oq(i).rseSignal         = NaN;
+            oq(i).minSignal         = NaN;
+            oq(i).maxSignal         = NaN;
+            oq(i).medianBackground  = NaN;
+            oq(i).meanBackground    = NaN;
+            oq(i).sumBackground     = NaN;
+            oq(i).stdBackground     = NaN;
+            oq(i).minBackground     = NaN;
+            oq(i).maxBackground     = NaN;
+            oq(i).rseBackground     = NaN;
+            oq(i).iIgnored          = NaN;
+            oq(i).fractionIgnored   = NaN;
+            oq(i).signalSaturation  = NaN;
         end
 end
 

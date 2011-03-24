@@ -13,7 +13,7 @@ if nargin > 0
     iyPos = iposition(2:2:end);
     d = [xPos, yPos] - [ixPos, iyPos];
     d = sqrt(sum(d.^2,2))/sp;
-    diameter = [oS.diameter]';
+    diameter = [oS.diameter];    
 else
     oQ = get(spotQuantification);
     xPos = [];
@@ -49,7 +49,6 @@ qTable =    {   'Row'               , [oQ.arrayRow]';
                 'Replaced_Spot'      ,[oQ.isReplaced]'};
                     
 qNames = qTable(:,1);
-
 if nargin > 0
     for i=1:length(qNames)
         qTypes(:,i) = qTable{i,2};

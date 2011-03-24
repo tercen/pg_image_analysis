@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-project>
-  <configuration target="target.com.component" target-name="Generic COM Component" name="PamSoft_Grid" location="C:\PamSoft\DataAnalysis\PamSoft_Grid\com" file="C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid.prj" build-checksum="638576212">
+  <configuration target="target.com.component" target-name="Generic COM Component" name="PamSoft_Grid" location="C:\PamSoft\DataAnalysis\PamSoft_Grid\com" file="C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid.prj" build-checksum="1620614142">
     <param.project.name>C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid.prj</param.project.name>
     <param.target.type>Generic COM Component</param.target.type>
     <param.appname>PamSoft_Grid4</param.appname>
@@ -17,7 +17,7 @@
       <warning.libname>on</warning.libname>
       <warning.demo>on</warning.demo>
     </param.warnings>
-    <param.version>1.7</param.version>
+    <param.version>1.8</param.version>
     <param.c.cpp.options.file />
     <param.include.dirs />
     <param.lib.dirs />
@@ -77,7 +77,7 @@
     </fileset.package>
     <build-deliverables>
       <file name="readme.txt" location="${PROJECT_ROOT}\PamSoft_Grid\distrib">C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid\distrib\readme.txt</file>
-      <file name="PamSoft_Grid4_1_7.dll" location="${PROJECT_ROOT}\PamSoft_Grid\distrib">C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid\distrib\PamSoft_Grid4_1_7.dll</file>
+      <file name="PamSoft_Grid4_1_8.dll" location="${PROJECT_ROOT}\PamSoft_Grid\distrib">C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid\distrib\PamSoft_Grid4_1_8.dll</file>
     </build-deliverables>
     <matlab>
       <root>C:\Program Files\MATLAB\R2010b</root>
