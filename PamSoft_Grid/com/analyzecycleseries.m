@@ -32,6 +32,7 @@ global qntOutlierMeasure
 global qntShowPamGridViewer
 global stateQuantification
 %warning('Call to analyzecycleseries is obsolete, use analyzeimageseries instead');
+
 qTypes = analyzeimageseries(imagePath);
 
 

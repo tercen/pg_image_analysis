@@ -69,10 +69,11 @@ for i=1:length(cx(:))
             if length(x) < oS.minEdgePixels
                 % when the number of foreground pixels is too low, abort
                 spotFound = false;
+                x0 = cx(i);
+                y0 = cy(i);
                 break;
-            else
-                spotFound = true;
-            end     
+            end
+            spotFound = true;
             % fit a circle to the foreground pixels
             [x0, y0, r, nChiSqr] = robCircFit(x,y);
             % calculate the difference between area midpoint and fitted midpoint 

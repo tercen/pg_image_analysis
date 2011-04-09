@@ -20,7 +20,9 @@ function   [xc,yc,R,nChiSqr, a] = circfit(x,y, w)
    end
    A = [x y ones(size(x))];
    b = -(x.^2+y.^2);
+   warning('off', 'MATLAB:rankDeficientMatrix');
    a = linsolve([w,w,w].*A,w.*b,struct('RECT',true));
+   warning('on', 'MATLAB:rankDeficientMatrix');
    xc = -.5*a(1);
    yc = -.5*a(2);
    R  =  sqrt((a(1)^2+a(2)^2)/4-a(3));
