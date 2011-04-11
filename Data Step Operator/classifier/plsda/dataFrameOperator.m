@@ -1,6 +1,6 @@
 function [aNumeric, aHeader] = dataFrameOperator(folder)
 %PLS-DA Class Prediction 
-%Version: 2.1 (MCR R2010A)
+%Version: 2.5 (MCR R2010B)
 %Creator: Rik de Wijn
 %Last Modification Date: January 20, 2011
 %Support Status: Supported
@@ -13,7 +13,7 @@ function [aNumeric, aHeader] = dataFrameOperator(folder)
 %method. The classifier implements a bagging method for 2-group
 %classification with unequal group sizes. Here, multiple predictors with
 %equal group sizes are bagged by drawing a random sample from the larger
-%group. This is controlled by teh BalanceBags parameter.
+%group. This is controlled by the BalanceBags parameter.
 %The operator trains a PLS classifier based on the data in the calling
 %Bionavigator spreadsheet and known grouping. Training involves determining
 %the optimal number of PLS components by (inner) cross validation. The
