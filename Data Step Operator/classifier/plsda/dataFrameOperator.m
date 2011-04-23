@@ -152,6 +152,8 @@ switch Optimization
     otherwise
         error('Invalid value for property ''Optimization''');
 end
+
+aPls.optmetric = 'chisqr';
 %% Train the all sample pls model, if requested open Save dialog
 aTrainedPls = aPls.train(X, y);
 finalModelFile = [];
@@ -204,7 +206,6 @@ aNumeric(:,2) = double(data.colSeq);
 lIdx = sub2ind(size(X'), data.rowSeq, data.colSeq); % linear index for converting matrix to flat output
 for i=1:length(aTrainedPls.uGroup)
     aHeader{2+i}    = ['beta',char(aTrainedPls.uGroup(i))];
-    keyboard
     beta = median(aTrainedPls.beta(2:end,i,:),3); % The median beta is returned when balanceBags are applied 
     beta = repmat(beta, 1, size(X,1))/std(beta);
     beta = beta(lIdx);
