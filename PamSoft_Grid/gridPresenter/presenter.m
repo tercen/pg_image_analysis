@@ -68,6 +68,7 @@ else
 end
 
 focus = [1,1];
+%
 xFocus = size(handles.I,3);
 If = handles.I(:,:,xFocus);
 handles.displayRange = double([0, max(If(:))]);

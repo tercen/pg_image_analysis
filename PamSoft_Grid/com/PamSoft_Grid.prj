@@ -1,56 +1,111 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<deployment-project>
-  <configuration target="target.com.component" target-name="Generic COM Component" name="PamSoft_Grid" location="C:\PamSoft\DataAnalysis\PamSoft_Grid\com" file="C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid.prj" build-checksum="1620614142">
-    <param.project.name>C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid.prj</param.project.name>
-    <param.target.type>Generic COM Component</param.target.type>
-    <param.appname>PamSoft_Grid4</param.appname>
-    <param.intermediate>C:\PamSoft\matlab compiler\PamSoft_Grid_src</param.intermediate>
-    <param.output>${PROJECT_ROOT}\PamSoft_Grid\distrib</param.output>
+<deployment-project plugin="plugin.ezdeploy" plugin-version="1.0">
+  <configuration file="C:\PamSoft\Matlab\PamSoft_Grid\com\PamSoft_Grid.prj" location="C:\PamSoft\Matlab\PamSoft_Grid\com" name="PamSoft_Grid" target="target.ezdeploy.library" target-name="Library Compiler">
+    <param.appname>PamSoft_Grid</param.appname>
+    <param.icon />
+    <param.icons />
+    <param.version>1.9</param.version>
+    <param.authnamewatermark />
+    <param.email />
+    <param.company />
+    <param.summary />
+    <param.description />
+    <param.screenshot />
+    <param.guid />
+    <param.net.saved.interface />
+    <param.installpath.string>PamSoft_Grid</param.installpath.string>
+    <param.installpath.combo>option.installpath.programfiles</param.installpath.combo>
+    <param.logo />
+    <param.install.notes />
+    <param.intermediate>${PROJECT_ROOT}\PamSoft_Grid\for_testing</param.intermediate>
+    <param.files.only>${PROJECT_ROOT}\PamSoft_Grid\for_redistribution_files_only</param.files.only>
+    <param.output>${PROJECT_ROOT}\PamSoft_Grid\for_redistribution</param.output>
+    <param.enable.clean.build>false</param.enable.clean.build>
+    <param.user.defined.mcr.options />
     <param.embed.ctf>true</param.embed.ctf>
-    <param.tbx_on_path>
-      <item>all</item>
-    </param.tbx_on_path>
-    <param.warnings>
-      <warning.fullpath>on</warning.fullpath>
-      <warning.duplicate>on</warning.duplicate>
-      <warning.option.ignored>on</warning.option.ignored>
-      <warning.libname>on</warning.libname>
-      <warning.demo>on</warning.demo>
-    </param.warnings>
-    <param.version>1.8</param.version>
-    <param.c.cpp.options.file />
-    <param.include.dirs />
-    <param.lib.dirs />
-    <param.lib.files />
-    <param.defines />
-    <param.undefines />
-    <param.debug>false</param.debug>
-    <param.share.mcr>false</param.share.mcr>
-    <param.disable.jvm>false</param.disable.jvm>
-    <param.disable.display>false</param.disable.display>
+    <param.target.type>subtarget.com.component</param.target.type>
+    <param.support.packages />
+    <param.required.mcr.products />
+    <param.namespace>PamSoft_Grid</param.namespace>
+    <param.classorg />
+    <param.web.mcr>true</param.web.mcr>
+    <param.package.mcr>false</param.package.mcr>
+    <param.no.mcr>false</param.no.mcr>
+    <param.web.mcr.name>MyAppInstaller_web</param.web.mcr.name>
+    <param.package.mcr.name>MyAppInstaller_mcr</param.package.mcr.name>
+    <param.no.mcr.name>MyAppInstaller_app</param.no.mcr.name>
+    <param.windows.command.prompt>true</param.windows.command.prompt>
     <param.create.log>false</param.create.log>
     <param.log.file />
-    <param.user.defined.mcr.options />
+    <param.user.only.registration>false</param.user.only.registration>
+    <param.net.framework>option.net.framework.default</param.net.framework>
+    <param.assembly.type>false</param.assembly.type>
+    <param.encryption.key.file />
+    <param.net.enable.remoting>false</param.net.enable.remoting>
+    <param.net.tsa.enable>false</param.net.tsa.enable>
+    <param.net.tsa.assembly />
+    <param.net.tsa.interface />
+    <param.net.tsa.namespace>PamSoft_Grid</param.net.tsa.namespace>
+    <param.net.tsa.superclass>analyze</param.net.tsa.superclass>
+    <param.net.tsa.metadata />
+    <param.net.tsa.metadata.assembly>C:\Users\rdwijn.PAMGENE\Documents\MATLAB</param.net.tsa.metadata.assembly>
     <unset>
-      <param.project.name />
-      <param.target.type />
+      <param.icon />
+      <param.icons />
+      <param.authnamewatermark />
+      <param.email />
+      <param.company />
+      <param.summary />
+      <param.description />
+      <param.screenshot />
+      <param.guid />
+      <param.net.saved.interface />
+      <param.installpath.combo />
+      <param.logo />
+      <param.intermediate />
+      <param.files.only />
+      <param.output />
+      <param.enable.clean.build />
+      <param.user.defined.mcr.options />
       <param.embed.ctf />
-      <param.tbx_on_path />
-      <param.warnings />
-      <param.c.cpp.options.file />
-      <param.include.dirs />
-      <param.lib.dirs />
-      <param.lib.files />
-      <param.defines />
-      <param.undefines />
-      <param.debug />
-      <param.share.mcr />
-      <param.disable.jvm />
-      <param.disable.display />
+      <param.support.packages />
+      <param.required.mcr.products />
+      <param.namespace />
+      <param.classorg />
+      <param.web.mcr />
+      <param.package.mcr />
+      <param.no.mcr />
+      <param.web.mcr.name />
+      <param.package.mcr.name />
+      <param.no.mcr.name />
+      <param.windows.command.prompt />
       <param.create.log />
       <param.log.file />
-      <param.user.defined.mcr.options />
+      <param.user.only.registration />
+      <param.net.framework />
+      <param.assembly.type />
+      <param.encryption.key.file />
+      <param.net.enable.remoting />
+      <param.net.tsa.enable />
+      <param.net.tsa.assembly />
+      <param.net.tsa.interface />
+      <param.net.tsa.namespace />
+      <param.net.tsa.superclass />
+      <param.net.tsa.metadata />
+      <param.net.tsa.metadata.assembly />
     </unset>
+    <fileset.exports>
+      <file>${PROJECT_ROOT}\analyzecycleseries.m</file>
+      <file>${PROJECT_ROOT}\analyzeimageseries.m</file>
+      <file>${PROJECT_ROOT}\getpropdefault.m</file>
+      <file>${PROJECT_ROOT}\getpropenumeration.m</file>
+      <file>${PROJECT_ROOT}\getpropstring.m</file>
+      <file>${PROJECT_ROOT}\getquantitationtypenames.m</file>
+      <file>${PROJECT_ROOT}\grdFromFile.m</file>
+      <file>${PROJECT_ROOT}\qClear.m</file>
+      <file>${PROJECT_ROOT}\qLoad.m</file>
+      <file>${PROJECT_ROOT}\qSave.m</file>
+      <file>${PROJECT_ROOT}\qShow.m</file>
+    </fileset.exports>
     <fileset.classes>
       <entity.package name="">
         <entity.class name="analyze">
@@ -73,98 +128,28 @@
       <file>C:\PamSoft\DataAnalysis\PamSoft_Grid\gridPresenter\presenter.m</file>
     </fileset.resources>
     <fileset.package>
-      <file special-file="file.mcr" reference-mode="direct">${MATLAB_ROOT}\toolbox\compiler\deploy\win32\MCRInstaller.exe</file>
+      <file>${MATLAB_ROOT}\toolbox\compiler\deploy\win32\MCRInstaller.exe</file>
     </fileset.package>
     <build-deliverables>
-      <file name="readme.txt" location="${PROJECT_ROOT}\PamSoft_Grid\distrib">C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid\distrib\readme.txt</file>
-      <file name="PamSoft_Grid4_1_8.dll" location="${PROJECT_ROOT}\PamSoft_Grid\distrib">C:\PamSoft\DataAnalysis\PamSoft_Grid\com\PamSoft_Grid\distrib\PamSoft_Grid4_1_8.dll</file>
+      <file location="${PROJECT_ROOT}\PamSoft_Grid\for_testing" name="PamSoft_Grid_1_9.dll" optional="false">C:\PamSoft\Matlab\PamSoft_Grid\com\PamSoft_Grid\for_testing\PamSoft_Grid_1_9.dll</file>
+      <file location="${PROJECT_ROOT}\PamSoft_Grid\for_testing" name="readme.txt" optional="true">C:\PamSoft\Matlab\PamSoft_Grid\com\PamSoft_Grid\for_testing\readme.txt</file>
+      <file location="${PROJECT_ROOT}\PamSoft_Grid\for_testing" name="_install.bat" optional="true">C:\PamSoft\Matlab\PamSoft_Grid\com\PamSoft_Grid\for_testing\_install.bat</file>
     </build-deliverables>
+    <workflow />
     <matlab>
-      <root>C:\Program Files\MATLAB\R2010b</root>
-      <path>
-        <directory>C:\PamSoft\SystemDev\classes</directory>
-        <directory>C:\PamSoft\DataAnalysis\PamSoft_Grid\gridPresenter</directory>
-        <directory>C:\PamSoft\DataAnalysis\PamSoft_Grid\com</directory>
-        <directory>C:\PamSoft\DataAnalysis\PamSoft_Grid</directory>
-        <directory>C:\PamSoft\DataAnalysis\classes</directory>
-        <directory>C:\PamSoft\DataAnalysis\common</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\general</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\ops</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\lang</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\elmat</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\randfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\elfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\specfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\matfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\datafun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\polyfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\funfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\sparfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\scribe</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\graph2d</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\graph3d</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\specgraph</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\graphics</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\uitools</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\strfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\imagesci</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\iofun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\audiovideo</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\timefun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\datatypes</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\verctrl</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\codetools</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\helptools</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\winfun</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\winfun\net</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\demos</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\timeseries</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\hds</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\guide</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\plottools</directory>
-        <directory>${MATLAB_ROOT}\toolbox\local</directory>
-        <directory>${MATLAB_ROOT}\toolbox\matlab\datamanager</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\simulink</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\instrument</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\asynciolib</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\comparisons</directory>
-        <directory>${MATLAB_ROOT}\toolbox\compiler</directory>
-        <directory>${MATLAB_ROOT}\toolbox\compiler\compilerdemos</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\controllib\general</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\controllib\graphics</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\dastudio</directory>
-        <directory>${MATLAB_ROOT}\toolbox\dotnetbuilder\dotnetbuilder</directory>
-        <directory>${MATLAB_ROOT}\toolbox\dotnetbuilder\dotnetbuilderdemos</directory>
-        <directory>${MATLAB_ROOT}\toolbox\images\colorspaces</directory>
-        <directory>${MATLAB_ROOT}\toolbox\images\images</directory>
-        <directory>${MATLAB_ROOT}\toolbox\images\imdemos</directory>
-        <directory>${MATLAB_ROOT}\toolbox\images\imuitools</directory>
-        <directory>${MATLAB_ROOT}\toolbox\images\iptformats</directory>
-        <directory>${MATLAB_ROOT}\toolbox\images\iptutils</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\imageslib</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\spcuilib</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\siglib</directory>
-        <directory>${MATLAB_ROOT}\toolbox\optim\optim</directory>
-        <directory>${MATLAB_ROOT}\toolbox\optim\optimdemos</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\optimlib</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\eml\eml</directory>
-        <directory>${MATLAB_ROOT}\toolbox\stats\stats</directory>
-        <directory>${MATLAB_ROOT}\toolbox\stats\statsdemos</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\statslib</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\testmeaslib\general</directory>
-        <directory>${MATLAB_ROOT}\toolbox\shared\testmeaslib\graphics</directory>
-      </path>
+      <root>C:\Program Files\MATLAB\R2015a</root>
+      <toolboxes />
     </matlab>
     <platform>
       <unix>false</unix>
       <mac>false</mac>
       <windows>true</windows>
       <win2k>false</win2k>
-      <winxp>true</winxp>
+      <winxp>false</winxp>
       <vista>false</vista>
       <linux>false</linux>
       <solaris>false</solaris>
-      <osver>5.1</osver>
+      <osver>6.1</osver>
       <os32>true</os32>
       <os64>false</os64>
       <arch>win32</arch>
@@ -172,4 +157,3 @@
     </platform>
   </configuration>
 </deployment-project>
-

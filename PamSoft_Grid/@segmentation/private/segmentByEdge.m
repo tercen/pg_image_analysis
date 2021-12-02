@@ -40,6 +40,7 @@ for i=1:length(cx(:))
         yLocal = round(yLu(i) + [0, 2*spotPitch]); 
         % do while delta larger than sqrt(2) 
         deltaIter = 0;
+        aMidpoint = s(i).initialMidpoint;
         while delta > sqrt(2) && deltaIter < 3
             deltaIter = deltaIter + 1;            
             % make sure the local coordinates are within the image
@@ -48,38 +49,39 @@ for i=1:length(cx(:))
             yLocal(yLocal < 1) = 1;
             yLocal(yLocal > size(I,2)) = size(I,2);                       
             % get the local image around the spot
-            Ilocal = false(size(I));          
+            %Ilocal = false(size(I));          
+            localMask = false(size(I));
             xInitial = xLocal + [pixOff,-pixOff];
             yInitial = yLocal + [pixOff,-pixOff];
-            Ilocal(xInitial(1):xInitial(2), yInitial(1):yInitial(2)) = I(xInitial(1):xInitial(2),yInitial(1):yInitial(2));
-            Linitial = bwlabel(Ilocal);
-            nObjects = max(Linitial(:));
-            if nObjects > 1
-                % keep the largest
-                a = zeros(nObjects,1);
-                for t = 1:nObjects
-                    a(t) = sum(Linitial(:) == t);
-                end
-                [~, nLargest] = max(a);
-                Ilocal = Linitial == nLargest(1);
-            end
-            [x,y] = find(Ilocal);
-            % store the current area left upper
+            Ilocal = I(xInitial(1):xInitial(2),yInitial(1):yInitial(2));
+            anObjectList = bwconncomp(Ilocal);
+            nPix = cellfun(@length, anObjectList.PixelIdxList);
+            [mxPix,mxObject] = max(nPix);
             s(i).bsLuIndex = [xLocal(1), yLocal(1)];
-            if length(x) < oS.minEdgePixels
+            if mxPix >= oS.minEdgePixels
+                spotFound = true;
+            else
                 % when the number of foreground pixels is too low, abort
                 spotFound = false;
                 x0 = cx(i);
                 y0 = cy(i);
                 break;
             end
-            spotFound = true;
+            % draw and paste the object back into original sized image
+            Ilocal = false(size(Ilocal));
+            Ilocal(anObjectList.PixelIdxList{mxObject}) = true;
+            J = false(size(I));
+            J(xInitial(1):xInitial(2),yInitial(1):yInitial(2)) = Ilocal;
+            [x,y] = find(J);
+            
             % fit a circle to the foreground pixels
+            %[x,y] = ind2sub(size(I), anObjectList.PixelIdxList{mxObject});
             [x0, y0, r, nChiSqr] = robCircFit(x,y);
             % calculate the difference between area midpoint and fitted midpoint 
             %s(i).finalMidpoint = [x0, y0];
-            mpOffset = [x0,y0] - s(i).initialMidpoint;
-            delta = norm(mpOffset);   
+            mpOffset = [x0,y0] - aMidpoint;
+            delta = norm(mpOffset);
+            aMidpoint = [x0,y0];
             % shift area according to mpOffset for next iteration,
             % the loop terminates if delta converges to some low value.
             xLocal = round(xLocal + mpOffset(1));
@@ -87,15 +89,15 @@ for i=1:length(cx(:))
             yLocal = round(yLocal + mpOffset(2));    
             yLocal(1) = max(yLocal(1),1); yLocal(2) = max(yLocal(2), yLocal(1) + 1);
         end
-        Ilocal = false(size(Ilocal));
+        J = false(size(I));
         if spotFound                   
             s(i).diameter = 2*r;
             s(i).chisqr = nChiSqr;            
             [xFit, yFit] = circle(x0,y0,r,round(pi*r)/2);
-            Ilocal = roipoly(Ilocal, yFit, xFit);    
+            J = roipoly(J, yFit, xFit);    
         end
-        s(i).bsSize    = size(Ilocal);
-        s(i).bsTrue    = find(Ilocal);
+        s(i).bsSize    = size(J);
+        s(i).bsTrue    = find(J);
         s(i) = translateBackgroundMask(s(i),[x0,y0], size(I));
         s(i).finalMidpoint = [x0, y0];
 end

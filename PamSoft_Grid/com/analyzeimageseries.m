@@ -188,12 +188,17 @@ for i=1:size(stateQuantification,2)
 end
 %permute qTypes from: Spot-QuantitationType-Array 
 % % to : Array-Spot-QuantitationType
+
 qTypes = permute(qTypes, [3,1,2]);
 if qntShowPamGridViewer ~=0 
     if length(unique(cycles))> 1
         x = cycles;
     else
         x = exp;
+    end
+    if isempty(x)
+        % handle the case of no tags
+        x = 1:size(I,3);
     end
     hViewer = showInteractive(stateQuantification, I, x);
     set(hViewer, 'Name', 'PamGridViewer');
